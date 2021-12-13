@@ -2,8 +2,7 @@ import yaml
 import numpy as np
 from scipy.spatial.transform import Rotation, Slerp
 from scipy.interpolate import PchipInterpolator, interp1d
-from scipy.optimize import lsq_linear
-from scipy.special import comb
+from .utils import get_landmarks
 
 
 class YamlInfo:
@@ -18,7 +17,7 @@ class YamlInfo:
         self.n_landmarks = n_landmarks
         self.xy_landmarks = np.empty((len(self.labels_nominal), n_landmarks, 2))
         for i, xy in enumerate(self.xy_fromfile):
-            self.xy_landmarks[i], _ = get_landmarks(xy, self.labels_nominal[i], n_landmarks=n_landmarks)
+            self.xy_landmarks[i], _ = get_landmarks(xy, self.labels_nominal[i], n_landmarks=n_landmarks, add_gap=0.002)
 
         # scaling of the nominal shape (same in x and y direction)
         self.chord_values = np.array(airfoils_dict['chord']['values'])
@@ -166,95 +165,3 @@ class YamlInfo:
         self.xy_transformed = self.get_physical_xy(self.xy_nominal, self.eta_nominal)
 
 
-def get_landmarks(xy, name, n_landmarks=401, cst_order=8):
-
-    if name in ['circular', 'Cylinder', 'Cylinder1', 'Cylinder2']:
-        n1, n2 = 0.5, 0.5
-    else:
-        n1, n2 = 0.5, 1.0
-
-    # Normalize coordinates (x from 0 to 1) to rid of the rounding error
-    x_min, x_max = np.min(xy[:, 0]), np.max(xy[:, 0])
-    xy[:, 0] = (xy[:, 0] - x_min) / (x_max - x_min)
-    xy[:, 1] = xy[:, 1] / (x_max - x_min)
-    if not np.allclose(x_min, 0) or not np.allclose(x_max, 1):
-        print('WARNING!: Airfoil shape is not normalized properly', x_min, x_max, (x_max - x_min))
-
-    le_ind = np.argmin(xy[:, 0])  # Leading edge index
-    y1_avg = np.average(xy[:le_ind, 1])  # Determine orientation of the airfoil shape
-    if y1_avg > 0:
-        xy = xy[::-1]  # Flip such that the pressure side is always first
-
-    # make tailedge gap
-    # te_lower_add = np.maximum(np.abs(xy[0, 1]), 0.002) - np.abs(xy[0, 1])
-    # te_upper_add = np.maximum(xy[-1, 1], 0.002) - xy[-1, 1]
-    # split into upper and lower parts
-    xy_upper, xy_lower = xy[le_ind:], xy[:le_ind]
-    # xy_upper[:, 1] += xy_upper[:, 0] * te_upper_add
-    # xy_lower[:, 1] -= xy_lower[:, 0] * te_lower_add
-
-    # calculate cst coefficients
-    cst_upper = calc_cst_param(xy_upper[:, 0], xy_upper[:, 1], n1, n2, cst_order)
-    cst_lower = calc_cst_param(xy_lower[:, 0], xy_lower[:, 1], n1, n2, cst_order)
-    cst = np.r_[cst_lower, cst_upper]
-
-    n_half = int(n_landmarks / 2)
-    x_c = -np.cos(np.linspace(0, np.pi, n_half + 1)) * 0.5 + 0.5
-    xy_landmarks = from_cst_parameters(x_c, cst_lower, cst_upper, n1, n2)
-
-    return xy_landmarks, cst
-
-
-def from_cst_parameters(xinp, cst_lower, cst_upper, n1, n2):
-    """ Compute landmark coordinates for the airfoil
-
-    :param xinp: (np.ndarray): Non-dimensional x-coordinate locations
-    :param cst_lower: (np.ndarray): cst parameters for lower part
-    :param cst_upper: (np.ndarray): cst parameters for upper part
-    :param n1: (double): normal coord
-    :param n2: (double): normal coord
-    :param te_lower: (double): Trailing edge thickness above camber line
-    :param te_upper: (double): Trailing edge thickness below camber line
-    :return: Numpy arrays for landmark coordinates
-    """
-    x = np.asarray(xinp)
-    order = np.size(cst_lower) - 2
-    amat = cst_matrix(xinp, n1, n2, order)
-    amat = np.hstack((amat, x.reshape(-1, 1)))
-
-    y_lower = np.dot(amat, cst_lower)
-    y_upper = np.dot(amat, cst_upper)
-
-    x = np.hstack((x[::-1], x[1:])).reshape(-1, 1)
-    y = np.hstack((y_lower[::-1], y_upper[1:])).reshape(-1, 1)
-
-    return np.hstack((x, y))
-
-
-def calc_cst_param(x, y, n1, n2, order=8):
-    """
-    Solve the least squares problem for a given shape
-    :param x: (np.ndarray): (x/c) coordinates locations
-    :param y: (np.ndarray): (y/c) coordinate locations
-    :param n1: normal coord
-    :param n2: normal coord
-    :param order:
-    :return: ``(BP+1)`` CST parameters
-    """
-    amat = cst_matrix(x, n1, n2, order)
-    amat = np.hstack((amat, x.reshape(-1, 1)))
-    bvec = y
-    out = lsq_linear(amat, bvec)
-    return out.x
-
-
-def cst_matrix(x, n1, n2, order):
-    x = np.asarray(x)
-    class_function = np.power(x, n1) * np.power((1.0 - x), n2)
-
-    K = comb(order, range(order + 1))
-    shape_function = np.empty((order + 1, x.shape[0]))
-    for i in range(order + 1):
-        shape_function[i, :] = K[i] * np.power(x, i) * np.power((1.0 - x), (order - i))
-
-    return (class_function * shape_function).T

@@ -112,3 +112,12 @@ def transform_blade_for_BEM(eta_span, shapes, twist, scalex, scaley, pitch):
     for i, (eta, xy) in enumerate(zip(eta_span, shapes)):
         shapes_transformed[i] = transform_for_BEM(eta, xy, twist, scalex, scaley, pitch)
     return shapes_transformed
+
+
+def global_blade_coordinates(xyz_local):
+
+    n_shapes, n_landmarks, _ = xyz_local.shape
+    xyz_global = np.empty((n_shapes, n_landmarks, 3))
+    for i, xyz in enumerate(xyz_local):
+        xyz_global[i] = np.c_[xyz[:, 1], -xyz[:, 0], xyz[:, 2]]
+    return xyz_global

@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.interpolate import PchipInterpolator
-from Grassmann import exp, log, distance
+from .Grassmann import exp, log, distance
 
 
 class GrassmannInterpolator:

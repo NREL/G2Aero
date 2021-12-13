@@ -3,15 +3,6 @@ import os
 import numpy as np
 
 
-def global_blade_coordinates(xyz_local):
-
-    n_shapes, n_landmarks, _ = xyz_local.shape
-    xyz_global = np.empty((n_shapes, n_landmarks, 3))
-    for i, xyz in enumerate(xyz_local):
-        xyz_global[i] = np.c_[xyz[:, 1], -xyz[:, 0], xyz[:, 2]]
-    return xyz_global
-
-
 def blade_CAD_geometry(shapes, outfilename, msh=False):
 
     gmsh.initialize()
