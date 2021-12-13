@@ -4,44 +4,54 @@ import numpy as np
 
 def procrustes(X, Y):
     """
-    Procrustes problem
-    :param X:
-    :param Y:
-    :return:
+    Procrustes clustering match the shapes via Procrustes analysis (Gower 1975). This calculate rotations that  can  be
+    applied to shapes for matching—which do not fundamentally modify the elements in the Grassmannian.
+    :param X: (n, 2) array defining shape 1
+    :param Y: (n, 2) array defining shape 2
+    :return: 2x2 Rotation matrix
     """
+    X = np.asarray(X)
     U, s, Vh = np.linalg.svd(X.T @ Y)
     R = U @ Vh
     return R
 
 
-def landmark_affine_transform(xy_array):
+def landmark_affine_transform(X_phys):
     """
-    Shift and scale all shapes using Landmark-Affine standardization (Bryner, 2D affine and projective spaces)
-    :param xy_array: array of (n, 2) arrays of physical coordinates of shapes
-    :return: xy_grassmann, M, b
+    Shift and scale all shapes using Landmark-Affine standardization (Bryner, 2D affine and projective spaces).
+    LA-standardization  normalizes  the  shape  such that  it  has  zero  mean  (translation  invariance)  and
+    sample covariance proportional to I2 over the n discrete boundary landmarks defining the shape.
+    X_phys = X_grassmann @ M + b.
+    :param X_phys: array of (n, 2) arrays of physical coordinates defining shapes
+    :return: X_grassmann, M, b, such that X_phys = X_grassmann M + 1 diag(b).
     """
-    n_shapes, n_landmarks, _ = xy_array.shape
-    xy_grassmann = np.empty_like(xy_array)
+    X_phys = np.asarray(X_phys)
+    if len(X_phys.shape) < 3:
+        X_phys = np.expand_dims(X_phys, axis=0)
+
+    n_shapes, n_landmarks, _ = X_phys.shape
+    X_grassmann = np.empty_like(X_phys)
     Minv = np.empty((n_shapes, 2, 2))
     b = np.empty((n_shapes, 2))
 
-    for i, xy in enumerate(xy_array):
+    for i, xy in enumerate(X_phys):
         center_mass = np.mean(xy, axis=0)
-        U, D, _ = np.linalg.svd(1 / np.sqrt(n_landmarks - 1) * (xy - center_mass).T)
-        Minv[i] = np.diag(1. / D) @ U.T
+        U, D, _ = np.linalg.svd((xy - center_mass).T)
+        Minv_T = np.diag(1. / D) @ U.T
+        Minv[i] = Minv_T.T
         b[i] = center_mass
-        xy_transformed = (xy - center_mass) @ Minv[i].T
-        xy_grassmann[i] = 1 / np.sqrt(n_landmarks - 1) * xy_transformed
+        X_grassmann[i] = (xy - center_mass) @ Minv[i]
 
     # Procrustes problem
-    for i in reversed(range(1, n_shapes)):
-        M_pr = xy_grassmann[i - 1].T @ xy_grassmann[i]
-        U, s, Vh = np.linalg.svd(M_pr)
-        R = U @ Vh
-        Minv[i - 1] = R.T @ Minv[i - 1]
-        xy_grassmann[i - 1] = xy_grassmann[i - 1] @ R
+    if n_shapes > 1:
+        for i in reversed(range(1, n_shapes)):
+            R = procrustes(X_grassmann[i - 1], X_grassmann[i])
+            Minv[i - 1] = Minv[i - 1] @ R
+            X_grassmann[i - 1] = X_grassmann[i - 1] @ R
 
-    return xy_grassmann, np.sqrt(n_landmarks - 1) * np.linalg.inv(Minv), b
+    if n_shapes == 1:
+        return X_grassmann.squeeze(axis=0), np.linalg.inv(Minv).squeeze(axis=0), b.squeeze(axis=0)
+    return X_grassmann, np.linalg.inv(Minv), b
 
 
 def exp(t, X, log_map):
@@ -189,7 +199,6 @@ def perturb_gr_shape(Vh, mu, perturbation):
     :param Vh: principal basis transposed (shape (n_landmarks*2)x(n_landmarks*2))
     :param mu: mean element
     :param perturbation: amount of perturbations in pga coordinates
-    :param scale: scale perturbations
     :return: perturbed element on Grassmann
     """
     direction = perturbation@Vh

@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.interpolate import PchipInterpolator
-from .Grassmann import exp, log, distance
+from .Grassmann import exp, log, distance, landmark_affine_transform
 
 
 class GrassmannInterpolator:
@@ -16,7 +16,7 @@ class GrassmannInterpolator:
         self.n_shapes, self.n_landmarks, _ = self.xy_nominal.shape
 
         # LA transformation
-        self.xy_grassmann, self.M, self.b = self.landmark_affine_transform(self.xy_nominal)
+        self.xy_grassmann, self.M, self.b = landmark_affine_transform(self.xy_nominal)
         self.dist_grassmann = self.calc_grassmann_distance(self.xy_grassmann)
 
         self.t_nominal = np.cumsum(self.dist_grassmann)
@@ -77,36 +77,6 @@ class GrassmannInterpolator:
             t[ind_01] = self.interpolator_cdf_01(eta_scaled[ind_01])
             t[eta_scaled >= 1] = 1.0
             return t
-
-    @staticmethod
-    def landmark_affine_transform(xy_array):
-        """
-        Shift and scale all shapes using Landmark-Affine standardization (Bryner, 2D affine and projective spaces)
-        :param xy_array: array of (n, 2) arrays of physical coordinates of shapes
-        :return: xy_grassmann, M, b
-        """
-        n_shapes, n_landmarks, _ = xy_array.shape
-        xy_grassmann = np.empty_like(xy_array)
-        Minv = np.empty((n_shapes, 2, 2))
-        b = np.empty((n_shapes, 2))
-
-        for i, xy in enumerate(xy_array):
-            center_mass = np.mean(xy, axis=0)
-            U, D, Vh = np.linalg.svd(1 / np.sqrt(n_landmarks - 1) * (xy - center_mass).T)
-            Minv[i] = np.diag(1. / D) @ U.T
-            b[i] = center_mass
-            xy_transformed = (xy - center_mass) @ Minv[i].T
-            xy_grassmann[i] = 1 / np.sqrt(n_landmarks - 1) * xy_transformed
-
-        # Procrustes problem
-        for i in reversed(range(1, n_shapes)):
-            M_pr = xy_grassmann[i-1].T@xy_grassmann[i]
-            U, s, Vh = np.linalg.svd(M_pr)
-            R = U @ Vh
-            Minv[i-1] = R.T @ Minv[i-1]
-            xy_grassmann[i-1] = xy_grassmann[i-1] @ R
-
-        return xy_grassmann, np.sqrt(n_landmarks - 1)*np.linalg.inv(Minv), b
 
     @staticmethod
     def calc_grassmann_distance(xy_grassmann):
