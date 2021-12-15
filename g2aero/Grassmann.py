@@ -57,13 +57,13 @@ def landmark_affine_transform(X_phys):
 def exp(t, X, log_map):
     """
     Exponential mapping (Grassmannian geodesic)
-    :param t: parameter that controls the location on geodesic (scalar from [0, 1])
-    :param X: starting point of geodesic in Grassmannian
-    :param log_map: direction (tangent vector \Delta)
-    :return:
+    :param X: (n, 2) array defining starting point of geodesic on Grassmann
+    :param log_map: (n, 2) array defining direction in tangent space (tangent vector \Delta)
+    :return: (n, 2) array defining end point on Grassmann
     """
     U, S, Vh = np.linalg.svd(log_map, full_matrices=False)
-    exp_map = np.hstack((X @ Vh.T, U)) @ np.vstack((np.diag(np.cos(t * S)), np.diag(np.sin(t * S)))) @ Vh
+    exp_map = np.hstack((X @ Vh.T, U)) @ np.vstack((np.diag(np.cos(t *
+                                                                   S)), np.diag(np.sin(t * S)))) @ Vh
     return exp_map
 
 
@@ -71,9 +71,9 @@ def log(X, Y):
     """
     Calculate logarithmic map log_X(Y) (inverse mapping of exponential map).
     Calculates direction(tangent vector \Delta) from X to Y in tangent subspace.
-    :param X: starting point of geodesic on Gr
-    :param Y: end point of geodesic on Gr
-    :return: direction (tangent vector \Delta)
+    :param X: (n, 2) array defining start point of geodesic on Grassmann
+    :param Y: (n, 2) array defining end point of geodesic on Grassmann
+    :return: (n, 2) array defining direction in tangent space (tangent vector \Delta)
     """
     X, Y = np.asarray(X), np.asarray(Y)
     ortho_projection = np.eye(len(X)) - X @ X.T
@@ -207,17 +207,16 @@ def perturb_gr_shape(Vh, mu, perturbation):
     return perturbed_shape
 
 
-def parallel_translate(start, end_direction, vector, t=1):
+def parallel_translate(start, end_direction, vector):
     """ Parallel translation of a vector along geodesic from start point to end point
         Edelman et al. (Theorem 2.4, pp. 321)
-    :param start:
-    :param end_direction:
-    :param vector:
-    :param t:
-    :return:
+    :param start: (n, 2) array defining start point element on Grassmann
+    :param end_direction: (n, 2) array defining direction to the end point element on Grassmann (log map)
+    :param vector: (n, 2) array defining vector to be translated
+    :return: (n, 2) array defining translated vector
     """
     n_landmarks = end_direction.shape[0]
     U, S, Vh = np.linalg.svd(end_direction, full_matrices=False)
-    exp_map = np.hstack((start @ Vh.T, U)) @ np.vstack((-np.diag(np.sin(t * S)), np.diag(np.cos(t * S)))) @ U.T \
+    exp_map = np.hstack((start @ Vh.T, U)) @ np.vstack((-np.diag(np.sin(S)), np.diag(np.cos(S)))) @ U.T \
               + np.eye(n_landmarks) - U@U.T
     return exp_map @ vector
