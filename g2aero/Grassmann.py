@@ -6,9 +6,9 @@ def procrustes(X, Y):
     """
     Procrustes clustering match the shapes via Procrustes analysis (Gower 1975). This calculate rotations that  can  be
     applied to shapes for matching—which do not fundamentally modify the elements in the Grassmannian.
-    :param X: (n, 2) array defining shape 1
-    :param Y: (n, 2) array defining shape 2
-    :return: 2x2 Rotation matrix
+    :param X: (n_landmarks, 2) array defining shape 1
+    :param Y: (n_landmarks, 2) array defining shape 2
+    :return: (2, 2) array of rotation matrix
     """
     X = np.asarray(X)
     U, s, Vh = np.linalg.svd(X.T @ Y)
@@ -21,9 +21,8 @@ def landmark_affine_transform(X_phys):
     Shift and scale all shapes using Landmark-Affine standardization (Bryner, 2D affine and projective spaces).
     LA-standardization  normalizes  the  shape  such that  it  has  zero  mean  (translation  invariance)  and
     sample covariance proportional to I2 over the n discrete boundary landmarks defining the shape.
-    X_phys = X_grassmann @ M + b.
-    :param X_phys: array of (n, 2) arrays of physical coordinates defining shapes
-    :return: X_grassmann, M, b, such that X_phys = X_grassmann M + 1 diag(b).
+    :param X_phys:(n_shapes, n_landmarks, 2) array of physical coordinates defining shapes
+    :return: X_grassmann, M, b, such that X_phys = X_grassmann @ M + b.
     """
     X_phys = np.asarray(X_phys)
     if len(X_phys.shape) < 3:
@@ -57,9 +56,9 @@ def landmark_affine_transform(X_phys):
 def exp(t, X, log_map):
     """
     Exponential mapping (Grassmannian geodesic)
-    :param X: (n, 2) array defining starting point of geodesic on Grassmann
-    :param log_map: (n, 2) array defining direction in tangent space (tangent vector \Delta)
-    :return: (n, 2) array defining end point on Grassmann
+    :param X: (n_landmarks, 2) array defining starting point of geodesic on Grassmann
+    :param log_map: (n_landmarks, 2) array defining direction in tangent space (tangent vector \Delta)
+    :return: (n_landmarks, 2) array defining end point on Grassmann
     """
     U, S, Vh = np.linalg.svd(log_map, full_matrices=False)
     exp_map = np.hstack((X @ Vh.T, U)) @ np.vstack((np.diag(np.cos(t *
@@ -71,9 +70,9 @@ def log(X, Y):
     """
     Calculate logarithmic map log_X(Y) (inverse mapping of exponential map).
     Calculates direction(tangent vector \Delta) from X to Y in tangent subspace.
-    :param X: (n, 2) array defining start point of geodesic on Grassmann
-    :param Y: (n, 2) array defining end point of geodesic on Grassmann
-    :return: (n, 2) array defining direction in tangent space (tangent vector \Delta)
+    :param X: (n_landmarks, 2) array defining start point of geodesic on Grassmann
+    :param Y: (n_landmarks, 2) array defining end point of geodesic on Grassmann
+    :return: (n_landmarks, 2) array defining direction in tangent space (tangent vector \Delta)
     """
     X, Y = np.asarray(X), np.asarray(Y)
     ortho_projection = np.eye(len(X)) - X @ X.T
@@ -91,8 +90,8 @@ def distance(X, Y):
     theta2 between span(X) and snap(Y) are the singular values of X.T@Y.
     That is, X.T@Y = U D V.T,  where D = diag(cos(theta1), cos(theta2)).
     The distance between two shapes is then defined as dist = sqrt(theta1**2+theta2**2)
-    :param X: first shape
-    :param Y: second shape
+    :param X: (n_landmarks, 2) array defining first shape
+    :param Y: (n_landmarks, 2) array defining second shape
     :return: distance between two shapes on Grassmannian
     """
     X, Y = np.asarray(X), np.asarray(Y)
@@ -119,10 +118,11 @@ def distance(X, Y):
 
 def Karcher(shapes, max_steps=20):
     """
-    Calculated Karcher mean for given elements on Grassmann
-    :param shapes: Given elements
+    Calculated Karcher mean for given shapes (elements on Grassmann) by
+    minimizing the sum of squared (Riemannian) distances to all shapes in the data (Fletcher, Lu, and Joshi 2003)
+    :param shapes: (n_shapes, n_landmarks, 2) array defining given shapes (Grassmann elements)
     :param max_steps: maximum number of iterations to converge
-    :return: Karcher mean (element on Grassmann)
+    :return: (n_landmarks, 2) array defining Karcher mean (element on Grassmann)
     """
     shapes = np.asarray(shapes)
     log_directions = np.zeros_like(shapes)
@@ -141,14 +141,17 @@ def Karcher(shapes, max_steps=20):
     return mu_karcher
 
 
-def PGA(mu, shapes_gr, sub=None):
+def PGA(mu, shapes_gr, n_coord=None):
     """
-    Principal Geodesic Analysis
-    :param mu: Karcher mean
-    :param shapes_gr: elements on Grassmann
-    :param sub: return subset of directions (first sub directions)
-    :return: U is principal basis, t are given elements in principal coordinates,
-             S is corresponding singular values, PGA directions are basis vectors scaled by singular value
+    Principal Geodesic Analysis (PGA), a generalization of Principal Component Analysis (PCA) over Riemannian manifolds.
+    PGA is a data-driven approach that determines principal components as elements in a central tangent space,
+    given a data set represented as elements in asmooth manifold.
+    :param mu: (n_landmarks, 2) array defining Karcher mean (element on Grassmann)
+    :param shapes_gr: (n_shapes, n_landmarks, 2) given shapes (elements on Grassmann)
+    :param n_coord: dimension of resulting PGA space (if None n_coord=n_landmarks)
+    :return: Vh is principal basis transposed ((n_coord*2)x(n_coord*2)),
+             t are given elements in principal coordinates,
+             S is corresponding singular values,
     """
     shapes_gr, mu = np.asarray(shapes_gr), np.asarray(mu)
     n_shapes, n_landmarks, dim = shapes_gr.shape
@@ -162,14 +165,14 @@ def PGA(mu, shapes_gr, sub=None):
     U, S, Vh = np.linalg.svd(H, full_matrices=False)
     # projection of the data on principal axis (H@V = U@S@Vh@V = U@S))
     t = U*S  # shape(n_shapes, n_landmark*dim)
-    if sub:
-        return Vh[:sub, :], S[:sub], t[:, :sub]
-    return Vh, S, t
+    if n_coord is None or n_coord > n_landmarks:
+        n_coord = n_landmarks
+    return Vh[:n_coord, :], S[:n_coord], t[:, :n_coord]
 
 
 def PGA_modes(PGA_directions, mu, scale=1, sub=10):
     """
-    Moves given element on Grassmann in each of sub given directions.
+    Moves given element on Grassmann in each of given directions.
     :param PGA_directions: directions to perturb element mu
     :param mu: element on grassmann
     :param sub: subset of directions (first sub directions)
@@ -182,6 +185,14 @@ def PGA_modes(PGA_directions, mu, scale=1, sub=10):
 
 
 def get_PGA_coordinates(shapes_gr, mu, V):
+    """
+    Get PGA coordinates of given standardized shapes (elements of Grassmann) and
+    PGA space defined by Karcher mean and basis vectors
+    :param shapes_gr: (n_shapes, n_landmarks, 2) array of given standardized shapes (element of Grassmann)
+    :param mu: (n_landmarks, 2) array of Karcher mean (origin of PGA space)
+    :param V: (n_coord*2, n_coord*2) array of PGA basis vectors
+    :return: (n_shapes, n_coord) array of PGA coordinates for given shapes
+    """
     shapes_gr, mu = np.asarray(shapes_gr), np.asarray(mu)
     n_shapes, n_landmarks, dim = shapes_gr.shape
     # get tangent directions from mu to each point (each direction is set of (n_landmark, dim)-dimensional vectors)
@@ -195,11 +206,11 @@ def get_PGA_coordinates(shapes_gr, mu, V):
 
 def perturb_gr_shape(Vh, mu, perturbation):
     """
-    Given element on Grassmann, perturbs it in given direction by a given amount.
-    :param Vh: principal basis transposed (shape (n_landmarks*2)x(n_landmarks*2))
-    :param mu: mean element
-    :param perturbation: amount of perturbations in pga coordinates
-    :return: perturbed element on Grassmann
+    Given element Karcher mean, perturbs it in given direction by a given amount.
+    :param Vh: (n_coord*2, n_coord*2) array of PGA basis vectors transposed
+    :param mu: (n_landmarks, 2) array of Karcher mean (elenemt on Grassmann)
+    :param perturbation: (n_coords,) array of amount of perturbations in pga coordinates
+    :return: (n_landmarks, 2) array of perturbed element on Grassmann
     """
     direction = perturbation@Vh
     direction = direction.reshape(-1, 2)
@@ -210,10 +221,10 @@ def perturb_gr_shape(Vh, mu, perturbation):
 def parallel_translate(start, end_direction, vector):
     """ Parallel translation of a vector along geodesic from start point to end point
         Edelman et al. (Theorem 2.4, pp. 321)
-    :param start: (n, 2) array defining start point element on Grassmann
-    :param end_direction: (n, 2) array defining direction to the end point element on Grassmann (log map)
-    :param vector: (n, 2) array defining vector to be translated
-    :return: (n, 2) array defining translated vector
+    :param start: (n_landmarks, 2) array defining start point element on Grassmann
+    :param end_direction: (n_landmarks, 2) array defining direction to the end point element on Grassmann (log map)
+    :param vector: (n_landmarks, 2) array defining vector to be translated
+    :return: (n_landmarks, 2) array defining translated vector
     """
     n_landmarks = end_direction.shape[0]
     U, S, Vh = np.linalg.svd(end_direction, full_matrices=False)

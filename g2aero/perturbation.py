@@ -42,7 +42,7 @@ class PGAspace:
         gr_shape = perturb_gr_shape(self.Vh, self.karcher_mean, pga_coord)
         return gr_shape @ M + b
 
-    def shapes2PGA(self, shapes_gr):
+    def gr_shapes2PGA(self, shapes_gr):
         return get_PGA_coordinates(shapes_gr, self.karcher_mean, self.Vh.T)
 
     def sample_coef(self, n_samples=1):
