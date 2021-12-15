@@ -1,15 +1,15 @@
 import os
 import numpy as np
-from yaml_info import YamlInfo
-from Grassmann_interpolation import GrassmannInterpolator
-from transform import TransformBlade
-from geometry_gmsh import blade_CAD_geometry, write_geofile, global_blade_coordinates
+from g2aero.yaml_info import YamlInfo
+from g2aero.Grassmann_interpolation import GrassmannInterpolator
+from g2aero.transform import TransformBlade, global_blade_coordinates
+from g2aero.geometry_gmsh import blade_CAD_geometry, write_geofile
 from time import time
 import datetime
-from plot_animation import plot_3d_blade
+# from plot_animation import plot_3d_blade
 
 def main():
-    shapes_filename = os.path.join(os.getcwd(), "../shape_data", "nrel5mw_ofpolars.yaml")
+    shapes_filename = os.path.join(os.getcwd(), "../data", 'blades_yamls', "nrel5mw_ofpolars.yaml")
 
     t_start = time()
     Blade = YamlInfo(shapes_filename, n_landmarks=321)
@@ -43,7 +43,6 @@ def main():
     print("creating CAD model")
     t4 = time()
     xyz_global = global_blade_coordinates(xyz_local)
-    np.savez('xyz_local.npz', xyz=xyz_local)
     # to create stp file and unstructured grid
     blade_CAD_geometry(xyz_global, 'nrel5mw_ofpolars', msh=True)
     t5 = time()
