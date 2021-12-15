@@ -1,4 +1,4 @@
-from Grassmann import *
+from .Grassmann import *
 from scipy.interpolate import PchipInterpolator
 
 
@@ -40,7 +40,7 @@ class PGAspace:
         if b is None:
             b = self.b_mean
         gr_shape = perturb_gr_shape(self.Vh, self.karcher_mean, pga_coord)
-        return gr_shape @ M.T + b
+        return gr_shape @ M + b
 
     def shapes2PGA(self, shapes_gr):
         return get_PGA_coordinates(shapes_gr, self.karcher_mean, self.Vh.T)
