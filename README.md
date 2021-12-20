@@ -19,10 +19,8 @@ python setup.py install
 import g2aero
 ```
 ## Example 
-<iframe
-  src="data/animations/IEA_15MW_blade.html"
-  style="width:100%; height:300px;"
-></iframe>
+<img src="https://github.com/NREL/G2Aero/blob/main/data/animations/animation.gif" alt="blade gif" title="gif" width="500"/>
+
 
 ## Testing
 You can run the tests from the root g2aero folder (once you installed pytest):
