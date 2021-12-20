@@ -128,3 +128,12 @@ def position_airfoil(shape):
     shape[:, 0] = (shape[:, 0] - min_x) / -min_x
 
     return shape
+
+
+def global_blade_coordinates(xyz_local):
+
+    n_shapes, n_landmarks, _ = xyz_local.shape
+    xyz_global = np.empty((n_shapes, n_landmarks, 3))
+    for i, xyz in enumerate(xyz_local):
+        xyz_global[i] = np.c_[xyz[:, 1], -xyz[:, 0], xyz[:, 2]]
+    return

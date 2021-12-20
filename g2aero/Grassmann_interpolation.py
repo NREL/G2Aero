@@ -7,8 +7,8 @@ class GrassmannInterpolator:
 
     def __init__(self, eta, xy):
         """
-        :param eta_nominal: list of nominal eta from 0 to 1
-        :param xy: list of (n, 2) arrays with 2D shape coordinates in physical space (nominal shapes)
+        :param eta_nominal: list of shape locations eta (normalized from 0 to 1)
+        :param xy: (n_shapes, n_landmarks, 2) array with 2D shape coordinates in physical space (nominal shapes)
         """
         # sort based on increasing span
         self.xy_nominal = np.array(xy)[np.argsort(eta)]
@@ -34,12 +34,23 @@ class GrassmannInterpolator:
         self.interpolator_b = PchipInterpolator(self.eta_nominal, self.b, axis=0)
 
     def eta_scaled(self, eta):
+        """
+        Renormalized eta, such that duplicated shapes are outside of [0, 1] interval
+        :param eta: given value of eta (single value of array)
+        :return: Renormalized eta (single value of array)
+        """
         return (eta - self.eta_shift) / self.eta_scale
 
     def eta_scaled_inv(self, eta):
         return eta * self.eta_scale + self.eta_shift
 
     def renormalize_eta(self, dist):
+        """
+        Renormalized eta, such that duplicated shapes (zero distance) in the beginning and in the end
+        are outside of [0, 1] interval
+        :param dist: (n_shapes, ) array of calculated distances between shapes (dist[0] always equal 0)
+        :return: eta_shift, eta_scale for renormalization
+        """
         # check for duplicates in the beginning and in the end
         ind_no_duplicates = np.arange(len(dist))
         while dist[1] == 0:
@@ -81,9 +92,9 @@ class GrassmannInterpolator:
     @staticmethod
     def calc_grassmann_distance(xy_grassmann):
         """
-        Calculate distance on Grassmannian
-        :param xy_grassmann: list of (n, 2) arrays
-        :return: list of distances on grassmannian
+        Calculate distance between ordered ellements on Grassmann
+        :param xy_grassmann: (n_shapes, n_landmarks, 2) array of elemments on Grassmann
+        :return: (n_shapes, ) array of distances on Grassmann (dist[0] always equal 0)
         """
         dist = np.zeros(len(xy_grassmann))
         for i in range(1, len(xy_grassmann)):
@@ -95,12 +106,12 @@ class GrassmannInterpolator:
         """
         Calculate log mapping (the tangent direction from Xi to Xi+1)
         for every given element Xi in ordered list of elements
-        :param xy_grassmann: elements on Grassmann
-        :return: array of directions (log mapping)
+        :param xy_grassmann: (n_shapes, n_landmarks, 2) array of elements on Grassmann
+        :return: (n_shapes-1, ) array of directions (log mapping)
         """
-        n, m, d = xy_grassmann.shape
-        log_map = np.empty((n - 1, m, d))
-        for i in range(n-1):
+        n_shapes, n_landmarks, dim = xy_grassmann.shape
+        log_map = np.empty((n_shapes - 1, n_landmarks, dim))
+        for i in range(n_shapes-1):
             log_map[i] = log(xy_grassmann[i], xy_grassmann[i+1])  # compute direction
         return log_map
 
