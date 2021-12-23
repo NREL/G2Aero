@@ -1,3 +1,4 @@
+![example workflow](https://github.com/NREL/G2Aero/blob/main/.github/workflows/python-package.yml/badge.svg)
 
 # G2Aero: Grassmannian Shape representation tool
 
