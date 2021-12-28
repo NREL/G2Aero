@@ -40,7 +40,7 @@ class Test(TestCase):
         # pga = get_PGA_coordinates(X, Y)
 
     def test_landmark_affine_transform(self):
-        # TODO: add physical shapes to test (right now X is already grassmannian)
+        #TODO: add physical shapes to test (right now X is already grassmannian)
 
         # single shape
         shapes_gr, M, b = landmark_affine_transform(X)
