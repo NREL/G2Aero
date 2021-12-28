@@ -17,10 +17,10 @@ class PGAspace:
         self.karcher_mean = karcher_mean
 
     @classmethod
-    def create_from_dataset(cls, phys_shapes, n_modes):
+    def create_from_dataset(cls, phys_shapes, n_modes=None):
         shapes_gr, M, b = landmark_affine_transform(phys_shapes)
         karcher_mean = Karcher(shapes_gr)
-        Vh, S, t = PGA(karcher_mean, shapes_gr, sub=n_modes)
+        Vh, S, t = PGA(karcher_mean, shapes_gr, n_coord=n_modes)
         pga_space = cls(Vh, np.mean(M, axis=0), np.mean(b, axis=0), karcher_mean)
 
         # for coefficients sampling

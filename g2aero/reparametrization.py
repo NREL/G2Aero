@@ -42,35 +42,42 @@ def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
     return xy_landmarks
 
 
-def polar_reparametrization(xy, n_landmarks=401, sampling='uniform'):
+def polar_reparametrization(xy, n_landmarks=401, sampling='uniform_gr'):
+
+    def arc_distance(xy):
+        dist = np.linalg.norm(np.diff(xy, axis=0), axis=1)
+        t = np.cumsum(dist) / np.sum(dist)
+        return np.hstack(([0.0], t))
+
     xy_gr, M, b = landmark_affine_transform(xy)
     if not np.allclose(xy_gr[0], xy_gr[-1]):
         xy_gr = np.vstack((xy_gr, xy_gr[0]))
     # arc length
-    dist = np.linalg.norm(np.diff(xy_gr, axis=0), axis=1)
-    t = np.cumsum(dist) / np.sum(dist)
-    t = np.hstack(([0.0], t))
-    # angles
+    t = arc_distance(xy_gr)
+    # angles and alpha
     theta_i = np.unwrap(np.arctan2(xy_gr[:, 1], xy_gr[:, 0]))
-    #     plt.plot(t, theta_i)
-    theta = PchipInterpolator(t, theta_i)
-    # theta = CubicSpline(t, theta_i, bc_type='clamped')
-    # alpha
     alpha_i = xy_gr[:, 0] * np.cos(theta_i) + xy_gr[:, 1] * np.sin(theta_i)
-    # alpha = CubicSpline(t, alpha_i, bc_type='periodic')
+    theta = PchipInterpolator(t, theta_i)
     alpha = PchipInterpolator(t, alpha_i)
 
-    # Sampling
-    if sampling == 'uniform':  # distribute landmarks uniformly along the arc length
+    # distribute landmarks uniformly along the arc length on Grassmann
+    if sampling == 'uniform_gr':
         t_new = np.linspace(0, 1, n_landmarks)
+    # distribute landmarks uniformly along the arc length in physical space
+    if sampling == 'uniform_phys':
+        t_tmp = np.linspace(0, 1, 10000)
+        landmarks = np.vstack((alpha(t_tmp) * np.cos(theta(t_tmp)), alpha(t_tmp) * np.sin(theta(t_tmp)))).T
+        landmarks = landmarks @ M + b
+        t_phys = arc_distance(landmarks)
+        t_new = PchipInterpolator(t_phys, t_tmp)(np.linspace(0, 1, n_landmarks))
+
     # TODO: add sampling landmarks according to curvature
-    # elif sampling == 'curvature': # distribute landmarks according to curvature
+    # distribute landmarks according to curvature of shape in physical space
+    # elif sampling == 'curvature':
     #     t_tmp = np.linspace(0, 1, 10000)
     #     # curvature =
 
-    landmarks = np.empty((n_landmarks, 2))
-    landmarks[:, 0] = alpha(t_new) * np.cos(theta(t_new))
-    landmarks[:, 1] = alpha(t_new) * np.sin(theta(t_new))
+    landmarks = np.vstack((alpha(t_new) * np.cos(theta(t_new)), alpha(t_new) * np.sin(theta(t_new)))).T
     landmarks = landmarks @ M + b
     # if len(xy) < len(landmarks):
     return landmarks
