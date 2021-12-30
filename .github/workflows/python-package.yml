@@ -40,6 +40,6 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest and generate coverage report
       run: |
-        pytest --cache-clear --cov=app test/ > pytest-coverage.txt
+        pytest --cache-clear --cov=app tests/ > pytest-coverage.txt
     - name: Comment coverage
       uses: coroo/pytest-coverage-commentator@v1.0.2
