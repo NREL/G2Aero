@@ -1,10 +1,9 @@
 import os
 import numpy as np
 from unittest import TestCase
-from src.g2aero import YamlInfo
-from src.g2aero import TransformBlade
-from src.g2aero import GrassmannInterpolator
-from src.g2aero import global_blade_coordinates
+from g2aero.yaml_info import YamlInfo
+from g2aero.transform import TransformBlade, global_blade_coordinates
+from g2aero.Grassmann_interpolation import GrassmannInterpolator
 
 
 class Test(TestCase):

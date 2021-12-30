@@ -3,8 +3,8 @@ from scipy.interpolate import CubicSpline, PchipInterpolator
 from scipy.optimize import lsq_linear
 from scipy.special import comb
 
-from g2aero.Grassmann import landmark_affine_transform
-from g2aero.utils import add_tailedge_gap
+from .Grassmann import landmark_affine_transform
+from .utils import add_tailedge_gap
 
 
 def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):

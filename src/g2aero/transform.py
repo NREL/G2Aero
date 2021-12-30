@@ -1,9 +1,6 @@
-import yaml
 import numpy as np
 from scipy.spatial.transform import Rotation, Slerp
 from scipy.interpolate import PchipInterpolator
-from scipy.optimize import lsq_linear
-from scipy.special import comb
 
 
 class TransformBlade:

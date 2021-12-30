@@ -1,4 +1,4 @@
-from g2aero.Grassmann import *
+from .Grassmann import *
 from scipy.interpolate import PchipInterpolator
 
 
