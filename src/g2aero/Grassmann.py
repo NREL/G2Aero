@@ -3,9 +3,11 @@ import numpy as np
 
 
 def procrustes(X, Y):
-    """
-    Procrustes clustering match the shapes via Procrustes analysis (Gower 1975). This calculate rotations that  can  be
-    applied to shapes for matching—which do not fundamentally modify the elements in the Grassmannian.
+    """Procrustes clustering match the shapes via Procrustes analysis (Gower 1975).
+
+    This function calculates rotation that can be applied to shapes for matching
+    (rotation does not fundamentally modify the elements in the Grassmannian).
+
     :param X: (n_landmarks, 2) array defining shape 1
     :param Y: (n_landmarks, 2) array defining shape 2
     :return: (2, 2) array of rotation matrix
@@ -17,10 +19,11 @@ def procrustes(X, Y):
 
 
 def landmark_affine_transform(X_phys):
-    """
-    Shift and scale all shapes using Landmark-Affine standardization (Bryner, 2D affine and projective spaces).
+    """Shift and scale all shapes using Landmark-Affine standardization (Bryner, 2D affine and projective spaces).
+
     LA-standardization  normalizes  the  shape  such that  it  has  zero  mean  (translation  invariance)  and
     sample covariance proportional to I2 over the n discrete boundary landmarks defining the shape.
+
     :param X_phys:(n_shapes, n_landmarks, 2) array of physical coordinates defining shapes
     :return: X_grassmann, M, b, such that X_phys = X_grassmann @ M + b.
     """
@@ -54,8 +57,8 @@ def landmark_affine_transform(X_phys):
 
 
 def exp(t, X, log_map):
-    """
-    Exponential mapping (Grassmannian geodesic)
+    """Exponential mapping (Grassmannian geodesic).
+
     :param X: (n_landmarks, 2) array defining starting point of geodesic on Grassmann
     :param log_map: (n_landmarks, 2) array defining direction in tangent space (tangent vector \Delta)
     :return: (n_landmarks, 2) array defining end point on Grassmann
@@ -67,9 +70,11 @@ def exp(t, X, log_map):
 
 
 def log(X, Y):
-    """
+    """Logarithmic mapping (inverse mapping of exponential map).
+
     Calculate logarithmic map log_X(Y) (inverse mapping of exponential map).
     Calculates direction(tangent vector \Delta) from X to Y in tangent subspace.
+
     :param X: (n_landmarks, 2) array defining start point of geodesic on Grassmann
     :param Y: (n_landmarks, 2) array defining end point of geodesic on Grassmann
     :return: (n_landmarks, 2) array defining direction in tangent space (tangent vector \Delta)
@@ -83,13 +88,15 @@ def log(X, Y):
 
 
 def distance(X, Y):
-    """
+    """Geodesic distance on Grassmannian.
+
     Geodesic distance on Grassmannian is defined by the principal angles
     between the subspaces spanned by the columns of X and Y, denoted by
     span(X) and span(Y). The cosines of the principal angles theta1 and
     theta2 between span(X) and snap(Y) are the singular values of X.T@Y.
     That is, X.T@Y = U D V.T,  where D = diag(cos(theta1), cos(theta2)).
-    The distance between two shapes is then defined as dist = sqrt(theta1**2+theta2**2)
+    The distance between two shapes is then defined as dist = sqrt(theta1**2+theta2**2).
+
     :param X: (n_landmarks, 2) array defining first shape
     :param Y: (n_landmarks, 2) array defining second shape
     :return: distance between two shapes on Grassmannian
@@ -117,9 +124,11 @@ def distance(X, Y):
 
 
 def Karcher(shapes, max_steps=20):
-    """
+    """Karcher mean for given shapes.
+
     Calculated Karcher mean for given shapes (elements on Grassmann) by
     minimizing the sum of squared (Riemannian) distances to all shapes in the data (Fletcher, Lu, and Joshi 2003)
+
     :param shapes: (n_shapes, n_landmarks, 2) array defining given shapes (Grassmann elements)
     :param max_steps: maximum number of iterations to converge
     :return: (n_landmarks, 2) array defining Karcher mean (element on Grassmann)
@@ -142,10 +151,12 @@ def Karcher(shapes, max_steps=20):
 
 
 def PGA(mu, shapes_gr, n_coord=None):
-    """
+    """Principal Geodesic Analysis (PGA).
+
     Principal Geodesic Analysis (PGA), a generalization of Principal Component Analysis (PCA) over Riemannian manifolds.
     PGA is a data-driven approach that determines principal components as elements in a central tangent space,
     given a data set represented as elements in asmooth manifold.
+
     :param mu: (n_landmarks, 2) array defining Karcher mean (element on Grassmann)
     :param shapes_gr: (n_shapes, n_landmarks, 2) given shapes (elements on Grassmann)
     :param n_coord: dimension of resulting PGA space (if None n_coord=n_landmarks)
@@ -173,6 +184,7 @@ def PGA(mu, shapes_gr, n_coord=None):
 def PGA_modes(PGA_directions, mu, scale=1, sub=10):
     """
     Moves given element on Grassmann in each of given directions.
+
     :param PGA_directions: directions to perturb element mu
     :param mu: element on grassmann
     :param sub: subset of directions (first sub directions)
@@ -187,7 +199,8 @@ def PGA_modes(PGA_directions, mu, scale=1, sub=10):
 def get_PGA_coordinates(shapes_gr, mu, V):
     """
     Get PGA coordinates of given standardized shapes (elements of Grassmann) and
-    PGA space defined by Karcher mean and basis vectors
+    PGA space defined by Karcher mean and basis vectors.
+
     :param shapes_gr: (n_shapes, n_landmarks, 2) array of given standardized shapes (element of Grassmann)
     :param mu: (n_landmarks, 2) array of Karcher mean (origin of PGA space)
     :param V: (n_coord*2, n_coord*2) array of PGA basis vectors
@@ -205,8 +218,8 @@ def get_PGA_coordinates(shapes_gr, mu, V):
 
 
 def perturb_gr_shape(Vh, mu, perturbation):
-    """
-    Given element Karcher mean, perturbs it in given direction by a given amount.
+    """Given element Karcher mean, perturbs it in given direction by a given amount.
+
     :param Vh: (n_coord*2, n_coord*2) array of PGA basis vectors transposed
     :param mu: (n_landmarks, 2) array of Karcher mean (elenemt on Grassmann)
     :param perturbation: (n_coords,) array of amount of perturbations in pga coordinates
@@ -220,7 +233,8 @@ def perturb_gr_shape(Vh, mu, perturbation):
 
 def parallel_translate(start, end_direction, vector):
     """ Parallel translation of a vector along geodesic from start point to end point
-        Edelman et al. (Theorem 2.4, pp. 321)
+    Edelman et al. (Theorem 2.4, pp. 321).
+
     :param start: (n_landmarks, 2) array defining start point element on Grassmann
     :param end_direction: (n_landmarks, 2) array defining direction to the end point element on Grassmann (log map)
     :param vector: (n_landmarks, 2) array defining vector to be translated

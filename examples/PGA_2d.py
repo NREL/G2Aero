@@ -1,8 +1,8 @@
 import os
 import numpy as np
 import pandas as pd
-from g2aero.perturbation import PGAspace
-from g2aero.utils import position_airfoil, add_tailedge_gap
+from src.g2aero import PGAspace
+from src.g2aero import position_airfoil, add_tailedge_gap
 
 import dash
 from dash import dcc

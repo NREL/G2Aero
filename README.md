@@ -17,7 +17,8 @@ python setup.py install
 ## Usage
 
 ```python
-import g2aero
+
+from src import g2aero
 ```
 ## Example 
 <img src="https://github.com/NREL/G2Aero/blob/main/data/animations/animation.gif" alt="blade gif" title="gif" width="500"/>

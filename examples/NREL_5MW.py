@@ -1,9 +1,9 @@
 import os
 import numpy as np
-from g2aero.yaml_info import YamlInfo
-from g2aero.Grassmann_interpolation import GrassmannInterpolator
-from g2aero.transform import TransformBlade, global_blade_coordinates
-from g2aero.geometry_gmsh import blade_CAD_geometry, write_geofile
+from src.g2aero import YamlInfo
+from src.g2aero import GrassmannInterpolator
+from src.g2aero import TransformBlade, global_blade_coordinates
+from src.g2aero import blade_CAD_geometry
 from time import time
 import datetime
 # from plot_animation import plot_3d_blade

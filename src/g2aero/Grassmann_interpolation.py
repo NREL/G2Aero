@@ -7,7 +7,8 @@ class GrassmannInterpolator:
 
     def __init__(self, eta, xy):
         """
-        :param eta_nominal: list of shape locations eta (normalized from 0 to 1)
+
+        :param eta: list of shape locations eta (normalized from 0 to 1)
         :param xy: (n_shapes, n_landmarks, 2) array with 2D shape coordinates in physical space (nominal shapes)
         """
         # sort based on increasing span
@@ -34,8 +35,8 @@ class GrassmannInterpolator:
         self.interpolator_b = PchipInterpolator(self.eta_nominal, self.b, axis=0)
 
     def eta_scaled(self, eta):
-        """
-        Renormalized eta, such that duplicated shapes are outside of [0, 1] interval
+        """Renormalized eta, such that duplicated shapes are outside of [0, 1] interval.
+
         :param eta: given value of eta (single value of array)
         :return: Renormalized eta (single value of array)
         """
@@ -45,9 +46,9 @@ class GrassmannInterpolator:
         return eta * self.eta_scale + self.eta_shift
 
     def renormalize_eta(self, dist):
-        """
-        Renormalized eta, such that duplicated shapes (zero distance) in the beginning and in the end
-        are outside of [0, 1] interval
+        """Renormalized eta, such that duplicated shapes (zero distance) in the beginning and in the end
+        are outside of [0, 1] interval.
+
         :param dist: (n_shapes, ) array of calculated distances between shapes (dist[0] always equal 0)
         :return: eta_shift, eta_scale for renormalization
         """
@@ -91,8 +92,8 @@ class GrassmannInterpolator:
 
     @staticmethod
     def calc_grassmann_distance(xy_grassmann):
-        """
-        Calculate distance between ordered ellements on Grassmann
+        """Calculate distance between ordered elements on Grassmann.
+
         :param xy_grassmann: (n_shapes, n_landmarks, 2) array of elemments on Grassmann
         :return: (n_shapes, ) array of distances on Grassmann (dist[0] always equal 0)
         """
@@ -103,9 +104,9 @@ class GrassmannInterpolator:
 
     @staticmethod
     def calc_log_mapping(xy_grassmann):
-        """
-        Calculate log mapping (the tangent direction from Xi to Xi+1)
-        for every given element Xi in ordered list of elements
+        """Calculate log mapping (the tangent direction from Xi to Xi+1)
+        for every given element Xi in ordered list of elements.
+
         :param xy_grassmann: (n_shapes, n_landmarks, 2) array of elements on Grassmann
         :return: (n_shapes-1, ) array of directions (log mapping)
         """
@@ -116,9 +117,9 @@ class GrassmannInterpolator:
         return log_map
 
     def sample_eta(self, n_samples, n_hub=10, n_tip=None, n_end=25):
-        """
-        Sample eta, such that t is uniformly distributed and filling
-        uniformly distributed eta between duplicated shapes
+        """Sample eta, such that t is uniformly distributed and filling
+        uniformly distributed eta between duplicated shapes.
+
         :param n_samples: number of samples uniformly distributed over Grassmannian
         :param n_hub: number of samples uniform over eta between duplicated shapes on the left
         :param n_tip: number of samples uniform over eta between duplicated shapes on the right, not including tip end
@@ -153,11 +154,10 @@ class GrassmannInterpolator:
         return self.eta_scaled_inv(eta_span)
 
     def shapes_perturbation(self, new_shapes, ind):
-        """
-        Substitute nominal shapes
-        :param new_shapes:
-        :param ind:
-        :return:
+        """ Substitute nominal shapes with perturbed ones.
+
+        :param new_shapes: perturbed grassmann shapes
+        :param ind: indices of shapes to substitute
         """
         self.xy_grassmann[ind] = new_shapes
         self.dist_grassmann = self.calc_grassmann_distance(self.xy_grassmann)
@@ -169,8 +169,8 @@ class GrassmannInterpolator:
         self.log_map = self.calc_log_mapping(self.xy_grassmann)
 
     def __call__(self, eta, grassmann=False):
-        """
-        Compute 2D shapes at a given spanwise locations
+        """Interpolate 2D shapes at a given spanwise locations.
+
         :param eta: physical normalized spanwise locations (assume eta is in [0,1])
         :param grassmann: if True, return shape in grassmann space as well (Landmark-Affine standardized)
         :return: array of (n, 2) arrays 2D shape coordinates

@@ -50,8 +50,6 @@ def polar_reparametrization(xy, n_landmarks=401, sampling='uniform_gr'):
         return np.hstack(([0.0], t))
 
     xy_gr, M, b = landmark_affine_transform(xy)
-    # if not np.allclose(xy_gr[0], xy_gr[-1]):
-    #     xy_gr = np.vstack((xy_gr, xy_gr[0]))
     # arc length
     t = arc_distance(xy_gr)
     # angles and alpha
@@ -160,7 +158,9 @@ def cst_reparametrization(xy, n_landmarks=401, name='', cst_order=8):
 
     le_ind = np.argmin(xy[:, 0])  # Leading edge index
 
-    # split into upper and lower parts
+    # # tailedge gap
+    # te_lower, te_upper = xy[0, 1], xy[-1, 1]
+    # split int upper and lower parts
     xy_upper, xy_lower = xy[le_ind:], xy[:le_ind]
 
     # calculate cst coefficients

@@ -1,4 +1,4 @@
-from .Grassmann import *
+from g2aero.Grassmann import *
 from scipy.interpolate import PchipInterpolator
 
 
@@ -22,6 +22,7 @@ class PGAspace:
         karcher_mean = Karcher(shapes_gr)
         Vh, S, t = PGA(karcher_mean, shapes_gr, n_coord=n_modes)
         pga_space = cls(Vh, np.mean(M, axis=0), np.mean(b, axis=0), karcher_mean)
+        pga_space.S = S
 
         # for coefficients sampling
         pga_space.axis_min = np.min(t, axis=0)
@@ -58,12 +59,13 @@ class PGAspace:
 
     def generate_perturbed_shapes(self, coef=None, n=1):
         """ Generates perturbed shapes.
+
         If coef are sampled (not given) checks for intersection
         in generated shape and resample if needed.
+
         :param coef: array of deterministic perturbations (n, n_modes)
         :param n: number of perturbed shapes, if not given calculated from coef.shape[0]
-        :return: array of generated perturbed shapes (n, n_landmarks, 2) in physical and grassmann coordinates
-                 and PGA corresponding to perturbations (n, n_modes)
+        :return: array of generated perturbed shapes (n, n_landmarks, 2) in physical and grassmann coordinates and PGA corresponding to perturbations (n, n_modes)
         """
         if coef is None:
             coef_array = self.sample_coef(n)
@@ -97,13 +99,14 @@ class PGAspace:
 
     def generate_perturbed_blade(self, blade, coef=None, n=1):
         """ Generates perturbed blades.
+
         If coef are sampled (not given) checks for intersection
         in generated shape and resample if needed.
+
         :param blade: array of grassmann shapes for baseline blade
         :param coef: perturbation coefficients (sampled if not given)
         :param n: number of perturbations (if need to sample)
-        :return: array of perturbed blades (in grassmann coordinates) (shape=(n, n_shapes, n_landmarks, 2))
-                 and PGA corresponding to perturbations (n, n_modes)
+        :return: array of perturbed blades (in grassmann coordinates) (shape=(n, n_shapes, n_landmarks, 2)) and PGA corresponding to perturbations (n, n_modes)
         """
         n_shapes, n_landmarks, dim = blade.shape
 
