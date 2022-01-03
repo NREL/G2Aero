@@ -18,10 +18,6 @@ def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
     :return:
     """
     xy = np.asarray(xy)
-    le_ind = np.argmin(xy[:, 0])  # Leading edge index
-    y1_avg = np.average(xy[:le_ind, 1])  # Determine orientation of the airfoil shape
-    if y1_avg > 0:
-        xy = xy[::-1]  # Flip such that the pressure side is always first
 
     # Normalize coordinates (x from 0 to 1) to rid of the rounding error
     x_min, x_max = np.min(xy[:, 0]), np.max(xy[:, 0])
@@ -55,12 +51,13 @@ def polar_reparametrization(xy, n_landmarks=401, sampling='uniform_gr'):
     # angles and alpha
     theta_i = np.unwrap(np.arctan2(xy_gr[:, 1], xy_gr[:, 0]))
     alpha_i = xy_gr[:, 0] * np.cos(theta_i) + xy_gr[:, 1] * np.sin(theta_i)
-    theta = PchipInterpolator(t, theta_i)
-    alpha = PchipInterpolator(t, alpha_i)
-
+    theta = CubicSpline(t, theta_i)
+    alpha = CubicSpline(t, alpha_i, bc_type='natural')
+    
     # distribute landmarks uniformly along the arc length on Grassmann
     if sampling == 'uniform_gr':
         t_new = np.linspace(0, 1, n_landmarks)
+        landmarks = np.vstack((alpha(t_new) * np.cos(theta(t_new)), alpha(t_new) * np.sin(theta(t_new)))).T@ M + b
     # distribute landmarks uniformly along the arc length in physical space
     if sampling == 'uniform_phys':
         t_tmp = np.linspace(0, 1, 10000)
@@ -68,84 +65,44 @@ def polar_reparametrization(xy, n_landmarks=401, sampling='uniform_gr'):
         landmarks = landmarks @ M + b
         t_phys = arc_distance(landmarks)
         t_new = PchipInterpolator(t_phys, t_tmp)(np.linspace(0, 1, n_landmarks))
+        landmarks = np.vstack((alpha(t_new) * np.cos(theta(t_new)), alpha(t_new) * np.sin(theta(t_new)))).T@ M + b
 
-    #TODO: fix sampling with curvature (doesn't work properly right now)
     # distribute landmarks according to curvature of shape in physical space
     elif sampling == 'curvature_polar':
-        th, d_th, dd_th = theta(t), theta(t, 1), theta(t, 2)
-        a, d_a, dd_a = alpha(t), alpha(t, 1), alpha(t, 2)
+        t_tmp = np.linspace(0, 1, 10000)
+        th, d_th, dd_th = theta(t_tmp), theta(t_tmp, 1), theta(t_tmp, 2)
+        a, d_a, dd_a = alpha(t_tmp), alpha(t_tmp, 1), alpha(t_tmp, 2)
 
         n = np.vstack((np.cos(th), np.sin(th)))
         d_n = np.vstack((-np.sin(th), np.cos(th)))
         dd_n = np.vstack((-np.cos(th), -np.sin(th)))
-        d_s = d_a * n + a * d_n * d_th
-        dd_s = dd_a * n + 2 * d_a * d_n * d_th + a * (dd_n * d_th ** 2 + d_n * dd_th)
+        d_s = M.T @ (d_a * n + a * d_n * d_th)
+        dd_s = M.T @ (dd_a * n + 2 * d_a * d_n * d_th + a * (dd_n * d_th ** 2 + d_n * dd_th))
 
         curvature_i = np.abs(d_s[0] * dd_s[1] - d_s[1] * dd_s[0]) / (d_s[0] ** 2 + d_s[1] ** 2) ** 1.5
         curvature_cdf_i = np.cumsum(curvature_i) - curvature_i[0]
         curvature_cdf_i /= curvature_cdf_i[-1]
-
-        import matplotlib.pyplot as plt
-        fig, ax = plt.subplots(3, 2, figsize=(10, 12))
-        ax[0, 0].plot(t, th, '.')
-        ax[0, 0].set_ylabel('theta(t)')
-        ax[0, 1].plot(t, a, '.')
-        ax[0, 1].set_ylabel('a(t)')
-        ax[1, 0].plot(t, d_a, '.')
-        ax[1, 0].set_ylabel("a'(t)")
-        ax[1, 1].plot(t, dd_a, '.')
-        ax[1, 1].set_ylabel("a''(t)")
-        ax[2, 0].semilogy(t, curvature_i, '.')
-        ax[2, 0].set_ylabel("curvature(t)")
-        ax[2, 1].plot(t, curvature_cdf_i, '.')
-        ax[2, 1].set_ylabel("cdf_curvature(t)")
-
-        cdf = PchipInterpolator(t, curvature_cdf_i)
-        t_tmp = np.linspace(0, 1, 10000)
-        interpolator_cdf = PchipInterpolator(cdf(t_tmp), t_tmp)
-        t_new = interpolator_cdf(np.linspace(0, 1, n_landmarks))
+        
+        t_new = PchipInterpolator(curvature_cdf_i, t_tmp)(np.linspace(0, 1, n_landmarks))
+        landmarks = np.vstack((alpha(t_new) * np.cos(theta(t_new)), alpha(t_new) * np.sin(theta(t_new)))).T@ M + b
 
     elif sampling == 'curvature_planar':
         t_phys = arc_distance(xy)
-        # s1 = CubicSpline(t_phys, xy[:, 0], bc_type=((2, 0), (2, 0)))
-        # s2 = CubicSpline(t_phys, xy[:, 1], bc_type=((2, 0), (2, 0)))
+        
         s1 = CubicSpline(t_phys, xy[:, 0])
         s2 = CubicSpline(t_phys, xy[:, 1])
-        # s1 = PchipInterpolator(t_phys, xy[:, 0])
-        # s2 = PchipInterpolator(t_phys, xy[:, 1])
 
-        ds1, ds2 = s1(t_phys, 1), s2(t_phys, 1)
-        dds1, dds2 = s1(t_phys, 2), s2(t_phys, 2)
+        t_tmp = np.linspace(0, 1, 10000)
+        ds1, ds2 = s1(t_tmp, 1), s2(t_tmp, 1)
+        dds1, dds2 = s1(t_tmp, 2), s2(t_tmp, 2)
 
         curvature_i = np.abs(ds1 * dds2 - ds2 * dds1) / (ds1 ** 2 + ds2 ** 2) ** 1.5
         curvature_cdf_i = np.cumsum(curvature_i) - curvature_i[0]
         curvature_cdf_i /= curvature_cdf_i[-1]
 
-        import matplotlib.pyplot as plt
-        fig, ax = plt.subplots(4, 2, figsize=(10, 12))
-        ax[0, 0].plot(t_phys, xy[:, 0], '.')
-        ax[0, 0].set_ylabel('s1(t)')
-        ax[0, 1].plot(t_phys, xy[:, 1], '.')
-        ax[0, 1].set_ylabel('s2(t))')
-        ax[1, 0].plot(t_phys, ds1, '.')
-        ax[1, 0].set_ylabel("s1'(t)")
-        ax[1, 1].plot(t_phys, ds2, '.')
-        ax[1, 1].set_ylabel("s2'(t)")
-        ax[2, 0].plot(t_phys, dds1, '.')
-        ax[2, 0].set_ylabel("s1''(t)")
-        ax[2, 1].plot(t_phys, dds2, '.')
-        ax[2, 1].set_ylabel("s2''(t)")
-        ax[3, 0].semilogy(t_phys, curvature_i, '.')
-        ax[3, 1].plot(t_phys, curvature_cdf_i, '.')
+        t_new = PchipInterpolator(curvature_cdf_i, t_tmp)(np.linspace(0, 1, n_landmarks))
+        landmarks = np.vstack((s1(t_new), s2(t_new))).T
 
-        cdf = PchipInterpolator(t_phys, curvature_cdf_i)
-        t_tmp = np.linspace(0, 1, 10000)
-        interpolator_cdf = PchipInterpolator(cdf(t_tmp), t_tmp)
-        t_new = interpolator_cdf(np.linspace(0, 1, n_landmarks))
-
-    landmarks = np.vstack((alpha(t_new) * np.cos(theta(t_new)), alpha(t_new) * np.sin(theta(t_new)))).T
-    landmarks = landmarks @ M + b
-    # if len(xy) < len(landmarks):
     return landmarks
 
 
