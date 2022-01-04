@@ -8,14 +8,13 @@ from .utils import add_tailedge_gap
 
 
 def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
-    """
-
-    :param xy:
-    :param n_landmarks:
-    :param method:
-    :param add_gap:
-    :param kwargs:
-    :return:
+    """Provides landmarks after reparametrization.
+    :param xy: (n, 2) given coordinated defining the shape
+    :param n_landmarks: scalar number of landmarks in returned shape
+    :param method: method of reparametrization: 'cst', 'polar' or 'planar'
+    :param add_gap: size of the tail gap added to the shape
+    :param kwargs: additional parameters for reparametrization (e.g. sampling strategy for 'polar' and 'planar' method)
+    :return: (n_landmarks, 2) array of landmarks after reparametrization
     """
     xy = np.asarray(xy)
 
@@ -25,6 +24,11 @@ def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
     xy[:, 1] = xy[:, 1] / (x_max - x_min)
     if not np.allclose(x_min, 0) or not np.allclose(x_max, 1):
         print('WARNING!: Airfoil shape is not normalized properly', x_min, x_max, (x_max - x_min))
+
+    le_ind = np.argmin(xy[:, 0])  # Leading edge index
+    y1_avg = np.average(xy[:le_ind, 1])  # Determine orientation of the airfoil shape
+    if y1_avg > 0:
+        xy = xy[::-1]  # Flip such that the pressure side is always first
 
     if method == 'cst':
         xy_landmarks, _ = cst_reparametrization(xy, n_landmarks, **kwargs)
@@ -40,7 +44,7 @@ def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
     return xy_landmarks
 
 
-def planar_reparametrization(xy, n_landmarks, sampling='curvature'):
+def planar_reparametrization(xy, n_landmarks, sampling='uniform'):
 
     t_phys = arc_distance(xy)
     s1 = CubicSpline(t_phys, xy[:, 0])
@@ -83,7 +87,7 @@ def polar_reparametrization(xy, n_landmarks=401, sampling='uniform_gr'):
         t_phys = arc_distance(landmarks)
         t_new = PchipInterpolator(t_phys, t_tmp)(np.linspace(0, 1, n_landmarks))
     # distribute landmarks according to curvature of shape in physical space
-    elif sampling == 'curvature_polar':
+    elif sampling == 'curvature':
         t_tmp = np.linspace(0, 1, 10000)
         curvature_i = curvature_polar(t_tmp, alpha, theta, M)
         curvature_cdf_i = np.cumsum(curvature_i) - curvature_i[0]
@@ -102,37 +106,36 @@ def cst_reparametrization(xy, n_landmarks=401, name='', cst_order=8):
         n1, n2 = 0.5, 1.0
 
     le_ind = np.argmin(xy[:, 0])  # Leading edge index
-
-    # # tailedge gap
-    # te_lower, te_upper = xy[0, 1], xy[-1, 1]
     # split int upper and lower parts
     xy_upper, xy_lower = xy[le_ind:], xy[:le_ind]
 
+    # tailedge gap
+    te_lower, te_upper = xy[0, 1], xy[-1, 1]
+
     # calculate cst coefficients
-    cst_upper = calc_cst_param(xy_upper[:, 0], xy_upper[:, 1], n1, n2, cst_order)
-    cst_lower = calc_cst_param(xy_lower[:, 0], xy_lower[:, 1], n1, n2, cst_order)
+    cst_upper = calc_cst_param(xy_upper[:, 0], xy_upper[:, 1], n1, n2, te_upper, cst_order)
+    cst_lower = calc_cst_param(xy_lower[:, 0], xy_lower[:, 1], n1, n2, te_lower, cst_order)
     cst = np.r_[cst_lower, cst_upper]
 
     n_half = int(n_landmarks / 2)
     x_c = -np.cos(np.linspace(0, np.pi, n_half + 1)) * 0.5 + 0.5
-    xy_landmarks = from_cst_parameters(x_c, cst_lower, cst_upper, n1, n2)
+    xy_landmarks = from_cst_parameters(x_c, cst_lower, cst_upper, n1, n2, te_lower, te_upper)
 
     return xy_landmarks, cst
 
 
-def calc_cst_param(x, y, n1, n2, order=8):
+def calc_cst_param(x, y, n1, n2, y_tailedge=0.0, order=8):
     """
     Solve the least squares problem for a given shape
     :param x: (np.ndarray): (x/c) coordinates locations
     :param y: (np.ndarray): (y/c) coordinate locations
     :param n1: normal coord
     :param n2: normal coord
-    :param order:
-    :return: ``(BP+1)`` CST parameters
+    :param order: order of the polynomial used
+    :return: CST parameters
     """
     amat = cst_matrix(x, n1, n2, order)
-    amat = np.hstack((amat, x.reshape(-1, 1)))
-    bvec = y
+    bvec = y - x * y_tailedge
     out = lsq_linear(amat, bvec)
     return out.x
 
@@ -149,22 +152,23 @@ def cst_matrix(x, n1, n2, order):
     return (class_function * shape_function).T
 
 
-def from_cst_parameters(xinp, cst_lower, cst_upper, n1, n2):
+def from_cst_parameters(xinp, cst_lower, cst_upper, n1, n2, te_lower, te_upper,):
     """ Compute landmark coordinates for the airfoil
     :param xinp: (np.ndarray): Non-dimensional x-coordinate locations
     :param cst_lower: (np.ndarray): cst parameters for lower part
     :param cst_upper: (np.ndarray): cst parameters for upper part
     :param n1: (double): normal coord
     :param n2: (double): normal coord
+    :param te_lower: (double): tail edge size for lower part
+    :param te_upper: (double): tail edge size for upper part
     :return: Numpy arrays for landmark coordinates
     """
     x = np.asarray(xinp)
-    order = np.size(cst_lower) - 2
+    order = np.size(cst_lower) - 1
     amat = cst_matrix(xinp, n1, n2, order)
-    amat = np.hstack((amat, x.reshape(-1, 1)))
 
-    y_lower = np.dot(amat, cst_lower)
-    y_upper = np.dot(amat, cst_upper)
+    y_lower = np.dot(amat, cst_lower) + te_lower * x
+    y_upper = np.dot(amat, cst_upper) + te_upper * x
 
     x = np.hstack((x[::-1], x[1:])).reshape(-1, 1)
     y = np.hstack((y_lower[::-1], y_upper[1:])).reshape(-1, 1)
