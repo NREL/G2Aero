@@ -30,6 +30,8 @@ def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
         xy_landmarks, _ = cst_reparametrization(xy, n_landmarks, **kwargs)
     elif method == 'polar':
         xy_landmarks = polar_reparametrization(xy, n_landmarks, **kwargs)
+    elif method == 'planar':
+        xy_landmarks = planar_reparametrization(xy, n_landmarks, **kwargs)
 
     # make tailedge gap
     if add_gap:
@@ -38,16 +40,32 @@ def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
     return xy_landmarks
 
 
+def planar_reparametrization(xy, n_landmarks, sampling='curvature'):
+
+    t_phys = arc_distance(xy)
+    s1 = CubicSpline(t_phys, xy[:, 0])
+    s2 = CubicSpline(t_phys, xy[:, 1])
+
+    if sampling == 'uniform_phys' or sampling == 'uniform':
+        t_new = np.linspace(0, 1, n_landmarks)
+
+    if sampling == 'curvature':
+        t_tmp = np.linspace(0, 1, 10000)
+        curvature_i = curvature_planar(t_tmp, s1, s2)
+        curvature_cdf_i = np.cumsum(curvature_i) - curvature_i[0]
+        curvature_cdf_i /= curvature_cdf_i[-1]
+
+        t_new = PchipInterpolator(curvature_cdf_i, t_tmp)(np.linspace(0, 1, n_landmarks))
+
+    landmarks = np.vstack((s1(t_new), s2(t_new))).T
+
+    return landmarks
+
+
 def polar_reparametrization(xy, n_landmarks=401, sampling='uniform_gr'):
 
-    def arc_distance(xy):
-        dist = np.linalg.norm(np.diff(xy, axis=0), axis=1)
-        t = np.cumsum(dist) / np.sum(dist)
-        return np.hstack(([0.0], t))
-
     xy_gr, M, b = landmark_affine_transform(xy)
-    # arc length
-    t = arc_distance(xy_gr)
+    t = arc_distance(xy_gr)     # arc length
     # angles and alpha
     theta_i = np.unwrap(np.arctan2(xy_gr[:, 1], xy_gr[:, 0]))
     alpha_i = xy_gr[:, 0] * np.cos(theta_i) + xy_gr[:, 1] * np.sin(theta_i)
@@ -57,52 +75,22 @@ def polar_reparametrization(xy, n_landmarks=401, sampling='uniform_gr'):
     # distribute landmarks uniformly along the arc length on Grassmann
     if sampling == 'uniform_gr':
         t_new = np.linspace(0, 1, n_landmarks)
-        landmarks = np.vstack((alpha(t_new) * np.cos(theta(t_new)), alpha(t_new) * np.sin(theta(t_new)))).T@ M + b
     # distribute landmarks uniformly along the arc length in physical space
-    if sampling == 'uniform_phys':
+    if sampling == 'uniform_phys' or sampling == 'uniform':
         t_tmp = np.linspace(0, 1, 10000)
         landmarks = np.vstack((alpha(t_tmp) * np.cos(theta(t_tmp)), alpha(t_tmp) * np.sin(theta(t_tmp)))).T
         landmarks = landmarks @ M + b
         t_phys = arc_distance(landmarks)
         t_new = PchipInterpolator(t_phys, t_tmp)(np.linspace(0, 1, n_landmarks))
-        landmarks = np.vstack((alpha(t_new) * np.cos(theta(t_new)), alpha(t_new) * np.sin(theta(t_new)))).T@ M + b
-
     # distribute landmarks according to curvature of shape in physical space
     elif sampling == 'curvature_polar':
         t_tmp = np.linspace(0, 1, 10000)
-        th, d_th, dd_th = theta(t_tmp), theta(t_tmp, 1), theta(t_tmp, 2)
-        a, d_a, dd_a = alpha(t_tmp), alpha(t_tmp, 1), alpha(t_tmp, 2)
-
-        n = np.vstack((np.cos(th), np.sin(th)))
-        d_n = np.vstack((-np.sin(th), np.cos(th)))
-        dd_n = np.vstack((-np.cos(th), -np.sin(th)))
-        d_s = M.T @ (d_a * n + a * d_n * d_th)
-        dd_s = M.T @ (dd_a * n + 2 * d_a * d_n * d_th + a * (dd_n * d_th ** 2 + d_n * dd_th))
-
-        curvature_i = np.abs(d_s[0] * dd_s[1] - d_s[1] * dd_s[0]) / (d_s[0] ** 2 + d_s[1] ** 2) ** 1.5
+        curvature_i = curvature_polar(t_tmp, alpha, theta, M)
         curvature_cdf_i = np.cumsum(curvature_i) - curvature_i[0]
         curvature_cdf_i /= curvature_cdf_i[-1]
-        
         t_new = PchipInterpolator(curvature_cdf_i, t_tmp)(np.linspace(0, 1, n_landmarks))
-        landmarks = np.vstack((alpha(t_new) * np.cos(theta(t_new)), alpha(t_new) * np.sin(theta(t_new)))).T@ M + b
 
-    elif sampling == 'curvature_planar':
-        t_phys = arc_distance(xy)
-        
-        s1 = CubicSpline(t_phys, xy[:, 0])
-        s2 = CubicSpline(t_phys, xy[:, 1])
-
-        t_tmp = np.linspace(0, 1, 10000)
-        ds1, ds2 = s1(t_tmp, 1), s2(t_tmp, 1)
-        dds1, dds2 = s1(t_tmp, 2), s2(t_tmp, 2)
-
-        curvature_i = np.abs(ds1 * dds2 - ds2 * dds1) / (ds1 ** 2 + ds2 ** 2) ** 1.5
-        curvature_cdf_i = np.cumsum(curvature_i) - curvature_i[0]
-        curvature_cdf_i /= curvature_cdf_i[-1]
-
-        t_new = PchipInterpolator(curvature_cdf_i, t_tmp)(np.linspace(0, 1, n_landmarks))
-        landmarks = np.vstack((s1(t_new), s2(t_new))).T
-
+    landmarks = np.vstack((alpha(t_new) * np.cos(theta(t_new)), alpha(t_new) * np.sin(theta(t_new)))).T @ M + b
     return landmarks
 
 
@@ -182,3 +170,29 @@ def from_cst_parameters(xinp, cst_lower, cst_upper, n1, n2):
     y = np.hstack((y_lower[::-1], y_upper[1:])).reshape(-1, 1)
 
     return np.hstack((x, y))
+
+
+def arc_distance(xy):
+    dist = np.linalg.norm(np.diff(xy, axis=0), axis=1)
+    t = np.cumsum(dist) / np.sum(dist)
+    return np.hstack(([0.0], t))
+
+
+def curvature_polar(t, alpha, theta, M):
+    th, d_th, dd_th = theta(t), theta(t, 1), theta(t, 2)
+    a, d_a, dd_a = alpha(t), alpha(t, 1), alpha(t, 2)
+
+    n = np.vstack((np.cos(th), np.sin(th)))
+    d_n = np.vstack((-np.sin(th), np.cos(th)))
+    dd_n = np.vstack((-np.cos(th), -np.sin(th)))
+    d_s = M.T @ (d_a * n + a * d_n * d_th)
+    dd_s = M.T @ (dd_a * n + 2 * d_a * d_n * d_th + a * (dd_n * d_th ** 2 + d_n * dd_th))
+
+    return np.abs(d_s[0] * dd_s[1] - d_s[1] * dd_s[0]) / (d_s[0] ** 2 + d_s[1] ** 2) ** 1.5
+
+
+def curvature_planar(t_phys, s1, s2):
+    ds1, ds2 = s1(t_phys, 1), s2(t_phys, 1)
+    dds1, dds2 = s1(t_phys, 2), s2(t_phys, 2)
+
+    return np.abs(ds1 * dds2 - ds2 * dds1) / (ds1 ** 2 + ds2 ** 2) ** 1.5
