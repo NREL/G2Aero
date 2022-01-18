@@ -1,5 +1,6 @@
-from .Grassmann import *
+import numpy as np
 from scipy.interpolate import PchipInterpolator
+from .Grassmann import *
 
 
 class Dataset:
@@ -27,8 +28,8 @@ class PGAspace:
         # for coefficients sampling
         pga_space.axis_min = np.min(t, axis=0)
         pga_space.axis_max = np.max(t, axis=0)
-        r_min = np.abs(np.quantile(t, 0.005, axis=0))
-        r_max = np.abs(np.quantile(t, 0.995, axis=0))
+        r_min = np.abs(np.quantile(t, 0.0, axis=0))
+        r_max = np.abs(np.quantile(t, 1.0, axis=0))
         pga_space.radius = np.max(np.array([r_min, r_max]), axis=0)
         return pga_space, t
 
@@ -91,7 +92,7 @@ class PGAspace:
     @staticmethod
     def intersection_exist(shape, i=0):
         n_landmarks, _ = shape.shape
-        if True in ((shape[-int(n_landmarks / 2):, 1][::-1] - shape[:int(n_landmarks / 2), 1]) < -1e-7):
+        if True in ((shape[-int(n_landmarks / 2):, 1][::-1] - shape[:int(n_landmarks / 2), 1]) < 0.002):
             print(f"WARNING: New shape {i} has intersection! gap = {shape[-1, 1] - shape[0, 1]}, "
                   f"intersection = {np.min((shape[-int(n_landmarks / 2):, 1][::-1] - shape[:int(n_landmarks / 2), 1]))}")
             return True
