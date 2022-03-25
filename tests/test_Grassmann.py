@@ -53,6 +53,22 @@ class Test(TestCase):
         new_shapes = shapes_gr @ M + b
         np.testing.assert_almost_equal(shapes, new_shapes, decimal=10, err_msg='', verbose=True)
 
+    def test_SPD(self):
+        #TODO: add physical shapes to test (right now X is already grassmannian)
+
+        # single shape
+        shapes_gr, P, b = polar_decomposition(X)
+        new_X = shapes_gr @ P + b
+        np.testing.assert_almost_equal(X, new_X, decimal=10, err_msg='', verbose=True)
+
+        # array of shapes
+        shapes = np.vstack((X, Y))
+        shapes_gr, P, b = polar_decomposition(shapes)
+        new_shapes = shapes_gr @ P + b
+        np.testing.assert_almost_equal(shapes, new_shapes, decimal=10, err_msg='', verbose=True)
+
+        #TODO: check orthonormality of columns
+
     def test_procrustes(self):
 
         # Recover angle

@@ -38,11 +38,12 @@ def landmark_affine_transform(X_phys):
 
     for i, xy in enumerate(X_phys):
         center_mass = np.mean(xy, axis=0)
-        U, D, _ = np.linalg.svd((xy - center_mass).T)
+        U, D, Vh = np.linalg.svd((xy - center_mass).T)
         Minv_T = np.diag(1. / D) @ U.T
         Minv[i] = Minv_T.T
         b[i] = center_mass
-        X_grassmann[i] = (xy - center_mass) @ Minv[i]
+        # X_grassmann[i] = (xy - center_mass) @ Minv[i]
+        X_grassmann[i] = Vh.T
 
     # Procrustes problem
     if n_shapes > 1:
@@ -55,6 +56,27 @@ def landmark_affine_transform(X_phys):
         return X_grassmann.squeeze(axis=0), np.linalg.inv(Minv).squeeze(axis=0), b.squeeze(axis=0)
     return X_grassmann, np.linalg.inv(Minv), b
 
+def polar_decomposition(X_phys):
+    X_phys = np.asarray(X_phys)
+    if len(X_phys.shape) < 3:
+        X_phys = np.expand_dims(X_phys, axis=0)
+
+    n_shapes, n_landmarks, _ = X_phys.shape
+    X_grassmann = np.empty_like(X_phys)
+    P = np.empty((n_shapes, 2, 2))
+    b = np.empty((n_shapes, 2))
+
+    for i, xy in enumerate(X_phys):
+        center_mass = np.mean(xy, axis=0)
+        U, D, _ = np.linalg.svd((xy - center_mass).T)
+        P[i] = (U * D) @ U.T
+        Pinv = (U / D) @ U.T
+        b[i] = center_mass
+        X_grassmann[i] = (xy - center_mass) @ Pinv
+    
+    if n_shapes == 1:
+        return X_grassmann.squeeze(axis=0), P.squeeze(axis=0), b.squeeze(axis=0)
+    return X_grassmann, P, b
 
 def exp(t, X, log_map):
     """Exponential mapping (Grassmannian geodesic).
