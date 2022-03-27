@@ -42,8 +42,9 @@ def landmark_affine_transform(X_phys):
         Minv_T = np.diag(1. / D) @ U.T
         Minv[i] = Minv_T.T
         b[i] = center_mass
-        # X_grassmann[i] = (xy - center_mass) @ Minv[i]
-        X_grassmann[i] = Vh.T
+        X_grassmann[i] = (xy - center_mass) @ Minv[i]
+        # TODO: check dimension of Vh.T
+        # X_grassmann[i] = Vh.T
 
     # Procrustes problem
     if n_shapes > 1:
