@@ -5,34 +5,21 @@ from scipy.linalg import expm, logm
 
 def Exp(p, X):
     Lambda, u = np.linalg.eig(p)
+    g = u @ np.sqrt(np.diag(Lambda))
+    ginv = np.linalg.inv(g)
+    Y = ginv @ X @ ginv.T
+    Sigma, v = np.linalg.eig(Y)
     
-    if np.min(Lambda) >= 1e-3:
-        g = u @ np.sqrt(np.diag(Lambda))
-        ginv = np.linalg.inv(g)
-        Y = ginv @ X @ ginv.T
-        Sigma, v = np.linalg.eig(Y)
-    else:
-        g = np.zeros((p.shape[0], p.shape[1]))
-        v = np.zeros((p.shape[0], p.shape[1]))
-        Sigma = np.zeros((p.shape[0], p.shape[1]))
-    
-    return (g@v) @ expm(Sigma) @ ((g@v).T)
+    return (g@v) @ expm(np.diag(Sigma)) @ ((g@v).T)
 
 def Log(p, x):
     Lambda, u = np.linalg.eig(p)
-    if np.min(Lambda) >= 1e-3:
-        g = u @ np.sqrt(np.diag(Lambda))
-        ginv = np.linalg.inv(g)
-        Y = ginv @ X @ ginv.T
-        Sigma, v = np.linalg.eig(Y)
-        output = (g@v) @ logm(Sigma) @ ((g@v).T)
-    else:
-        g = np.zeros((p.shape[0], p.shape[1]))
-        v = np.zeros((p.shape[0], p.shape[1]))
-        Sigma = np.zeros((p.shape[0], p.shape[1]))
-        output = np.zeros((p.shape[0], p.shape[1]))
-        
-    return output
+    g = u @ np.sqrt(np.diag(Lambda))
+    ginv = np.linalg.inv(g)
+    Y = ginv @ x @ ginv.T
+    Sigma, v = np.linalg.eig(Y)
+    
+    return (g@v) @ logm(np.diag(Sigma)) @ ((g@v).T)
 
 def Karcher(XD):
     # infer dimensionality from data
@@ -43,7 +30,7 @@ def Karcher(XD):
     # initialize
     count = 0
     V = np.ones((m, n))
-    muX = XD[:,:,0].reshape((m, n))
+    muX = XD[:,:,int(N/2)].reshape((m, n))
     L = np.zeros((m, n, N))
     
     print('Karcher mean convergence:')
@@ -57,7 +44,7 @@ def Karcher(XD):
         muX = Exp(muX, V)
         count += 1
         print('||V||_F = ', np.linalg.norm(V, ord='fro'))
-        if count > 10:
+        if count > 20:
             print('WARNING: Maximum count reached...')
             break
     return muX
@@ -75,4 +62,4 @@ def PGA(muX, XD):
     U, S, V = np.linalg.svd(1/np.sqrt(N) * H, full_matrices=False)
     # compute normal coordiantes
     t = H.T @ U
-    return U, t
+    return U, t, S
