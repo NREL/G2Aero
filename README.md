@@ -25,6 +25,7 @@ python setup.py install
 
 ``` -->
 ## Example 
+Grassmannian interpolation combined with parametrized affine deformations:
 <img src="https://github.com/NREL/G2Aero/blob/main/data/animations/animation.gif" alt="blade gif" title="gif" width="500"/>
 
 
