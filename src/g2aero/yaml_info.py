@@ -17,6 +17,7 @@ class YamlInfo:
         self.n_landmarks = n_landmarks
         self.xy_landmarks = np.empty((len(self.labels_nominal), n_landmarks, 2))
         for i, xy in enumerate(self.xy_fromfile):
+            # self.xy_landmarks[i] = get_landmarks(xy, n_landmarks=n_landmarks, add_gap=0.002, name=self.labels_nominal[i])
             self.xy_landmarks[i] = get_landmarks(xy, n_landmarks=n_landmarks, add_gap=0.002)
 
         # scaling of the nominal shape (same in x and y direction)
