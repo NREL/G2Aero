@@ -33,19 +33,18 @@ def landmark_affine_transform(X_phys):
 
     n_shapes, n_landmarks, _ = X_phys.shape
     X_grassmann = np.empty_like(X_phys)
+    M = np.empty((n_shapes, 2, 2))
     Minv = np.empty((n_shapes, 2, 2))
     b = np.empty((n_shapes, 2))
 
     for i, xy in enumerate(X_phys):
         center_mass = np.mean(xy, axis=0)
-        U, D, Vh = np.linalg.svd((xy - center_mass).T)
-        Minv_T = np.diag(1. / D) @ U.T
-        Minv[i] = Minv_T.T
+        U, D, Vh = np.linalg.svd((xy - center_mass).T, full_matrices=False)
+        Minv[i] = U*(1/D)
+        M[i] = D*U.T
         b[i] = center_mass
-        X_grassmann[i] = (xy - center_mass) @ Minv[i]
-        # TODO: check dimension of Vh.T
-        # X_grassmann[i] = Vh.T
-
+        # X_grassmann[i] = (xy - center_mass) @ Minv[i]
+        X_grassmann[i] = Vh.T
     # Procrustes problem
     if n_shapes > 1:
         for i in reversed(range(1, n_shapes)):
@@ -54,8 +53,8 @@ def landmark_affine_transform(X_phys):
             X_grassmann[i - 1] = X_grassmann[i - 1] @ R
 
     if n_shapes == 1:
-        return X_grassmann.squeeze(axis=0), np.linalg.inv(Minv).squeeze(axis=0), b.squeeze(axis=0)
-    return X_grassmann, np.linalg.inv(Minv), b
+        return X_grassmann.squeeze(axis=0), M.squeeze(axis=0), b.squeeze(axis=0)
+    return X_grassmann, M, b
 
 def polar_decomposition(X_phys):
     X_phys = np.asarray(X_phys)
