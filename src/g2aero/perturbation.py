@@ -4,8 +4,12 @@ from .Grassmann import *
 
 
 class Dataset:
-    def __init__(self, phys_shapes):
-        self.shapes_gr, self.M, self.b = landmark_affine_transform(phys_shapes)
+    def __init__(self, phys_shapes, method='SPD'):
+        self.n_shapes = len(phys_shapes)
+        if method == 'SPD':
+            self.shapes_gr, self.M, self.b = polar_decomposition(phys_shapes)
+        elif method == 'LA-transform':
+            self.shapes_gr, self.M, self.b = landmark_affine_transform(phys_shapes)
 
 
 class PGAspace:
@@ -18,8 +22,11 @@ class PGAspace:
         self.karcher_mean = karcher_mean
 
     @classmethod
-    def create_from_dataset(cls, phys_shapes, n_modes=None):
-        shapes_gr, M, b = landmark_affine_transform(phys_shapes)
+    def create_from_dataset(cls, phys_shapes, n_modes=None, method='SPD'):
+        if method == 'SPD':
+            shapes_gr, M, b = polar_decomposition(phys_shapes)
+        elif method == 'LA-transform':
+            shapes_gr, M, b = landmark_affine_transform(phys_shapes)
         karcher_mean = Karcher(shapes_gr)
         Vh, S, t = PGA(karcher_mean, shapes_gr, n_coord=n_modes)
         pga_space = cls(Vh, np.mean(M, axis=0), np.mean(b, axis=0), karcher_mean)
@@ -92,7 +99,7 @@ class PGAspace:
     @staticmethod
     def intersection_exist(shape, i=0):
         n_landmarks, _ = shape.shape
-        if True in ((shape[-int(n_landmarks / 2):, 1][::-1] - shape[:int(n_landmarks / 2), 1]) < 0.002):
+        if True in ((shape[-int(n_landmarks / 2):, 1][::-1] - shape[:int(n_landmarks / 2), 1]) < -1e8):
             print(f"WARNING: New shape {i} has intersection! gap = {shape[-1, 1] - shape[0, 1]}, "
                   f"intersection = {np.min((shape[-int(n_landmarks / 2):, 1][::-1] - shape[:int(n_landmarks / 2), 1]))}")
             return True

@@ -19,11 +19,11 @@ def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
     xy = np.asarray(xy)
 
     # Normalize coordinates (x from 0 to 1) to rid of the rounding error
-    x_min, x_max = np.min(xy[:, 0]), np.max(xy[:, 0])
-    xy[:, 0] = (xy[:, 0] - x_min) / (x_max - x_min)
-    xy[:, 1] = xy[:, 1] / (x_max - x_min)
-    if not np.allclose(x_min, 0) or not np.allclose(x_max, 1):
-        print('WARNING!: Airfoil shape is not normalized properly', x_min, x_max, (x_max - x_min))
+    # x_min, x_max = np.min(xy[:, 0]), np.max(xy[:, 0])
+    # xy[:, 0] = (xy[:, 0] - x_min) / (x_max - x_min)
+    # xy[:, 1] = xy[:, 1] / (x_max - x_min)
+    # if not np.allclose(x_min, 0) or not np.allclose(x_max, 1):
+    #     print('WARNING!: Airfoil shape is not normalized properly', x_min, x_max, (x_max - x_min))
 
     le_ind = np.argmin(xy[:, 0])  # Leading edge index
     y1_avg = np.average(xy[:le_ind, 1])  # Determine orientation of the airfoil shape
@@ -47,6 +47,7 @@ def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
 def planar_reparametrization(xy, n_landmarks, sampling='uniform'):
 
     t_phys = arc_distance(xy)
+    
     s1 = CubicSpline(t_phys, xy[:, 0])
     s2 = CubicSpline(t_phys, xy[:, 1])
 
@@ -54,7 +55,7 @@ def planar_reparametrization(xy, n_landmarks, sampling='uniform'):
         t_new = np.linspace(0, 1, n_landmarks)
 
     if sampling == 'curvature':
-        t_tmp = np.linspace(0, 1, 10000)
+        t_tmp = np.linspace(0, 1, 100000)
         curvature_i = curvature_planar(t_tmp, s1, s2)
         curvature_cdf_i = np.cumsum(curvature_i) - curvature_i[0]
         curvature_cdf_i /= curvature_cdf_i[-1]
@@ -80,15 +81,15 @@ def polar_reparametrization(xy, n_landmarks=401, sampling='uniform_gr'):
     if sampling == 'uniform_gr':
         t_new = np.linspace(0, 1, n_landmarks)
     # distribute landmarks uniformly along the arc length in physical space
-    if sampling == 'uniform_phys' or sampling == 'uniform':
-        t_tmp = np.linspace(0, 1, 10000)
+    elif sampling == 'uniform_phys' or sampling == 'uniform':
+        t_tmp = np.linspace(0, 1, 100000)
         landmarks = np.vstack((alpha(t_tmp) * np.cos(theta(t_tmp)), alpha(t_tmp) * np.sin(theta(t_tmp)))).T
         landmarks = landmarks @ M + b
         t_phys = arc_distance(landmarks)
         t_new = PchipInterpolator(t_phys, t_tmp)(np.linspace(0, 1, n_landmarks))
     # distribute landmarks according to curvature of shape in physical space
     elif sampling == 'curvature':
-        t_tmp = np.linspace(0, 1, 10000)
+        t_tmp = np.linspace(0, 1, 100000)
         curvature_i = curvature_polar(t_tmp, alpha, theta, M)
         curvature_cdf_i = np.cumsum(curvature_i) - curvature_i[0]
         curvature_cdf_i /= curvature_cdf_i[-1]
