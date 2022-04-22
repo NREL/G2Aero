@@ -40,6 +40,18 @@ pytest
 Contributions are always welcome! See `contributing.md` for ways to get started.
 Please adhere to this project's `code of conduct`.
 
+## Citations
+If you use this software in your research or publications, please cite the following paper:
+
+   @inproceedings{
+   doronina2022grassmannian,
+   title={Grassmannian Shape Representations for Aerodynamic Applications},
+   author={Olga Doronina and Zachary Grey and Andrew Glaws},
+   booktitle={AAAI 2022 Workshop on AI for Design and Manufacturing (ADAM)},
+   year={2022},
+   url={https://openreview.net/forum?id=1RRU6ud9YC}
+   }
+
 <!-- ## License -->
 
 
