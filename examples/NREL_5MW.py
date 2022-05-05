@@ -1,9 +1,10 @@
 import os
 import numpy as np
-from src.g2aero import YamlInfo
-from src.g2aero import GrassmannInterpolator
-from src.g2aero import TransformBlade, global_blade_coordinates
-from src.g2aero import blade_CAD_geometry
+from g2aero import yaml_info
+from g2aero.Grassmann_interpolation import GrassmannInterpolator
+from g2aero.transform import TransformBlade
+from g2aero.transform import global_blade_coordinates
+from g2aero import geometry_gmsh
 from time import time
 import datetime
 # from plot_animation import plot_3d_blade
@@ -12,7 +13,7 @@ def main():
     shapes_filename = os.path.join(os.getcwd(), "../data", 'blades_yamls', "nrel5mw_ofpolars.yaml")
 
     t_start = time()
-    Blade = YamlInfo(shapes_filename, n_landmarks=321)
+    Blade = yaml_info.YamlInfo(shapes_filename, n_landmarks=321)
     eta_nominal = Blade.eta_nominal
     xy_nominal = Blade.xy_landmarks
 
@@ -44,7 +45,7 @@ def main():
     t4 = time()
     xyz_global = global_blade_coordinates(xyz_local)
     # to create stp file and unstructured grid
-    blade_CAD_geometry(xyz_global, 'nrel5mw_ofpolars', msh=True)
+    geometry_gmsh.blade_CAD_geometry(xyz_global, 'nrel5mw_ofpolars', msh=True)
     t5 = time()
 
     print(f'Time to make nominal cross sections from .yaml file: {datetime.timedelta(seconds=(t1 - t_start))}')
