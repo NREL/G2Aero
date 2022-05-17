@@ -14,7 +14,7 @@ if os.path.isfile(requirementPath):
 
 setuptools.setup(
     name='g2aero',
-    version='0.1.0',
+    version='0.1.1',
     packages=setuptools.find_packages(where="src"),
     project_urls={
         "Bug Tracker": "https://github.com/NREL/G2Aero",
