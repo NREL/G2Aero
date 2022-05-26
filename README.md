@@ -19,6 +19,11 @@ cd G2Aero
 python setup.py install
 ```
 
+Installing via `conda-forge`
+```bash
+conda install -c conda-forge g2aero
+```
+
 ## Usage
 
 <!-- ```python
