@@ -80,17 +80,32 @@ def polar_decomposition(X_phys):
         return X_grassmann.squeeze(axis=0), P.squeeze(axis=0), b.squeeze(axis=0)
     return X_grassmann, P, b
 
-def exp(t, X, log_map):
+def exp(t, X, direction):
     """Exponential mapping (Grassmannian geodesic).
-
+    
+    :param t: scalar > 0, how far in given direction to move (if t=0, exp(X, log_map) = X)
     :param X: (n_landmarks, 2) array defining starting point of geodesic on Grassmann
-    :param log_map: (n_landmarks, 2) array defining direction in tangent space (tangent vector \Delta)
+    :param direction: (n_landmarks, 2) array defining direction in tangent space (tangent vector \Delta)
     :return: (n_landmarks, 2) array defining end point on Grassmann
     """
-    U, S, Vh = np.linalg.svd(log_map, full_matrices=False)
+    U, S, Vh = np.linalg.svd(direction, full_matrices=False)
     exp_map = np.hstack((X @ Vh.T, U)) @ np.vstack((np.diag(np.cos(t *
                                                                    S)), np.diag(np.sin(t * S)))) @ Vh
     return exp_map
+
+
+def exp_spd(P, direction):
+    """SPD Exponential
+
+    :param P: (2, 2) array defining starting point 
+    :param direction: (2, 2) array defining direction in tangent space 
+    :return: (2, 2) array defining end point 
+    """
+    P, direction = np.asarray(P), np.asarray(direction)
+    P_sqrt = np.sqrt(P)
+    P_sqrt_inv = np.linalg.inv(P_sqrt)
+    D = P_sqrt @ np.exp(P_sqrt_inv @ direction @ P_sqrt_inv) @ P_sqrt
+    return D
 
 
 def log(X, Y):
@@ -103,12 +118,26 @@ def log(X, Y):
     :param Y: (n_landmarks, 2) array defining end point of geodesic on Grassmann
     :return: (n_landmarks, 2) array defining direction in tangent space (tangent vector \Delta)
     """
+    
     X, Y = np.asarray(X), np.asarray(Y)
     ortho_projection = np.eye(len(X)) - X @ X.T
     Delta = ortho_projection @ Y @ np.linalg.inv(X.T @ Y)
     U, S, Vh = np.linalg.svd(Delta, full_matrices=False)
     log_map = U @ np.diag(np.arctan(S)) @ Vh
     return log_map
+
+
+def log_spd(P, D):
+    """SPD Logarithm
+
+    :param P: (2, 2) array defining start point 
+    :param D: (2, 2) array defining end point
+    :return: (2, 2) array defining direction in tangent space
+    """
+    P_sqrt = np.sqrt(P)
+    P_sqrt_inv = np.linalg.inv(P_sqrt)
+    direction = P_sqrt @ np.log(P_sqrt_inv @ D @ P_sqrt_inv) @ P_sqrt
+    return direction
 
 
 def distance(X, Y):
@@ -129,10 +158,8 @@ def distance(X, Y):
     dim = X.shape[1]  # get dimensions(must be identical for Y)
     if X.shape != Y.shape:
         raise ValueError('Input matrices must have the same number of columns')
-    if not np.allclose(X.T @ X, np.eye(dim)):
-        raise ValueError(f'First input does not constitute an element of the Grassmannian: X.T @ X = {X.T @ X}')
-    if not np.allclose(Y.T @ Y, np.eye(dim)):
-        raise ValueError('Second input does not constitute an element of the Grassmannian')
+    check_orthogonality(X)
+    check_orthogonality(Y)
 
     D = np.linalg.svd(X.T @ Y, compute_uv=False)  # compute singular values
 
@@ -147,17 +174,20 @@ def distance(X, Y):
     return dist
 
 
-def Karcher(shapes, max_steps=20):
+def Karcher(shapes, eps=1e-8, max_steps=20):
     """Karcher mean for given shapes.
 
     Calculated Karcher mean for given shapes (elements on Grassmann) by
-    minimizing the sum of squared (Riemannian) distances to all shapes in the data (Fletcher, Lu, and Joshi 2003)
+    minimizing the sum of squared (Riemannian) distances to all shapes in the data 
+    (Fletcher, Lu, and Joshi 2003)
 
-    :param shapes: (n_shapes, n_landmarks, 2) array defining given shapes (Grassmann elements)
+    :param shapes: (n_shapes, n_landmarks, 2) array of given shapes (Grassmann elements)
     :param max_steps: maximum number of iterations to converge
     :return: (n_landmarks, 2) array defining Karcher mean (element on Grassmann)
     """
     shapes = np.asarray(shapes)
+    # check for orthogonality (for Grassmann elements)
+    check_orthogonality(shapes[0])
     log_directions = np.zeros_like(shapes)
     mu_karcher = shapes[0]
     print('Karcher mean convergence:')
@@ -168,7 +198,7 @@ def Karcher(shapes, max_steps=20):
         V = np.mean(log_directions, axis=0)
         mu_karcher = exp(1, mu_karcher, V)
         print(f'||V||_F = {np.linalg.norm(V, ord="fro")}')
-        if np.linalg.norm(V, ord='fro') <= 1e-8:
+        if np.linalg.norm(V, ord='fro') <= eps:
             return mu_karcher
     print('WARNING: Maximum count reached...')
     return mu_karcher
@@ -189,6 +219,7 @@ def PGA(mu, shapes_gr, n_coord=None):
              S is corresponding singular values,
     """
     shapes_gr, mu = np.asarray(shapes_gr), np.asarray(mu)
+    check_orthogonality(shapes_gr[0])
     n_shapes, n_landmarks, dim = shapes_gr.shape
     # get tangent directions from mu to each point (each direction is set of (n_landmark, dim)-dimensional vectors)
     # flatten each (n_landmark, dim) vector into (n_landmark*dim) vector for later svd decomposition
@@ -214,6 +245,7 @@ def PGA_modes(PGA_directions, mu, scale=1, sub=10):
     :param sub: subset of directions (first sub directions)
     :return: elements on Grassmann (perturbed from mu in PGA_directions)
     """
+    PGA_directions = PGA_directions.reshape(len(PGA_directions), -1, 2)
     PGA_fwd = np.zeros_like(PGA_directions)
     for i in range(min(sub, len(PGA_directions))):
         PGA_fwd[i] = exp(scale, mu, PGA_directions[i])
@@ -269,3 +301,7 @@ def parallel_translate(start, end_direction, vector):
     exp_map = np.hstack((start @ Vh.T, U)) @ np.vstack((-np.diag(np.sin(S)), np.diag(np.cos(S)))) @ U.T \
               + np.eye(n_landmarks) - U@U.T
     return exp_map @ vector
+
+def check_orthogonality(X):
+    if not np.allclose(X.T @ X, np.eye(X.shape[1])):
+        raise ValueError(f'Input does not constitute an element of the Grassmannian: X.T @ X = {X.T @ X}')
