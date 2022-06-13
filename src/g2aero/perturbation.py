@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.interpolate import PchipInterpolator
 from .Grassmann import *
+from .utils import check_selfintersect
 
 
 class Dataset:
@@ -22,7 +23,7 @@ class PGAspace:
         self.karcher_mean = karcher_mean
 
     @classmethod
-    def create_from_dataset(cls, phys_shapes, n_modes=None, method='SPD'):
+    def create_from_dataset(cls, phys_shapes, n_modes=None, method='LA-transform'):
         if method == 'SPD':
             shapes_gr, M, b = polar_decomposition(phys_shapes)
         elif method == 'LA-transform':
@@ -98,10 +99,10 @@ class PGAspace:
 
     @staticmethod
     def intersection_exist(shape, i=0):
-        n_landmarks, _ = shape.shape
-        if True in ((shape[-int(n_landmarks / 2):, 1][::-1] - shape[:int(n_landmarks / 2), 1]) < -1e8):
-            print(f"WARNING: New shape {i} has intersection! gap = {shape[-1, 1] - shape[0, 1]}, "
-                  f"intersection = {np.min((shape[-int(n_landmarks / 2):, 1][::-1] - shape[:int(n_landmarks / 2), 1]))}")
+
+        check_selfintersect(shape)
+        if check_selfintersect(shape):
+            print(f"WARNING: New shape {i} has intersection!")
             return True
         return False
 
@@ -128,15 +129,18 @@ class PGAspace:
             return new_blade
 
         def intersection_exist_in_blade(blade):
-            flag = []
             for i, shape in enumerate(blade):
-                flag.append(self.intersection_exist(shape, i))
-            return True in flag
+                if self.intersection_exist(shape, i):
+                    return True
+            return False
 
         if coef is None:
             coef_array = self.sample_coef(n)
         else:
-            coef_array = coef
+            coef_array = np.asarray(coef)
+            if len(coef_array.shape) == 1:
+                coef_array = np.expand_dims(coef_array, axis=0)
+
         n = len(coef_array)
         blades = np.empty((n, n_shapes, n_landmarks, dim))
         for k, c in enumerate(coef_array):
