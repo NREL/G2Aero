@@ -4,7 +4,7 @@ from scipy.optimize import lsq_linear
 from scipy.special import comb
 
 from .Grassmann import landmark_affine_transform
-from .utils import add_tailedge_gap
+from .utils import add_tailedge_gap, arc_distance
 
 
 def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
@@ -17,6 +17,10 @@ def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
     :return: (n_landmarks, 2) array of landmarks after reparametrization
     """
     xy = np.asarray(xy)
+
+    # remove for consequant duplicate points
+    ind = np.where(np.diff(arc_distance(xy), axis=0) == 0)[0]
+    xy = np.delete(xy, ind, axis=0)
 
     # Normalize coordinates (x from 0 to 1) to rid of the rounding error
     # x_min, x_max = np.min(xy[:, 0]), np.max(xy[:, 0])
@@ -153,7 +157,7 @@ def cst_matrix(x, n1, n2, order):
     return (class_function * shape_function).T
 
 
-def from_cst_parameters(xinp, cst_lower, cst_upper, n1, n2, te_lower, te_upper,):
+def from_cst_parameters(xinp, cst_lower, cst_upper, n1=0.5, n2=1.0, te_lower=0, te_upper=0):
     """ Compute landmark coordinates for the airfoil
     :param xinp: (np.ndarray): Non-dimensional x-coordinate locations
     :param cst_lower: (np.ndarray): cst parameters for lower part
@@ -175,12 +179,6 @@ def from_cst_parameters(xinp, cst_lower, cst_upper, n1, n2, te_lower, te_upper,)
     y = np.hstack((y_lower[::-1], y_upper[1:])).reshape(-1, 1)
 
     return np.hstack((x, y))
-
-
-def arc_distance(xy):
-    dist = np.linalg.norm(np.diff(xy, axis=0), axis=1)
-    t = np.cumsum(dist) / np.sum(dist)
-    return np.hstack(([0.0], t))
 
 
 def curvature_polar(t, alpha, theta, M):

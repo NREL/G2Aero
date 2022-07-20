@@ -7,7 +7,7 @@ from .reparametrization import get_landmarks
 
 class YamlInfo:
 
-    def __init__(self, yaml_filename, n_landmarks):
+    def __init__(self, yaml_filename, n_landmarks=401):
         airfoils_dict, airfoils_nominal_list, hub_d = self.read_yamlfile(yaml_filename)
 
         self.eta_nominal = np.array(airfoils_dict['airfoil_position']['grid'])
