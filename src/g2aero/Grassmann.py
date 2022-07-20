@@ -31,54 +31,27 @@ def landmark_affine_transform(X_phys):
     if len(X_phys.shape) < 3:
         X_phys = np.expand_dims(X_phys, axis=0)
 
-    n_shapes, n_landmarks, _ = X_phys.shape
+    n_shapes, _, _ = X_phys.shape
     X_grassmann = np.empty_like(X_phys)
     M = np.empty((n_shapes, 2, 2))
     Minv = np.empty((n_shapes, 2, 2))
     b = np.empty((n_shapes, 2))
 
     for i, xy in enumerate(X_phys):
-        center_mass = np.mean(xy, axis=0)
-        U, D, Vh = np.linalg.svd((xy - center_mass).T, full_matrices=False)
-
-        Minv[i] = U*(1/D)
-        M[i] = D*U.T
-        b[i] = center_mass
-        # X_grassmann[i] = (xy - center_mass) @ Minv[i]
+        b[i] = np.mean(xy, axis=0) # center of mass
+        U, D, Vh = np.linalg.svd((xy - b[i]).T, full_matrices=False)
+        M[i] = np.diag(D)@U
         X_grassmann[i] = Vh.T
-        
     # Procrustes problem
     if n_shapes > 1:
         for i in reversed(range(1, n_shapes)):
             R = procrustes(X_grassmann[i - 1], X_grassmann[i])
-            Minv[i - 1] = Minv[i - 1] @ R
+            M[i - 1] =  R.T @ M[i - 1] 
             X_grassmann[i - 1] = X_grassmann[i - 1] @ R
 
     if n_shapes == 1:
         return X_grassmann.squeeze(axis=0), M.squeeze(axis=0), b.squeeze(axis=0)
     return X_grassmann, M, b
-
-def polar_decomposition(X_phys):
-    X_phys = np.asarray(X_phys)
-    if len(X_phys.shape) < 3:
-        X_phys = np.expand_dims(X_phys, axis=0)
-
-    n_shapes, n_landmarks, _ = X_phys.shape
-    X_grassmann = np.empty_like(X_phys)
-    P = np.empty((n_shapes, 2, 2))
-    b = np.empty((n_shapes, 2))
-
-    for i, xy in enumerate(X_phys):
-        center_mass = np.mean(xy, axis=0)
-        U, D, _ = np.linalg.svd((xy - center_mass).T, full_matrices=False)
-        P[i] = (U * D) @ U.T
-        Pinv = (U / D) @ U.T
-        b[i] = center_mass
-        X_grassmann[i] = (xy - center_mass) @ Pinv
-    
-    if n_shapes == 1:
-        return X_grassmann.squeeze(axis=0), P.squeeze(axis=0), b.squeeze(axis=0)
-    return X_grassmann, P, b
 
 def exp(t, X, direction):
     """Exponential mapping (Grassmannian geodesic).
@@ -92,20 +65,6 @@ def exp(t, X, direction):
     exp_map = np.hstack((X @ Vh.T, U)) @ np.vstack((np.diag(np.cos(t *
                                                                    S)), np.diag(np.sin(t * S)))) @ Vh
     return exp_map
-
-
-def exp_spd(P, direction):
-    """SPD Exponential
-
-    :param P: (2, 2) array defining starting point 
-    :param direction: (2, 2) array defining direction in tangent space 
-    :return: (2, 2) array defining end point 
-    """
-    P, direction = np.asarray(P), np.asarray(direction)
-    P_sqrt = np.sqrt(P)
-    P_sqrt_inv = np.linalg.inv(P_sqrt)
-    D = P_sqrt @ np.exp(P_sqrt_inv @ direction @ P_sqrt_inv) @ P_sqrt
-    return D
 
 
 def log(X, Y):
@@ -125,19 +84,6 @@ def log(X, Y):
     U, S, Vh = np.linalg.svd(Delta, full_matrices=False)
     log_map = U @ np.diag(np.arctan(S)) @ Vh
     return log_map
-
-
-def log_spd(P, D):
-    """SPD Logarithm
-
-    :param P: (2, 2) array defining start point 
-    :param D: (2, 2) array defining end point
-    :return: (2, 2) array defining direction in tangent space
-    """
-    P_sqrt = np.sqrt(P)
-    P_sqrt_inv = np.linalg.inv(P_sqrt)
-    direction = P_sqrt @ np.log(P_sqrt_inv @ D @ P_sqrt_inv) @ P_sqrt
-    return direction
 
 
 def distance(X, Y):
@@ -231,8 +177,8 @@ def PGA(mu, shapes_gr, n_coord=None):
     U, S, Vh = np.linalg.svd(H, full_matrices=False)
     # projection of the data on principal axis (H@V = U@S@Vh@V = U@S))
     t = U*S  # shape(n_shapes, n_landmark*dim)
-    if n_coord is None or n_coord > n_landmarks:
-        n_coord = n_landmarks
+    if n_coord is None or n_coord > 2*n_landmarks:
+        n_coord = 2*n_landmarks
     return Vh[:n_coord, :], S[:n_coord], t[:, :n_coord]
 
 

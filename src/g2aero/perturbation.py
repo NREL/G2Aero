@@ -2,13 +2,13 @@ import numpy as np
 from scipy.interpolate import PchipInterpolator
 from .Grassmann import *
 from .utils import check_selfintersect
-
+import g2aero.SPD as spd
 
 class Dataset:
     def __init__(self, phys_shapes, method='SPD'):
         self.n_shapes = len(phys_shapes)
         if method == 'SPD':
-            self.shapes_gr, self.M, self.b = polar_decomposition(phys_shapes)
+            self.shapes_gr, self.M, self.b = spd.polar_decomposition(phys_shapes)
         elif method == 'LA-transform':
             self.shapes_gr, self.M, self.b = landmark_affine_transform(phys_shapes)
 
@@ -25,7 +25,7 @@ class PGAspace:
     @classmethod
     def create_from_dataset(cls, phys_shapes, n_modes=None, method='LA-transform'):
         if method == 'SPD':
-            shapes_gr, M, b = polar_decomposition(phys_shapes)
+            shapes_gr, M, b = spd.polar_decomposition(phys_shapes)
         elif method == 'LA-transform':
             shapes_gr, M, b = landmark_affine_transform(phys_shapes)
         karcher_mean = Karcher(shapes_gr)
@@ -33,7 +33,7 @@ class PGAspace:
         pga_space = cls(Vh, np.mean(M, axis=0), np.mean(b, axis=0), karcher_mean)
         pga_space.S = S
 
-        # for coefficients sampling
+        # for coefficients sampling.
         pga_space.axis_min = np.min(t, axis=0)
         pga_space.axis_max = np.max(t, axis=0)
         r_min = np.abs(np.quantile(t, 0.0, axis=0))
@@ -74,7 +74,9 @@ class PGAspace:
 
         :param coef: array of deterministic perturbations (n, n_modes)
         :param n: number of perturbed shapes, if not given calculated from coef.shape[0]
-        :return: array of generated perturbed shapes (n, n_landmarks, 2) in physical and grassmann coordinates and PGA corresponding to perturbations (n, n_modes)
+        :return: array of generated perturbed shapes (n, n_landmarks, 2) in physical and 
+                 array of grassmann coordinates and 
+                 array of PGA coordinates corresponding to perturbations (n, n_modes)
         """
         if coef is None:
             coef_array = self.sample_coef(n)
@@ -86,25 +88,16 @@ class PGAspace:
         for i, c in enumerate(coef_array):
             while True:
                 gr_samples[i] = perturb_gr_shape(self.Vh, self.karcher_mean, c)
-                if not self.intersection_exist(gr_samples[i], i) or coef is not None:
+                if coef is not None or not check_selfintersect(gr_samples[i])       :
                     break
                 else:
                     c = self.sample_coef()
-                    print('generating new coef')
+                    print(f"WARNING: New shape {i} has intersection! Generating new coef")
                     coef_array[i] = c
             phys_samples[i] = gr_samples[i] @ self.M_mean.T + self.b_mean
         if n == 1:
             return phys_samples.squeeze(axis=0), gr_samples.squeeze(axis=0),  coef_array
         return phys_samples, gr_samples, coef_array
-
-    @staticmethod
-    def intersection_exist(shape, i=0):
-
-        check_selfintersect(shape)
-        if check_selfintersect(shape):
-            print(f"WARNING: New shape {i} has intersection!")
-            return True
-        return False
 
     def generate_perturbed_blade(self, blade, coef=None, n=1):
         """ Generates perturbed blades.
@@ -115,7 +108,8 @@ class PGAspace:
         :param blade: array of grassmann shapes for baseline blade
         :param coef: perturbation coefficients (sampled if not given)
         :param n: number of perturbations (if need to sample)
-        :return: array of perturbed blades (in grassmann coordinates) (shape=(n, n_shapes, n_landmarks, 2)) and PGA corresponding to perturbations (n, n_modes)
+        :return: array of perturbed blades (in grassmann coordinates) (shape=(n, n_shapes, n_landmarks, 2)) and 
+                 array of PGA corresponding to perturbations (n, n_modes)
         """
         n_shapes, n_landmarks, dim = blade.shape
 
@@ -130,7 +124,8 @@ class PGAspace:
 
         def intersection_exist_in_blade(blade):
             for i, shape in enumerate(blade):
-                if self.intersection_exist(shape, i):
+                if check_selfintersect(shape):
+                    print(f"WARNING: New shape {i} has intersection!")
                     return True
             return False
 
