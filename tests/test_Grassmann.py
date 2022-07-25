@@ -848,10 +848,10 @@ class Test(TestCase):
         np.testing.assert_almost_equal(Y_phys, new_X, decimal=10, err_msg='', verbose=True)
 
         # # array of shapes
-        # shapes = np.vstack((X, Y))
-        # shapes_gr, M, b = landmark_affine_transform(shapes)
-        # new_shapes = shapes_gr @ M + b
-        # np.testing.assert_almost_equal(shapes, new_shapes, decimal=10, err_msg='', verbose=True)
+        shapes = np.vstack((X, Y))
+        shapes_gr, M, b = landmark_affine_transform(shapes)
+        new_shapes = shapes_gr @ M + b
+        np.testing.assert_almost_equal(shapes, new_shapes, decimal=10, err_msg='', verbose=True)
 
     
     def test_procrustes(self):

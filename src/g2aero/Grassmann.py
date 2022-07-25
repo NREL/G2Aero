@@ -40,7 +40,7 @@ def landmark_affine_transform(X_phys):
     for i, xy in enumerate(X_phys):
         b[i] = np.mean(xy, axis=0) # center of mass
         U, D, Vh = np.linalg.svd((xy - b[i]).T, full_matrices=False)
-        M[i] = np.diag(D)@U
+        M[i] = np.diag(D)@U.T
         X_grassmann[i] = Vh.T
     # Procrustes problem
     if n_shapes > 1:
