@@ -34,7 +34,6 @@ def landmark_affine_transform(X_phys):
     n_shapes, _, _ = X_phys.shape
     X_grassmann = np.empty_like(X_phys)
     M = np.empty((n_shapes, 2, 2))
-    Minv = np.empty((n_shapes, 2, 2))
     b = np.empty((n_shapes, 2))
 
     for i, xy in enumerate(X_phys):
@@ -69,7 +68,7 @@ def exp(t, X, direction):
 
 def log(X, Y):
     """Logarithmic mapping (inverse mapping of exponential map).
-
+    Algorithm 11 (Zimmermann, 2019)
     Calculate logarithmic map log_X(Y) (inverse mapping of exponential map).
     Calculates direction(tangent vector \Delta) from X to Y in tangent subspace.
 
@@ -77,12 +76,15 @@ def log(X, Y):
     :param Y: (n_landmarks, 2) array defining end point of geodesic on Grassmann
     :return: (n_landmarks, 2) array defining direction in tangent space (tangent vector \Delta)
     """
-    
     X, Y = np.asarray(X), np.asarray(Y)
+    Psi, S, Rh = np.linalg.svd(Y.T@X, full_matrices=False)
+    # Procrutes match
+    Y = Y @ (Psi @ Rh) 
+    # Projection to horizontal space
     ortho_projection = np.eye(len(X)) - X @ X.T
-    Delta = ortho_projection @ Y @ np.linalg.inv(X.T @ Y)
-    U, S, Vh = np.linalg.svd(Delta, full_matrices=False)
-    log_map = U @ np.diag(np.arctan(S)) @ Vh
+    L = ortho_projection @ Y 
+    Q, Sigma, Vh = np.linalg.svd(L, full_matrices=False)
+    log_map = Q @ np.diag(np.arcsin(Sigma)) @ Vh
     return log_map
 
 
@@ -209,6 +211,8 @@ def get_PGA_coordinates(shapes_gr, mu, V):
     :return: (n_shapes, n_coord) array of PGA coordinates for given shapes
     """
     shapes_gr, mu = np.asarray(shapes_gr), np.asarray(mu)
+    if len(shapes_gr.shape) < 3:
+        shapes_gr = np.expand_dims(shapes_gr, axis=0)
     n_shapes, n_landmarks, dim = shapes_gr.shape
     # get tangent directions from mu to each point (each direction is set of (n_landmark, dim)-dimensional vectors)
     # flatten each (n_landmark, dim) vector into (n_landmark*dim) vector

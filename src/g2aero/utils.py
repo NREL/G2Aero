@@ -3,11 +3,26 @@ from scipy.interpolate import CubicSpline, PchipInterpolator
 
 
 def add_tailedge_gap(xy, gap):
+    # need to position airfoil first
     # split into upper and lower parts
     le_ind = np.argmin(xy[:, 0])  # Leading edge index
     xy_upper, xy_lower = xy[le_ind:], xy[:le_ind]
     xy_upper[:, 1] += xy_upper[:, 0] * gap/2
     xy_lower[:, 1] -= xy_lower[:, 0] * gap/2
+    return np.r_[xy_lower, xy_upper]
+
+def add_minimum_gap(xy):
+    """Adding minimum TE gap of 2mm.
+    Before using need to position airfoil first (chord on x-axis from 0 to 1)
+
+    :param xy (n, 2): shape coordinates
+    :return: array of shape coordinates with added gap
+    """
+    # split into upper and lower parts
+    le_ind = np.argmin(xy[:, 0])  # Leading edge index
+    xy_upper, xy_lower = xy[le_ind:], xy[:le_ind]
+    xy_upper[:, 1] += xy_upper[:, 0] * 0.001
+    xy_lower[:, 1] -= xy_lower[:, 0] * 0.001
     return np.r_[xy_lower, xy_upper]
 
 

@@ -18,8 +18,8 @@ def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
     """
     xy = np.asarray(xy)
 
-    # remove for consequant duplicate points
-    ind = np.where(np.diff(arc_distance(xy), axis=0) == 0)[0]
+    # remove for consequent duplicate points
+    ind = np.where(np.diff(arc_distance(xy), axis=0) <= 1e-7)[0]
     xy = np.delete(xy, ind, axis=0)
 
     # Normalize coordinates (x from 0 to 1) to rid of the rounding error
@@ -52,8 +52,8 @@ def planar_reparametrization(xy, n_landmarks, sampling='uniform'):
 
     t_phys = arc_distance(xy)
     
-    s1 = CubicSpline(t_phys, xy[:, 0])
-    s2 = CubicSpline(t_phys, xy[:, 1])
+    s1 = CubicSpline(t_phys, xy[:, 0], bc_type='natural')
+    s2 = CubicSpline(t_phys, xy[:, 1], bc_type='natural')
 
     if sampling == 'uniform_phys' or sampling == 'uniform':
         t_new = np.linspace(0, 1, n_landmarks)
