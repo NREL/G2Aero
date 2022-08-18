@@ -13,7 +13,7 @@ def procrustes(X, Y):
     :return: (2, 2) array of rotation matrix
     """
     X = np.asarray(X)
-    U, s, Vh = np.linalg.svd(X.T @ Y)
+    U, _, Vh = np.linalg.svd(X.T @ Y)
     R = U @ Vh
     return R
 
@@ -77,14 +77,14 @@ def log(X, Y):
     :return: (n_landmarks, 2) array defining direction in tangent space (tangent vector \Delta)
     """
     X, Y = np.asarray(X), np.asarray(Y)
-    Psi, S, Rh = np.linalg.svd(Y.T@X, full_matrices=False)
     # Procrutes match
-    Y = Y @ (Psi @ Rh) 
+    R = procrustes(Y, X)
+    Y = Y @ R
     # Projection to horizontal space
     ortho_projection = np.eye(len(X)) - X @ X.T
     L = ortho_projection @ Y 
     Q, Sigma, Vh = np.linalg.svd(L, full_matrices=False)
-    log_map = Q @ np.diag(np.arcsin(Sigma)) @ Vh
+    log_map = (Q * np.arcsin(Sigma)) @ Vh
     return log_map
 
 
