@@ -29,6 +29,7 @@ class PGAspace:
         elif method == 'LA-transform':
             shapes_gr, M, b = landmark_affine_transform(phys_shapes)
         karcher_mean = Karcher(shapes_gr)
+
         Vh, S, t = PGA(karcher_mean, shapes_gr, n_coord=n_modes)
         pga_space = cls(Vh, np.mean(M, axis=0), np.mean(b, axis=0), karcher_mean)
         pga_space.S = S
@@ -54,6 +55,14 @@ class PGAspace:
 
     def gr_shapes2PGA(self, shapes_gr):
         return get_PGA_coordinates(shapes_gr, self.karcher_mean, self.Vh.T)
+    
+    def shapes2PGA(self, shapes, method='SPD', n_modes=None):
+        if method == 'SPD':
+            shapes_gr, M, b = spd.polar_decomposition(shapes)
+        elif method == 'LA-transform':
+            shapes_gr, M, b = landmark_affine_transform(shapes)
+        t = get_PGA_coordinates(shapes_gr, self.karcher_mean, self.Vh.T)
+        return t, M, b
 
     def sample_coef(self, n_samples=1):
         k = 0

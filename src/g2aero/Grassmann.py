@@ -200,7 +200,7 @@ def PGA_modes(PGA_directions, mu, scale=1, sub=10):
     return PGA_fwd
 
 
-def get_PGA_coordinates(shapes_gr, mu, V):
+def get_PGA_coordinates(shapes_gr, mu, V, n_modes=None):
     """
     Get PGA coordinates of given standardized shapes (elements of Grassmann) and
     PGA space defined by Karcher mean and basis vectors.
@@ -214,24 +214,28 @@ def get_PGA_coordinates(shapes_gr, mu, V):
     if len(shapes_gr.shape) < 3:
         shapes_gr = np.expand_dims(shapes_gr, axis=0)
     n_shapes, n_landmarks, dim = shapes_gr.shape
+    if n_modes is None or n_modes > 2*n_landmarks:
+        n_modes = 2*n_landmarks
     # get tangent directions from mu to each point (each direction is set of (n_landmark, dim)-dimensional vectors)
     # flatten each (n_landmark, dim) vector into (n_landmark*dim) vector
     H = np.zeros((n_shapes, n_landmarks * dim))
     for i, shape in enumerate(shapes_gr):
         H[i] = log(mu, shape).flatten()
-    coords = H@V
+    coords = H@V[:, :n_modes]
     return coords
 
 
 def perturb_gr_shape(Vh, mu, perturbation):
     """Given element Karcher mean, perturbs it in given direction by a given amount.
 
-    :param Vh: (n_coord*2, n_coord*2) array of PGA basis vectors transposed
+    :param Vh: (n_landmarks*2, n_landmarks*2) array of PGA basis vectors transposed
     :param mu: (n_landmarks, 2) array of Karcher mean (elenemt on Grassmann)
-    :param perturbation: (n_coords,) array of amount of perturbations in pga coordinates
+    :param perturbation: (n_modes,) array of amount of perturbations in pga coordinates
     :return: (n_landmarks, 2) array of perturbed element on Grassmann
     """
-    direction = perturbation@Vh
+    perturbation = perturbation.reshape(1, -1)
+    n_modes = perturbation.shape[1]
+    direction = perturbation@Vh[:n_modes]
     direction = direction.reshape(-1, 2)
     perturbed_shape = exp(1, mu, direction)
     return perturbed_shape
