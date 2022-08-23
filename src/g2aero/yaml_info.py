@@ -7,7 +7,7 @@ from .reparametrization import get_landmarks
 
 class YamlInfo:
 
-    def __init__(self, yaml_filename, n_landmarks=401):
+    def __init__(self, yaml_filename, n_landmarks=401, landmark_method='planar', add_gap=0):
         airfoils_dict, airfoils_nominal_list, hub_d = self.read_yamlfile(yaml_filename)
 
         self.eta_nominal = np.array(airfoils_dict['airfoil_position']['grid'])
@@ -16,9 +16,12 @@ class YamlInfo:
         self.xy_fromfile = self.get_xy_coordinates(airfoils_nominal_list, self.labels_nominal)
         self.n_landmarks = n_landmarks
         self.xy_landmarks = np.empty((len(self.labels_nominal), n_landmarks, 2))
+        # if landmark_method in ['planar', 'polar']:
+        #     for i, xy in enumerate(self.xy_fromfile):
+        #         self.xy_landmarks[i] = get_landmarks(xy, n_landmarks=n_landmarks, method=landmark_method, add_gap=add_gap)
+        # elif landmark_method == 'cst':
         for i, xy in enumerate(self.xy_fromfile):
-            # self.xy_landmarks[i] = get_landmarks(xy, n_landmarks=n_landmarks, add_gap=0.002, name=self.labels_nominal[i])
-            self.xy_landmarks[i] = get_landmarks(xy, n_landmarks=n_landmarks, method='cst', name=self.labels_nominal[i])
+            self.xy_landmarks[i] = get_landmarks(xy, n_landmarks=n_landmarks, method=landmark_method, add_gap=add_gap, name=self.labels_nominal[i])
 
         # scaling of the nominal shape (same in x and y direction)
         self.chord_values = np.array(airfoils_dict['chord']['values'])

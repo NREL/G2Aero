@@ -33,7 +33,7 @@ def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
     y1_avg = np.average(xy[:le_ind, 1])  # Determine orientation of the airfoil shape
     if y1_avg > 0:
         xy = xy[::-1]  # Flip such that the pressure side is always first
-
+        
     if method == 'cst':
         xy_landmarks, _ = cst_reparametrization(xy, n_landmarks, **kwargs)
     elif method == 'polar':
@@ -48,7 +48,7 @@ def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
     return xy_landmarks
 
 
-def planar_reparametrization(xy, n_landmarks, sampling='uniform'):
+def planar_reparametrization(xy, n_landmarks, sampling='uniform', **kwargs):
 
     t_phys = arc_distance(xy)
     
@@ -71,7 +71,7 @@ def planar_reparametrization(xy, n_landmarks, sampling='uniform'):
     return landmarks
 
 
-def polar_reparametrization(xy, n_landmarks=401, sampling='uniform_gr'):
+def polar_reparametrization(xy, n_landmarks=401, sampling='uniform_gr', **kwargs):
 
     xy_gr, M, b = landmark_affine_transform(xy)
     t = arc_distance(xy_gr)     # arc length
@@ -103,7 +103,7 @@ def polar_reparametrization(xy, n_landmarks=401, sampling='uniform_gr'):
     return landmarks
 
 
-def cst_reparametrization(xy, n_landmarks=401, name='', cst_order=8):
+def cst_reparametrization(xy, n_landmarks=401, original_landmarks=False, name='', cst_order=8, **kwargs):
     xy = np.asarray(xy)
     if name in ['circular', 'Cylinder', 'Cylinder1', 'Cylinder2']:
         n1, n2 = 0.5, 0.5
@@ -122,9 +122,14 @@ def cst_reparametrization(xy, n_landmarks=401, name='', cst_order=8):
     cst_lower = calc_cst_param(xy_lower[:, 0], xy_lower[:, 1], n1, n2, te_lower, cst_order)
     cst = np.r_[cst_lower, cst_upper]
 
-    n_half = int(n_landmarks / 2)
-    x_c = -np.cos(np.linspace(0, np.pi, n_half + 1)) * 0.5 + 0.5
-    xy_landmarks = from_cst_parameters(x_c, cst_lower, cst_upper, n1, n2, te_lower, te_upper)
+    if original_landmarks:
+        upper = halfsurface_from_cst_parameters(xy_upper[:, 0], cst_upper, n1, n2, te_upper)
+        lower = halfsurface_from_cst_parameters(xy_lower[:, 0], cst_lower, n1, n2, te_lower)
+        xy_landmarks = np.vstack((lower, upper))
+    else:
+        n_half = int(n_landmarks / 2)
+        x_c = -np.cos(np.linspace(0, np.pi, n_half + 1)) * 0.5 + 0.5
+        xy_landmarks = from_cst_parameters(x_c, cst_lower, cst_upper, n1, n2, te_lower, te_upper)
 
     return xy_landmarks, cst
 
@@ -157,9 +162,9 @@ def cst_matrix(x, n1, n2, order):
     return (class_function * shape_function).T
 
 
-def from_cst_parameters(xinp, cst_lower, cst_upper, n1=0.5, n2=1.0, te_lower=0, te_upper=0):
-    """ Compute landmark coordinates for the airfoil
-    :param xinp: (np.ndarray): Non-dimensional x-coordinate locations
+def from_cst_parameters(x, cst_lower, cst_upper, n1=0.5, n2=1.0, te_lower=0, te_upper=0):
+    """ Compute landmark coordinates for the airfoil given x-coordinate locations
+    :param x: (np.ndarray): Non-dimensional x-coordinate locations
     :param cst_lower: (np.ndarray): cst parameters for lower part
     :param cst_upper: (np.ndarray): cst parameters for upper part
     :param n1: (double): normal coord
@@ -168,9 +173,9 @@ def from_cst_parameters(xinp, cst_lower, cst_upper, n1=0.5, n2=1.0, te_lower=0, 
     :param te_upper: (double): tail edge size for upper part
     :return: Numpy arrays for landmark coordinates
     """
-    x = np.asarray(xinp)
+    x = np.asarray(x)
     order = np.size(cst_lower) - 1
-    amat = cst_matrix(xinp, n1, n2, order)
+    amat = cst_matrix(x, n1, n2, order)
 
     y_lower = np.dot(amat, cst_lower) + te_lower * x
     y_upper = np.dot(amat, cst_upper) + te_upper * x
@@ -179,6 +184,22 @@ def from_cst_parameters(xinp, cst_lower, cst_upper, n1=0.5, n2=1.0, te_lower=0, 
     y = np.hstack((y_lower[::-1], y_upper[1:])).reshape(-1, 1)
 
     return np.hstack((x, y))
+
+def halfsurface_from_cst_parameters(x, cst, n1=0.5, n2=1.0, te=0):
+    """ Compute landmark coordinates for the upper or lower surface of airfoil
+    :param x: (np.ndarray): Non-dimensional x-coordinate locations
+    :param cst: (np.ndarray): cst parameters for upper or lower part
+    :param n1: (double): normal coord
+    :param n2: (double): normal coord
+    :param te: (double): tail edge size for uppper or lower part
+    :return: Numpy arrays for landmark coordinates
+    """
+    x = np.asarray(x)
+    order = np.size(cst) - 1
+    amat = cst_matrix(x, n1, n2, order)
+    y = np.dot(amat, cst) + te * x
+
+    return np.hstack((x.reshape(-1, 1), y.reshape(-1, 1)))
 
 
 def curvature_polar(t, alpha, theta, M):
