@@ -23,7 +23,7 @@ class PGAspace:
         self.karcher_mean = karcher_mean
 
     @classmethod
-    def create_from_dataset(cls, phys_shapes, n_modes=None, method='LA-transform'):
+    def create_from_dataset(cls, phys_shapes, n_modes=None, method='SPD'):
         if method == 'SPD':
             shapes_gr, M, b = spd.polar_decomposition(phys_shapes)
         elif method == 'LA-transform':

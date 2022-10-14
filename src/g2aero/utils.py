@@ -36,11 +36,21 @@ def remove_tailedge_gap(xy):
     return np.r_[xy_lower, xy_upper]
 
 
-def position_airfoil(shape):
-    y_shift = shape[0, 1]
-    shape[:, 1] -= y_shift
+def position_airfoil(shape_inp):
+    shape = np.array(shape_inp)
+    
+    # Flip such that the pressure side is always first
+    le_ind = np.argmin(shape[:, 0])  # Leading edge index
+    y1_avg = np.average(shape[:le_ind, 1])  # Determine orientation of the airfoil shape
+    if y1_avg > 0:
+        shape = shape[::-1]  # Flip such that the pressure side is always first
+    
+    if shape[-1, 1] != - shape[0, 1]:
+        tailgap = shape[-1, 1] - shape[0, 1]
+        y_shift = shape[0, 1] + tailgap/2
+        shape[:, 1] -=  y_shift
+    
     x_shift = shape[0, 0]
-
     shape[:, 0] -= x_shift
     min_angle = 0
     min_x = np.min(shape[:, 0])
@@ -52,7 +62,7 @@ def position_airfoil(shape):
             min_angle = angle
     R = np.array([[np.cos(min_angle), -np.sin(min_angle)], [np.sin(min_angle), np.cos(min_angle)]])
     shape = shape @ R.T
-    shape[:, 0] = (shape[:, 0] - min_x) / -min_x
+    shape[:, 0] = (shape[:, 0] - min_x) / -min_x 
 
     return shape
 

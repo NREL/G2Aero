@@ -7,7 +7,7 @@ from .Grassmann import landmark_affine_transform
 from .utils import add_tailedge_gap, arc_distance
 
 
-def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
+def get_landmarks(xy, n_landmarks=401, method='planar', add_gap=False, **kwargs):
     """Provides landmarks after reparametrization.
     :param xy: (n, 2) given coordinated defining the shape
     :param n_landmarks: scalar number of landmarks in returned shape
@@ -18,16 +18,9 @@ def get_landmarks(xy, n_landmarks=401, method='polar', add_gap=False, **kwargs):
     """
     xy = np.asarray(xy)
 
-    # remove for consequent duplicate points
+    # check for epsilon close arc-lengths and discard landmarks which are too close (considered a "duplicate landmark")
     ind = np.where(np.diff(arc_distance(xy), axis=0) <= 1e-7)[0]
     xy = np.delete(xy, ind, axis=0)
-
-    # Normalize coordinates (x from 0 to 1) to rid of the rounding error
-    # x_min, x_max = np.min(xy[:, 0]), np.max(xy[:, 0])
-    # xy[:, 0] = (xy[:, 0] - x_min) / (x_max - x_min)
-    # xy[:, 1] = xy[:, 1] / (x_max - x_min)
-    # if not np.allclose(x_min, 0) or not np.allclose(x_max, 1):
-    #     print('WARNING!: Airfoil shape is not normalized properly', x_min, x_max, (x_max - x_min))
 
     le_ind = np.argmin(xy[:, 0])  # Leading edge index
     y1_avg = np.average(xy[:le_ind, 1])  # Determine orientation of the airfoil shape
@@ -55,6 +48,22 @@ def planar_reparametrization(xy, n_landmarks, sampling='uniform', **kwargs):
     s1 = CubicSpline(t_phys, xy[:, 0], bc_type='natural')
     s2 = CubicSpline(t_phys, xy[:, 1], bc_type='natural')
 
+    # check if the shape is closed (0 tailgap)
+    # if not closed reduce the number of landmarks by one (so after closing we end up with the same number of landmarks)
+    closed_flag = True
+    if np.linalg.norm(xy[0] - xy[-1]) > 10e-7:
+        n_landmarks -= 1
+        closed_flag = False
+
+    # if sampling == 'chebyshev_nodes':
+    #     t_new = np.polynomial.chebyshev.Chebyshev.roots()
+
+    if sampling == 'uniform_gr':
+        xy_gr, _, _ = landmark_affine_transform(xy)
+        t_gr = arc_distance(xy_gr)
+        interpolator = PchipInterpolator(t_gr, t_phys)
+        t_new = interpolator(np.linspace(0, 1, n_landmarks))
+
     if sampling == 'uniform_phys' or sampling == 'uniform':
         t_new = np.linspace(0, 1, n_landmarks)
 
@@ -67,6 +76,10 @@ def planar_reparametrization(xy, n_landmarks, sampling='uniform', **kwargs):
         t_new = PchipInterpolator(curvature_cdf_i, t_tmp)(np.linspace(0, 1, n_landmarks))
 
     landmarks = np.vstack((s1(t_new), s2(t_new))).T
+
+    # close the shape by adding first landmark to the end
+    if not closed_flag:
+        landmarks = np.vstack((landmarks, landmarks[0]))
 
     return landmarks
 
@@ -120,7 +133,6 @@ def cst_reparametrization(xy, n_landmarks=401, original_landmarks=False, name=''
     # calculate cst coefficients
     cst_upper = calc_cst_param(xy_upper[:, 0], xy_upper[:, 1], n1, n2, te_upper, cst_order)
     cst_lower = calc_cst_param(xy_lower[:, 0], xy_lower[:, 1], n1, n2, te_lower, cst_order)
-    cst = np.r_[cst_lower, cst_upper]
 
     if original_landmarks:
         upper = halfsurface_from_cst_parameters(xy_upper[:, 0], cst_upper, n1, n2, te_upper)
@@ -130,6 +142,8 @@ def cst_reparametrization(xy, n_landmarks=401, original_landmarks=False, name=''
         n_half = int(n_landmarks / 2)
         x_c = -np.cos(np.linspace(0, np.pi, n_half + 1)) * 0.5 + 0.5
         xy_landmarks = from_cst_parameters(x_c, cst_lower, cst_upper, n1, n2, te_lower, te_upper)
+
+    cst = np.r_[cst_lower, cst_upper, te_lower, te_upper]
 
     return xy_landmarks, cst
 
