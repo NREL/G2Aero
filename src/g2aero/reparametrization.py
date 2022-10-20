@@ -4,6 +4,7 @@ from scipy.optimize import lsq_linear
 from scipy.special import comb
 
 from .Grassmann import landmark_affine_transform
+from .SPD import polar_decomposition
 from .utils import add_tailedge_gap, arc_distance
 
 
@@ -48,18 +49,19 @@ def planar_reparametrization(xy, n_landmarks, sampling='uniform', **kwargs):
     s1 = CubicSpline(t_phys, xy[:, 0], bc_type='natural')
     s2 = CubicSpline(t_phys, xy[:, 1], bc_type='natural')
 
-    # check if the shape is closed (0 tailgap)
-    # if not closed reduce the number of landmarks by one (so after closing we end up with the same number of landmarks)
-    closed_flag = True
-    if np.linalg.norm(xy[0] - xy[-1]) > 10e-7:
-        n_landmarks -= 1
-        closed_flag = False
+    # # check if the shape is closed (0 tailgap)
+    # # if not closed reduce the number of landmarks by one (so after closing we end up with the same number of landmarks)
+    # closed_flag = True
+    # if np.linalg.norm(xy[0] - xy[-1]) > 10e-7:
+    #     n_landmarks -= 1
+    #     closed_flag = False
 
     # if sampling == 'chebyshev_nodes':
     #     t_new = np.polynomial.chebyshev.Chebyshev.roots()
 
     if sampling == 'uniform_gr':
-        xy_gr, _, _ = landmark_affine_transform(xy)
+        # xy_gr, _, _ = landmark_affine_transform(xy)
+        xy_gr, _, _ = polar_decomposition(xy)
         t_gr = arc_distance(xy_gr)
         interpolator = PchipInterpolator(t_gr, t_phys)
         t_new = interpolator(np.linspace(0, 1, n_landmarks))
@@ -72,14 +74,13 @@ def planar_reparametrization(xy, n_landmarks, sampling='uniform', **kwargs):
         curvature_i = curvature_planar(t_tmp, s1, s2)
         curvature_cdf_i = np.cumsum(curvature_i) - curvature_i[0]
         curvature_cdf_i /= curvature_cdf_i[-1]
-
         t_new = PchipInterpolator(curvature_cdf_i, t_tmp)(np.linspace(0, 1, n_landmarks))
 
     landmarks = np.vstack((s1(t_new), s2(t_new))).T
 
-    # close the shape by adding first landmark to the end
-    if not closed_flag:
-        landmarks = np.vstack((landmarks, landmarks[0]))
+    # # close the shape by adding first landmark to the end
+    # if not closed_flag:
+    #     landmarks = np.vstack((landmarks, landmarks[0]))
 
     return landmarks
 

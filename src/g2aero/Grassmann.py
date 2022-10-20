@@ -233,7 +233,7 @@ def perturb_gr_shape(Vh, mu, perturbation):
     :param perturbation: (n_modes,) array of amount of perturbations in pga coordinates
     :return: (n_landmarks, 2) array of perturbed element on Grassmann
     """
-    perturbation = perturbation.reshape(1, -1)
+    perturbation = np.asarray(perturbation).reshape(1, -1)
     n_modes = perturbation.shape[1]
     direction = perturbation@Vh[:n_modes]
     direction = direction.reshape(-1, 2)
