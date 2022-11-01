@@ -45,12 +45,16 @@ class PGAspace:
     def PGA2gr_shape(self, pga_coord):
         return perturb_gr_shape(self.Vh, self.karcher_mean, pga_coord)
 
-    def PGA2shape(self, pga_coord, M=None, b=None):
+    def PGA2shape(self, pga_coord, M=None, b=None, original_shape_gr=None):
         if M is None:
             M = self.M_mean
         if b is None:
             b = self.b_mean
         gr_shape = perturb_gr_shape(self.Vh, self.karcher_mean, pga_coord)
+        # rotate to match with original shape (e.g. for reconstruction error calculation)
+        if original_shape_gr is not None:
+            R = procrustes(gr_shape, original_shape_gr)
+            gr_shape= gr_shape @ R
         return gr_shape @ M + b
 
     def gr_shapes2PGA(self, shapes_gr):
