@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 from g2aero.perturbation import PGAspace
-from g2aero.utils import position_airfoil, add_tailedge_gap
+from g2aero.utils import position_airfoil, add_tailedge_gap, check_selfintersect
 
 import dash
 from dash import dcc
@@ -11,13 +11,14 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output
 
-pga_dict = np.load(os.path.join(os.getcwd(), '../data', 'PGA_space', 'PGA_space.npz'))
+space_folder = os.path.join(os.getcwd(), '../data', 'PGA_space', )
+
+pga_dict = np.load(os.path.join(space_folder, 'PGA_space.npz'))
 pga = PGAspace(pga_dict['Vh'], pga_dict['M_mean'], pga_dict['b_mean'], pga_dict['karcher_mean'])
 pga.M_mean = pga.M_mean.T
-s2 = np.load(os.path.join(os.getcwd(), '../data', 'PGA_space', 'M_b.npz'))['M'][:, 1:, 1]
-b = np.load(os.path.join(os.getcwd(), '../data', 'PGA_space', 'M_b.npz'))['b']
-t = np.load(os.path.join(os.getcwd(), '../data', 'PGA_space', 't.npz'))['t']
-
+s2 = np.load(os.path.join(space_folder, 'M_b.npz'))['M'][:, 1:, 1]
+b = np.load(os.path.join(space_folder, 'M_b.npz'))['b']
+t = np.load(os.path.join(space_folder, 't.npz'))['t']
 
 r_min = np.abs(np.quantile(t, 0.0, axis=0))
 r_max = np.abs(np.quantile(t, 0.0, axis=0))
@@ -168,13 +169,14 @@ def calculate_shape(t1, t2, t3, t4, M22, gap):
     fig.update_yaxes(range=[-0.3, 0.3], scaleanchor="x", scaleratio=1)
     fig.add_trace(go.Scatter(x=karcher_mean[:, 0], y=karcher_mean[:, 1],
                              line=dict(color="#FF0000", width=2), name='Karcher mean'))
-    if gap < (m*M22+l) and np.sum((np.array([t1, t2, t3, t4, M22]) - centers)**2/ pga.radius ** 2) <= 1:
+    # if gap < (m*M22+l) and np.sum((np.array([t1, t2, t3, t4, M22]) - centers)**2/ pga.radius ** 2) <= 1:
+    if not check_selfintersect(shape):
         fig.add_trace(go.Scatter(x=shape[:, 0], y=shape[:, 1],
                              line=dict(color="#000000", width=3), name='Perturbation'))
                              # line=dict(color="#00CED1", width=3), name='Perturbation'))
     else:
         fig.add_trace(go.Scatter(x=shape[:, 0], y=shape[:, 1],
-                                 line=dict(color="#FFA500", width=3), name='outside sampling space'))
+                                 line=dict(color="#FFA500", width=3), name='shape selfintersects'))
     return fig
 
 
@@ -186,6 +188,13 @@ def calculate_shape(t1, t2, t3, t4, M22, gap):
                Input('M22-slider', 'value'),
                Input('gap-slider', 'value')])
 def update_scatterplot(t1, t2, t3, t4, M22, gap):
+
+    M = pga.M_mean.copy()
+    M[1, 1] = M22
+    shape = pga.PGA2shape([t1, t2, t3, t4], M=M)
+    shape = position_airfoil(shape)
+    shape = add_tailedge_gap(shape, gap)
+    
     fig_scatterplot = go.Figure(
         data=go.Splom(dimensions=[dict(label='t1', values=df.t1), dict(label='t2', values=df.t2),
                                   dict(label='t3', values=df.t3), dict(label='t4', values=df.t4),
@@ -206,7 +215,8 @@ def update_scatterplot(t1, t2, t3, t4, M22, gap):
                                        showupperhalf=False, diagonal_visible=False,  # remove plots on diagonal
                                        marker=dict(color="#FF0000", size=10), name='Karcher mean'))
 
-    if gap < (m*M22+l) and np.sum((np.array([t1, t2, t3, t4, M22]) - centers)**2/ pga.radius ** 2) <= 1:
+    # if gap < (m*M22+l) and np.sum((np.array([t1, t2, t3, t4, M22]) - centers)**2/ pga.radius ** 2) <= 1:
+    if not check_selfintersect(shape):
 
         fig_scatterplot.add_trace(go.Splom(dimensions=[dict(label=r'$t_1$', values=[t1]), dict(label='t2', values=[t2]),
                                                        dict(label='t3', values=[t3]), dict(label='t4', values=[t4]),
