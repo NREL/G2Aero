@@ -2,8 +2,7 @@ import os
 import numpy as np
 from g2aero import yaml_info
 from g2aero.Grassmann_interpolation import GrassmannInterpolator
-from g2aero.transform import TransformBlade
-from g2aero.transform import global_blade_coordinates
+from g2aero.transform import TransformBlade, global_blade_coordinates
 from g2aero import geometry_gmsh
 from time import time
 import datetime
@@ -45,8 +44,8 @@ def main():
     print('Inverse Transform')
     Transform = TransformBlade(M_yaml, b_yaml, b_pitch, M, b)
     xyz_local = Transform.grassmann_to_phys(gr_crosssections, eta_span)
-    # np.savez('xyz_local.npz', xyz=xyz_local)
     xyz_global = global_blade_coordinates(xyz_local)
+    np.savez('xyz_blade.npz', xyz=xyz_global)
     
     t3 = time()
     
