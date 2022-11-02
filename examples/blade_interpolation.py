@@ -49,11 +49,12 @@ def main():
     
     t3 = time()
     
-    print("creating CAD model")
-    # to create stp file and unstructured grid
-    geometry_gmsh.blade_CAD_geometry(xyz_global, blade_filename[:-5], msh=True)
-    # to create structured grid
-    geometry_gmsh.write_geofile(xyz_global, blade_filename[:-5], n_spanwise=300, n_te=3, n_cross_half=100)
+    # print("creating CAD model")
+    # TODO: check gmsh functionality
+    # # to create stp file and unstructured grid
+    # geometry_gmsh.blade_CAD_geometry(xyz_global, blade_filename[:-5], msh=True)
+    # # to create structured grid
+    # geometry_gmsh.write_geofile(xyz_global, blade_filename[:-5], n_spanwise=300, n_te=3, n_cross_half=100)
     
     t4 = time()
 
