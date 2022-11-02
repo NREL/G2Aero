@@ -4,9 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-    <title>g2aero package &#8212; G2Aero 0.0.1 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>g2aero package &#8212; G2Aero v0.1.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -31,23 +30,24 @@
 
           <div class="body" role="main">
             
-  <section id="g2aero-package">
+  <div class="section" id="g2aero-package">
 <h1>g2aero package<a class="headerlink" href="#g2aero-package" title="Permalink to this headline">¶</a></h1>
-<section id="submodules">
+<div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</section>
-<section id="module-g2aero.Grassmann">
+</div>
+<div class="section" id="module-g2aero.Grassmann">
 <span id="g2aero-grassmann-module"></span><h2>g2aero.Grassmann module<a class="headerlink" href="#module-g2aero.Grassmann" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="g2aero.Grassmann.Karcher">
-<span class="sig-prename descclassname"><span class="pre">g2aero.Grassmann.</span></span><span class="sig-name descname"><span class="pre">Karcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann.Karcher" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">g2aero.Grassmann.</span></span><span class="sig-name descname"><span class="pre">Karcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann.Karcher" title="Permalink to this definition">¶</a></dt>
 <dd><p>Karcher mean for given shapes.</p>
 <p>Calculated Karcher mean for given shapes (elements on Grassmann) by
-minimizing the sum of squared (Riemannian) distances to all shapes in the data (Fletcher, Lu, and Joshi 2003)</p>
+minimizing the sum of squared (Riemannian) distances to all shapes in the data
+(Fletcher, Lu, and Joshi 2003)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>shapes</strong> – (n_shapes, n_landmarks, 2) array defining given shapes (Grassmann elements)</p></li>
+<li><p><strong>shapes</strong> – (n_shapes, n_landmarks, 2) array of given shapes (Grassmann elements)</p></li>
 <li><p><strong>max_steps</strong> – maximum number of iterations to converge</p></li>
 </ul>
 </dd>
@@ -99,6 +99,11 @@ S is corresponding singular values,</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="g2aero.Grassmann.check_orthogonality">
+<span class="sig-prename descclassname"><span class="pre">g2aero.Grassmann.</span></span><span class="sig-name descname"><span class="pre">check_orthogonality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann.check_orthogonality" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="g2aero.Grassmann.distance">
 <span class="sig-prename descclassname"><span class="pre">g2aero.Grassmann.</span></span><span class="sig-name descname"><span class="pre">distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann.distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Geodesic distance on Grassmannian.</p>
@@ -123,13 +128,14 @@ The distance between two shapes is then defined as dist = sqrt(theta1**2+theta2*
 
 <dl class="py function">
 <dt class="sig sig-object py" id="g2aero.Grassmann.exp">
-<span class="sig-prename descclassname"><span class="pre">g2aero.Grassmann.</span></span><span class="sig-name descname"><span class="pre">exp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann.exp" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">g2aero.Grassmann.</span></span><span class="sig-name descname"><span class="pre">exp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann.exp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exponential mapping (Grassmannian geodesic).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> – scalar &gt; 0, how far in given direction to move (if t=0, exp(X, log_map) = X)</p></li>
 <li><p><strong>X</strong> – (n_landmarks, 2) array defining starting point of geodesic on Grassmann</p></li>
-<li><p><strong>log_map</strong> – (n_landmarks, 2) array defining direction in tangent space (tangent vector Delta)</p></li>
+<li><p><strong>direction</strong> – (n_landmarks, 2) array defining direction in tangent space (tangent vector Delta)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -140,7 +146,7 @@ The distance between two shapes is then defined as dist = sqrt(theta1**2+theta2*
 
 <dl class="py function">
 <dt class="sig sig-object py" id="g2aero.Grassmann.get_PGA_coordinates">
-<span class="sig-prename descclassname"><span class="pre">g2aero.Grassmann.</span></span><span class="sig-name descname"><span class="pre">get_PGA_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shapes_gr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann.get_PGA_coordinates" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">g2aero.Grassmann.</span></span><span class="sig-name descname"><span class="pre">get_PGA_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shapes_gr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_modes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann.get_PGA_coordinates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get PGA coordinates of given standardized shapes (elements of Grassmann) and
 PGA space defined by Karcher mean and basis vectors.</p>
 <dl class="field-list simple">
@@ -170,8 +176,9 @@ sample covariance proportional to I2 over the n discrete boundary landmarks defi
 <dl class="py function">
 <dt class="sig sig-object py" id="g2aero.Grassmann.log">
 <span class="sig-prename descclassname"><span class="pre">g2aero.Grassmann.</span></span><span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann.log" title="Permalink to this definition">¶</a></dt>
-<dd><p>Logarithmic mapping (inverse mapping of exponential map).</p>
-<p>Calculate logarithmic map log_X(Y) (inverse mapping of exponential map).
+<dd><p>Logarithmic mapping (inverse mapping of exponential map).
+Algorithm 11 (Zimmermann, 2019)
+Calculate logarithmic map log_X(Y) (inverse mapping of exponential map).
 Calculates direction(tangent vector Delta) from X to Y in tangent subspace.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -212,9 +219,9 @@ Edelman et al. (Theorem 2.4, pp. 321).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>Vh</strong> – (n_coord*2, n_coord*2) array of PGA basis vectors transposed</p></li>
+<li><p><strong>Vh</strong> – (n_landmarks*2, n_landmarks*2) array of PGA basis vectors transposed</p></li>
 <li><p><strong>mu</strong> – (n_landmarks, 2) array of Karcher mean (elenemt on Grassmann)</p></li>
-<li><p><strong>perturbation</strong> – (n_coords,) array of amount of perturbations in pga coordinates</p></li>
+<li><p><strong>perturbation</strong> – (n_modes,) array of amount of perturbations in pga coordinates</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -242,16 +249,16 @@ Edelman et al. (Theorem 2.4, pp. 321).</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="module-g2aero.Grassmann_interpolation">
+</div>
+<div class="section" id="module-g2aero.Grassmann_interpolation">
 <span id="g2aero-grassmann-interpolation-module"></span><h2>g2aero.Grassmann_interpolation module<a class="headerlink" href="#module-g2aero.Grassmann_interpolation" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="g2aero.Grassmann_interpolation.GrassmannInterpolator">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">g2aero.Grassmann_interpolation.</span></span><span class="sig-name descname"><span class="pre">GrassmannInterpolator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann_interpolation.GrassmannInterpolator" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">g2aero.Grassmann_interpolation.</span></span><span class="sig-name descname"><span class="pre">GrassmannInterpolator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann_interpolation.GrassmannInterpolator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="g2aero.Grassmann_interpolation.GrassmannInterpolator.calc_grassmann_distance">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">calc_grassmann_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy_grassmann</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann_interpolation.GrassmannInterpolator.calc_grassmann_distance" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calc_grassmann_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy_grassmann</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann_interpolation.GrassmannInterpolator.calc_grassmann_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate distance between ordered elements on Grassmann.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -265,7 +272,7 @@ Edelman et al. (Theorem 2.4, pp. 321).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="g2aero.Grassmann_interpolation.GrassmannInterpolator.calc_log_mapping">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">calc_log_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy_grassmann</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann_interpolation.GrassmannInterpolator.calc_log_mapping" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calc_log_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy_grassmann</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.Grassmann_interpolation.GrassmannInterpolator.calc_log_mapping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate log mapping (the tangent direction from Xi to Xi+1)
 for every given element Xi in ordered list of elements.</p>
 <dl class="field-list simple">
@@ -358,19 +365,19 @@ uniformly distributed eta between duplicated shapes.</p>
 
 </dd></dl>
 
-</section>
-<section id="module-g2aero.reparametrization">
+</div>
+<div class="section" id="module-g2aero.reparametrization">
 <span id="g2aero-reparametrization-module"></span><h2>g2aero.reparametrization module<a class="headerlink" href="#module-g2aero.reparametrization" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="g2aero.reparametrization.calc_cst_param">
-<span class="sig-prename descclassname"><span class="pre">g2aero.reparametrization.</span></span><span class="sig-name descname"><span class="pre">calc_cst_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.reparametrization.calc_cst_param" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">g2aero.reparametrization.</span></span><span class="sig-name descname"><span class="pre">calc_cst_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_tailedge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.reparametrization.calc_cst_param" title="Permalink to this definition">¶</a></dt>
 <dd><p>Solve the least squares problem for a given shape
 :param x: (np.ndarray): (x/c) coordinates locations
 :param y: (np.ndarray): (y/c) coordinate locations
 :param n1: normal coord
 :param n2: normal coord
-:param order:
-:return: <code class="docutils literal notranslate"><span class="pre">(BP+1)</span></code> CST parameters</p>
+:param order: order of the polynomial used
+:return: CST parameters</p>
 </dd></dl>
 
 <dl class="py function">
@@ -380,51 +387,73 @@ uniformly distributed eta between duplicated shapes.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="g2aero.reparametrization.cst_reparametrization">
-<span class="sig-prename descclassname"><span class="pre">g2aero.reparametrization.</span></span><span class="sig-name descname"><span class="pre">cst_reparametrization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_landmarks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">401</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cst_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.reparametrization.cst_reparametrization" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">g2aero.reparametrization.</span></span><span class="sig-name descname"><span class="pre">cst_reparametrization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_landmarks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">401</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_landmarks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cst_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.reparametrization.cst_reparametrization" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="g2aero.reparametrization.curvature_planar">
+<span class="sig-prename descclassname"><span class="pre">g2aero.reparametrization.</span></span><span class="sig-name descname"><span class="pre">curvature_planar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_phys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.reparametrization.curvature_planar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="g2aero.reparametrization.curvature_polar">
+<span class="sig-prename descclassname"><span class="pre">g2aero.reparametrization.</span></span><span class="sig-name descname"><span class="pre">curvature_polar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.reparametrization.curvature_polar" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="g2aero.reparametrization.from_cst_parameters">
-<span class="sig-prename descclassname"><span class="pre">g2aero.reparametrization.</span></span><span class="sig-name descname"><span class="pre">from_cst_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xinp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cst_lower</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cst_upper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.reparametrization.from_cst_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute landmark coordinates for the airfoil
-:param xinp: (np.ndarray): Non-dimensional x-coordinate locations
+<span class="sig-prename descclassname"><span class="pre">g2aero.reparametrization.</span></span><span class="sig-name descname"><span class="pre">from_cst_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cst_lower</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cst_upper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">te_lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">te_upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.reparametrization.from_cst_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute landmark coordinates for the airfoil given x-coordinate locations
+:param x: (np.ndarray): Non-dimensional x-coordinate locations
 :param cst_lower: (np.ndarray): cst parameters for lower part
 :param cst_upper: (np.ndarray): cst parameters for upper part
 :param n1: (double): normal coord
 :param n2: (double): normal coord
+:param te_lower: (double): tail edge size for lower part
+:param te_upper: (double): tail edge size for upper part
 :return: Numpy arrays for landmark coordinates</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="g2aero.reparametrization.get_landmarks">
-<span class="sig-prename descclassname"><span class="pre">g2aero.reparametrization.</span></span><span class="sig-name descname"><span class="pre">get_landmarks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_landmarks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">401</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'polar'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.reparametrization.get_landmarks" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>xy</strong> – </p></li>
-<li><p><strong>n_landmarks</strong> – </p></li>
-<li><p><strong>method</strong> – </p></li>
-<li><p><strong>add_gap</strong> – </p></li>
-<li><p><strong>kwargs</strong> – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-</dl>
+<span class="sig-prename descclassname"><span class="pre">g2aero.reparametrization.</span></span><span class="sig-name descname"><span class="pre">get_landmarks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_landmarks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">401</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'planar'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.reparametrization.get_landmarks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides landmarks after reparametrization.
+:param xy: (n, 2) given coordinated defining the shape
+:param n_landmarks: scalar number of landmarks in returned shape
+:param method: method of reparametrization: ‘cst’, ‘polar’ or ‘planar’
+:param add_gap: size of the tail gap added to the shape
+:param kwargs: additional parameters for reparametrization (e.g. sampling strategy for ‘polar’ and ‘planar’ method)
+:return: (n_landmarks, 2) array of landmarks after reparametrization</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="g2aero.reparametrization.polar_reparametrization">
-<span class="sig-prename descclassname"><span class="pre">g2aero.reparametrization.</span></span><span class="sig-name descname"><span class="pre">polar_reparametrization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_landmarks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">401</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'uniform_gr'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.reparametrization.polar_reparametrization" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="g2aero.reparametrization.halfsurface_from_cst_parameters">
+<span class="sig-prename descclassname"><span class="pre">g2aero.reparametrization.</span></span><span class="sig-name descname"><span class="pre">halfsurface_from_cst_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">te</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.reparametrization.halfsurface_from_cst_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute landmark coordinates for the upper or lower surface of airfoil
+:param x: (np.ndarray): Non-dimensional x-coordinate locations
+:param cst: (np.ndarray): cst parameters for upper or lower part
+:param n1: (double): normal coord
+:param n2: (double): normal coord
+:param te: (double): tail edge size for uppper or lower part
+:return: Numpy arrays for landmark coordinates</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="g2aero.reparametrization.planar_reparametrization">
+<span class="sig-prename descclassname"><span class="pre">g2aero.reparametrization.</span></span><span class="sig-name descname"><span class="pre">planar_reparametrization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_landmarks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'uniform'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.reparametrization.planar_reparametrization" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</section>
-<section id="module-g2aero.transform">
+<dl class="py function">
+<dt class="sig sig-object py" id="g2aero.reparametrization.polar_reparametrization">
+<span class="sig-prename descclassname"><span class="pre">g2aero.reparametrization.</span></span><span class="sig-name descname"><span class="pre">polar_reparametrization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_landmarks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">401</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'uniform_gr'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.reparametrization.polar_reparametrization" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-g2aero.transform">
 <span id="g2aero-transform-module"></span><h2>g2aero.transform module<a class="headerlink" href="#module-g2aero.transform" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="g2aero.transform.TransformBlade">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">g2aero.transform.</span></span><span class="sig-name descname"><span class="pre">TransformBlade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M_yaml</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_yaml</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_pitch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.transform.TransformBlade" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">g2aero.transform.</span></span><span class="sig-name descname"><span class="pre">TransformBlade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M_yaml</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_yaml</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_pitch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.transform.TransformBlade" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="g2aero.transform.TransformBlade.calc_M_b_total">
@@ -483,8 +512,8 @@ uniformly distributed eta between duplicated shapes.</p>
 <span class="sig-prename descclassname"><span class="pre">g2aero.transform.</span></span><span class="sig-name descname"><span class="pre">transform_for_BEM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">twist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaley</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.transform.transform_for_BEM" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</section>
-<section id="module-g2aero.geometry_gmsh">
+</div>
+<div class="section" id="module-g2aero.geometry_gmsh">
 <span id="g2aero-geometry-gmsh-module"></span><h2>g2aero.geometry_gmsh module<a class="headerlink" href="#module-g2aero.geometry_gmsh" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="g2aero.geometry_gmsh.blade_CAD_geometry">
@@ -496,12 +525,12 @@ uniformly distributed eta between duplicated shapes.</p>
 <span class="sig-prename descclassname"><span class="pre">g2aero.geometry_gmsh.</span></span><span class="sig-name descname"><span class="pre">write_geofile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfilename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_spanwise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_te</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cross_half</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.geometry_gmsh.write_geofile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</section>
-<section id="module-g2aero.yaml_info">
+</div>
+<div class="section" id="module-g2aero.yaml_info">
 <span id="g2aero-yaml-info-module"></span><h2>g2aero.yaml_info module<a class="headerlink" href="#module-g2aero.yaml_info" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="g2aero.yaml_info.YamlInfo">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">g2aero.yaml_info.</span></span><span class="sig-name descname"><span class="pre">YamlInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_landmarks</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.yaml_info.YamlInfo" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">g2aero.yaml_info.</span></span><span class="sig-name descname"><span class="pre">YamlInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_landmarks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">401</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmark_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'planar'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.yaml_info.YamlInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="g2aero.yaml_info.YamlInfo.add_eta_nominal">
@@ -527,7 +556,7 @@ of ref axis (elastic axis).
 
 <dl class="py method">
 <dt class="sig sig-object py" id="g2aero.yaml_info.YamlInfo.get_xy_coordinates">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_xy_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">airfoils_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nominal_labels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.yaml_info.YamlInfo.get_xy_coordinates" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_xy_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">airfoils_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nominal_labels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.yaml_info.YamlInfo.get_xy_coordinates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -552,7 +581,7 @@ of ref axis (elastic axis).
 
 <dl class="py method">
 <dt class="sig sig-object py" id="g2aero.yaml_info.YamlInfo.read_yamlfile">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">read_yamlfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.yaml_info.YamlInfo.read_yamlfile" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_yamlfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.yaml_info.YamlInfo.read_yamlfile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -562,30 +591,108 @@ of ref axis (elastic axis).
 
 </dd></dl>
 
-</section>
-<section id="module-g2aero.utils">
+</div>
+<div class="section" id="module-g2aero.utils">
 <span id="g2aero-utils"></span><h2>g2aero.utils<a class="headerlink" href="#module-g2aero.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="g2aero.utils.add_minimum_gap">
+<span class="sig-prename descclassname"><span class="pre">g2aero.utils.</span></span><span class="sig-name descname"><span class="pre">add_minimum_gap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.utils.add_minimum_gap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adding minimum TE gap of 2mm.
+Before using need to position airfoil first (chord on x-axis from 0 to 1)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>2</strong><strong>)</strong> (<em>xy</em><em> (</em><em>n</em><em>,</em>) – shape coordinates</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>array of shape coordinates with added gap</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="g2aero.utils.add_tailedge_gap">
 <span class="sig-prename descclassname"><span class="pre">g2aero.utils.</span></span><span class="sig-name descname"><span class="pre">add_tailedge_gap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.utils.add_tailedge_gap" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="g2aero.utils.global_blade_coordinates">
-<span class="sig-prename descclassname"><span class="pre">g2aero.utils.</span></span><span class="sig-name descname"><span class="pre">global_blade_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz_local</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.utils.global_blade_coordinates" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="g2aero.utils.arc_distance">
+<span class="sig-prename descclassname"><span class="pre">g2aero.utils.</span></span><span class="sig-name descname"><span class="pre">arc_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.utils.arc_distance" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="g2aero.utils.position_airfoil">
-<span class="sig-prename descclassname"><span class="pre">g2aero.utils.</span></span><span class="sig-name descname"><span class="pre">position_airfoil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.utils.position_airfoil" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="g2aero.utils.calc_area">
+<span class="sig-prename descclassname"><span class="pre">g2aero.utils.</span></span><span class="sig-name descname"><span class="pre">calc_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.utils.calc_area" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function calculates area inside of an airfoil shape xy
+(x coordinates are normalized by chord length) from left
+boundary a to right boundary b using discrete representation
+of a shape and trapesoidal rule.</p>
+<p>E.g. to calculate area inside of an airfoil from 25% chord
+to 45% chord one can use <cite>calc_area(xy, a=0.25, b=0.45)</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xy</strong> – (n, 2) array of given shape</p></li>
+<li><p><strong>a</strong> – left boundary</p></li>
+<li><p><strong>b</strong> – right boundary</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>scalar area</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="g2aero.utils.calc_curvature">
+<span class="sig-prename descclassname"><span class="pre">g2aero.utils.</span></span><span class="sig-name descname"><span class="pre">calc_curvature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.utils.calc_curvature" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</section>
-<section id="module-g2aero.perturbation">
+<dl class="py function">
+<dt class="sig sig-object py" id="g2aero.utils.check_selfintersect">
+<span class="sig-prename descclassname"><span class="pre">g2aero.utils.</span></span><span class="sig-name descname"><span class="pre">check_selfintersect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.utils.check_selfintersect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if self intersection in a shape exist.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> – (n_landmarks, 2) discrete planar curve with n landmarks representing a shape</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>bool  = if intersection exist</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="g2aero.utils.find_selfintersect">
+<span class="sig-prename descclassname"><span class="pre">g2aero.utils.</span></span><span class="sig-name descname"><span class="pre">find_selfintersect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.utils.find_selfintersect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find all self intersections of shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> – (n_landmarks, 2) discrete planar curve with n landmarks representing a shape</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>bool  = if intersection exist
+(n, 2) array with index p and q of intersecting intervals (n=number of intersections)
+(n, 2) array of intersection locations (n=number of intersections)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="g2aero.utils.position_airfoil">
+<span class="sig-prename descclassname"><span class="pre">g2aero.utils.</span></span><span class="sig-name descname"><span class="pre">position_airfoil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_LEind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.utils.position_airfoil" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="g2aero.utils.remove_tailedge_gap">
+<span class="sig-prename descclassname"><span class="pre">g2aero.utils.</span></span><span class="sig-name descname"><span class="pre">remove_tailedge_gap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.utils.remove_tailedge_gap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-g2aero.perturbation">
 <span id="g2aero-perturbation-module"></span><h2>g2aero.perturbation module<a class="headerlink" href="#module-g2aero.perturbation" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="g2aero.perturbation.AffineTransformPerturbation">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">g2aero.perturbation.</span></span><span class="sig-name descname"><span class="pre">AffineTransformPerturbation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengthscale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.AffineTransformPerturbation" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">g2aero.perturbation.</span></span><span class="sig-name descname"><span class="pre">AffineTransformPerturbation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengthscale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.AffineTransformPerturbation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="g2aero.perturbation.AffineTransformPerturbation.generate_from_coef">
@@ -606,13 +713,13 @@ of ref axis (elastic axis).
 
 <dl class="py class">
 <dt class="sig sig-object py" id="g2aero.perturbation.Dataset">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">g2aero.perturbation.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phys_shapes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.Dataset" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">g2aero.perturbation.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phys_shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SPD'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.Dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="g2aero.perturbation.NoiseFunc">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">g2aero.perturbation.</span></span><span class="sig-name descname"><span class="pre">NoiseFunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.NoiseFunc" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">g2aero.perturbation.</span></span><span class="sig-name descname"><span class="pre">NoiseFunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.NoiseFunc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="g2aero.perturbation.NoiseFunc.ReLU">
@@ -633,7 +740,7 @@ of ref axis (elastic axis).
 
 <dl class="py class">
 <dt class="sig sig-object py" id="g2aero.perturbation.PGAspace">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">g2aero.perturbation.</span></span><span class="sig-name descname"><span class="pre">PGAspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Vh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">karcher_mean</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.PGAspace" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">g2aero.perturbation.</span></span><span class="sig-name descname"><span class="pre">PGAspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Vh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">karcher_mean</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.PGAspace" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="g2aero.perturbation.PGAspace.PGA2gr_shape">
@@ -642,12 +749,12 @@ of ref axis (elastic axis).
 
 <dl class="py method">
 <dt class="sig sig-object py" id="g2aero.perturbation.PGAspace.PGA2shape">
-<span class="sig-name descname"><span class="pre">PGA2shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pga_coord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.PGAspace.PGA2shape" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">PGA2shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pga_coord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_shape_gr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.PGAspace.PGA2shape" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="g2aero.perturbation.PGAspace.create_from_dataset">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">create_from_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phys_shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_modes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.PGAspace.create_from_dataset" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_from_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phys_shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_modes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SPD'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.PGAspace.create_from_dataset" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -665,7 +772,8 @@ in generated shape and resample if needed.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>array of perturbed blades (in grassmann coordinates) (shape=(n, n_shapes, n_landmarks, 2)) and PGA corresponding to perturbations (n, n_modes)</p>
+<dd class="field-even"><p>array of perturbed blades (in grassmann coordinates) (shape=(n, n_shapes, n_landmarks, 2)) and
+array of PGA corresponding to perturbations (n, n_modes)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -684,7 +792,9 @@ in generated shape and resample if needed.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>array of generated perturbed shapes (n, n_landmarks, 2) in physical and grassmann coordinates and PGA corresponding to perturbations (n, n_modes)</p>
+<dd class="field-even"><p>array of generated perturbed shapes (n, n_landmarks, 2) in physical and
+array of grassmann coordinates and
+array of PGA coordinates corresponding to perturbations (n, n_modes)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -695,22 +805,22 @@ in generated shape and resample if needed.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="g2aero.perturbation.PGAspace.intersection_exist">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">intersection_exist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.PGAspace.intersection_exist" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="g2aero.perturbation.PGAspace.sample_coef">
 <span class="sig-name descname"><span class="pre">sample_coef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.PGAspace.sample_coef" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="g2aero.perturbation.PGAspace.shapes2PGA">
+<span class="sig-name descname"><span class="pre">shapes2PGA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SPD'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_modes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#g2aero.perturbation.PGAspace.shapes2PGA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
-</section>
-<section id="module-g2aero">
+</div>
+<div class="section" id="module-g2aero">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-g2aero" title="Permalink to this headline">¶</a></h2>
-</section>
-</section>
+</div>
+</div>
 
 
           </div>
@@ -729,7 +839,7 @@ in generated shape and resample if needed.</p>
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="usage/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="community.html">Feedback, Support, and Contributions</a></li>
@@ -746,7 +856,7 @@ in generated shape and resample if needed.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
@@ -765,10 +875,10 @@ in generated shape and resample if needed.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2021, Olga Doronina, Zach Grey.
+      &copy;2021, Olga Doronina, Zach Grey, Andrew Glaws.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

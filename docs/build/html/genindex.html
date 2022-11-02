@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; G2Aero 0.0.1 documentation</title>
+    <title>Index &#8212; G2Aero v0.1.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -41,6 +41,7 @@
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
@@ -60,11 +61,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="g2aero.html#g2aero.yaml_info.YamlInfo.add_eta_nominal">add_eta_nominal() (g2aero.yaml_info.YamlInfo method)</a>
 </li>
+      <li><a href="g2aero.html#g2aero.utils.add_minimum_gap">add_minimum_gap() (in module g2aero.utils)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="g2aero.html#g2aero.utils.add_tailedge_gap">add_tailedge_gap() (in module g2aero.utils)</a>
 </li>
       <li><a href="g2aero.html#g2aero.perturbation.AffineTransformPerturbation">AffineTransformPerturbation (class in g2aero.perturbation)</a>
+</li>
+      <li><a href="g2aero.html#g2aero.utils.arc_distance">arc_distance() (in module g2aero.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -82,21 +87,33 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="g2aero.html#g2aero.yaml_info.YamlInfo.calc_angle_interpolator">calc_angle_interpolator() (g2aero.yaml_info.YamlInfo method)</a>
 </li>
+      <li><a href="g2aero.html#g2aero.utils.calc_area">calc_area() (in module g2aero.utils)</a>
+</li>
       <li><a href="g2aero.html#g2aero.reparametrization.calc_cst_param">calc_cst_param() (in module g2aero.reparametrization)</a>
+</li>
+      <li><a href="g2aero.html#g2aero.utils.calc_curvature">calc_curvature() (in module g2aero.utils)</a>
 </li>
       <li><a href="g2aero.html#g2aero.Grassmann_interpolation.GrassmannInterpolator.calc_grassmann_distance">calc_grassmann_distance() (g2aero.Grassmann_interpolation.GrassmannInterpolator static method)</a>
 </li>
       <li><a href="g2aero.html#g2aero.Grassmann_interpolation.GrassmannInterpolator.calc_log_mapping">calc_log_mapping() (g2aero.Grassmann_interpolation.GrassmannInterpolator static method)</a>
 </li>
+      <li><a href="g2aero.html#g2aero.transform.TransformBlade.calc_M_b_total">calc_M_b_total() (g2aero.transform.TransformBlade method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="g2aero.html#g2aero.transform.TransformBlade.calc_M_b_total">calc_M_b_total() (g2aero.transform.TransformBlade method)</a>
+      <li><a href="g2aero.html#g2aero.Grassmann.check_orthogonality">check_orthogonality() (in module g2aero.Grassmann)</a>
+</li>
+      <li><a href="g2aero.html#g2aero.utils.check_selfintersect">check_selfintersect() (in module g2aero.utils)</a>
 </li>
       <li><a href="g2aero.html#g2aero.perturbation.PGAspace.create_from_dataset">create_from_dataset() (g2aero.perturbation.PGAspace class method)</a>
 </li>
       <li><a href="g2aero.html#g2aero.reparametrization.cst_matrix">cst_matrix() (in module g2aero.reparametrization)</a>
 </li>
       <li><a href="g2aero.html#g2aero.reparametrization.cst_reparametrization">cst_reparametrization() (in module g2aero.reparametrization)</a>
+</li>
+      <li><a href="g2aero.html#g2aero.reparametrization.curvature_planar">curvature_planar() (in module g2aero.reparametrization)</a>
+</li>
+      <li><a href="g2aero.html#g2aero.reparametrization.curvature_polar">curvature_polar() (in module g2aero.reparametrization)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -129,6 +146,10 @@
 
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="g2aero.html#g2aero.utils.find_selfintersect">find_selfintersect() (in module g2aero.utils)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="g2aero.html#g2aero.reparametrization.from_cst_parameters">from_cst_parameters() (in module g2aero.reparametrization)</a>
 </li>
@@ -220,11 +241,7 @@
       <li><a href="g2aero.html#g2aero.yaml_info.YamlInfo.get_xy_coordinates">get_xy_coordinates() (g2aero.yaml_info.YamlInfo static method)</a>
 </li>
       <li><a href="g2aero.html#g2aero.transform.global_blade_coordinates">global_blade_coordinates() (in module g2aero.transform)</a>
-
-      <ul>
-        <li><a href="g2aero.html#g2aero.utils.global_blade_coordinates">(in module g2aero.utils)</a>
 </li>
-      </ul></li>
       <li><a href="g2aero.html#g2aero.perturbation.PGAspace.gr_shapes2PGA">gr_shapes2PGA() (g2aero.perturbation.PGAspace method)</a>
 </li>
       <li><a href="g2aero.html#g2aero.transform.TransformBlade.grassmann_to_nominal">grassmann_to_nominal() (g2aero.transform.TransformBlade method)</a>
@@ -236,14 +253,18 @@
   </ul></td>
 </tr></table>
 
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="g2aero.html#g2aero.reparametrization.halfsurface_from_cst_parameters">halfsurface_from_cst_parameters() (in module g2aero.reparametrization)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="g2aero.html#g2aero.Grassmann_interpolation.GrassmannInterpolator.interpolator_cdf">interpolator_cdf() (g2aero.Grassmann_interpolation.GrassmannInterpolator method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="g2aero.html#g2aero.perturbation.PGAspace.intersection_exist">intersection_exist() (g2aero.perturbation.PGAspace static method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -336,6 +357,8 @@
 </li>
       <li><a href="g2aero.html#g2aero.perturbation.PGAspace">PGAspace (class in g2aero.perturbation)</a>
 </li>
+      <li><a href="g2aero.html#g2aero.reparametrization.planar_reparametrization">planar_reparametrization() (in module g2aero.reparametrization)</a>
+</li>
       <li><a href="g2aero.html#g2aero.reparametrization.polar_reparametrization">polar_reparametrization() (in module g2aero.reparametrization)</a>
 </li>
       <li><a href="g2aero.html#g2aero.utils.position_airfoil">position_airfoil() (in module g2aero.utils)</a>
@@ -352,11 +375,13 @@
 </li>
       <li><a href="g2aero.html#g2aero.yaml_info.YamlInfo.read_yamlfile">read_yamlfile() (g2aero.yaml_info.YamlInfo static method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="g2aero.html#g2aero.perturbation.NoiseFunc.ReLU">ReLU() (g2aero.perturbation.NoiseFunc method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="g2aero.html#g2aero.perturbation.NoiseFunc.ReLU_0">ReLU_0() (g2aero.perturbation.NoiseFunc method)</a>
+</li>
+      <li><a href="g2aero.html#g2aero.utils.remove_tailedge_gap">remove_tailedge_gap() (in module g2aero.utils)</a>
 </li>
       <li><a href="g2aero.html#g2aero.Grassmann_interpolation.GrassmannInterpolator.renormalize_eta">renormalize_eta() (g2aero.Grassmann_interpolation.GrassmannInterpolator method)</a>
 </li>
@@ -369,6 +394,8 @@
       <li><a href="g2aero.html#g2aero.perturbation.PGAspace.sample_coef">sample_coef() (g2aero.perturbation.PGAspace method)</a>
 </li>
       <li><a href="g2aero.html#g2aero.Grassmann_interpolation.GrassmannInterpolator.sample_eta">sample_eta() (g2aero.Grassmann_interpolation.GrassmannInterpolator method)</a>
+</li>
+      <li><a href="g2aero.html#g2aero.perturbation.PGAspace.shapes2PGA">shapes2PGA() (g2aero.perturbation.PGAspace method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -437,8 +464,9 @@
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">src</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="community.html">Feedback, Support, and Contributions</a></li>
 </ul>
@@ -454,7 +482,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
@@ -473,10 +501,10 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2021, Olga Doronina, Zach Grey.
+      &copy;2021, Olga Doronina, Zach Grey, Andrew Glaws.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

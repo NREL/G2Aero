@@ -5,6 +5,7 @@ Welcome to G2Aero's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   modules
    usage/installation
    community
 
