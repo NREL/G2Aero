@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>transform module &mdash; G2Aero v0.1.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> G2Aero
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../community.html">Feedback, Support, and Contributions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">G2Aero</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">transform module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/technical_references/transform.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="module-transform">
+<span id="transform-module"></span><h1>transform module<a class="headerlink" href="#module-transform" title="Permalink to this headline"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="transform.TransformBlade">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">transform.</span></span><span class="sig-name descname"><span class="pre">TransformBlade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M_yaml</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_yaml</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_pitch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.TransformBlade" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.TransformBlade.calc_M_b_total">
+<span class="sig-name descname"><span class="pre">calc_M_b_total</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.TransformBlade.calc_M_b_total" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.TransformBlade.grassmann_to_nominal">
+<span class="sig-name descname"><span class="pre">grassmann_to_nominal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy_gr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.TransformBlade.grassmann_to_nominal" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.TransformBlade.grassmann_to_phys">
+<span class="sig-name descname"><span class="pre">grassmann_to_phys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy_gr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.TransformBlade.grassmann_to_phys" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.TransformBlade.make_R_out_interpolator">
+<span class="sig-name descname"><span class="pre">make_R_out_interpolator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#transform.TransformBlade.make_R_out_interpolator" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.TransformBlade.update_M_yaml_interpolator">
+<span class="sig-name descname"><span class="pre">update_M_yaml_interpolator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_twist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">twist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_chord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chordx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chordy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.TransformBlade.update_M_yaml_interpolator" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="transform.global_blade_coordinates">
+<span class="sig-prename descclassname"><span class="pre">transform.</span></span><span class="sig-name descname"><span class="pre">global_blade_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz_local</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.global_blade_coordinates" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="transform.transform_blade_for_BEM">
+<span class="sig-prename descclassname"><span class="pre">transform.</span></span><span class="sig-name descname"><span class="pre">transform_blade_for_BEM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eta_span</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">twist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaley</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.transform_blade_for_BEM" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eta_span</strong> – locations of cross sections on (0, 1)</p></li>
+<li><p><strong>shapes</strong> – grassamnn shapes</p></li>
+<li><p><strong>twist</strong> – twist interpolator</p></li>
+<li><p><strong>scalex</strong> – chord interpolator (should be the same as scaley)</p></li>
+<li><p><strong>scaley</strong> – chord interpolator</p></li>
+<li><p><strong>pitch</strong> – pitch interpolator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="transform.transform_for_BEM">
+<span class="sig-prename descclassname"><span class="pre">transform.</span></span><span class="sig-name descname"><span class="pre">transform_for_BEM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">twist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaley</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.transform_for_BEM" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Olga Doronina, Zach Grey, Andrew Glaws.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
