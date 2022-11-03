@@ -1,3 +1,4 @@
+from re import I
 import numpy as np
 from scipy.interpolate import CubicSpline, PchipInterpolator
 
@@ -36,35 +37,39 @@ def remove_tailedge_gap(xy):
     return np.r_[xy_lower, xy_upper]
 
 
-def position_airfoil(shape_inp):
-    shape = np.array(shape_inp)
-    
-    # Flip such that the pressure side is always first
-    le_ind = np.argmin(shape[:, 0])  # Leading edge index
-    y1_avg = np.average(shape[:le_ind, 1])  # Determine orientation of the airfoil shape
-    if y1_avg > 0:
-        shape = shape[::-1]  # Flip such that the pressure side is always first
-    
-    if shape[-1, 1] != - shape[0, 1]:
-        tailgap = shape[-1, 1] - shape[0, 1]
-        y_shift = shape[0, 1] + tailgap/2
-        shape[:, 1] -=  y_shift
-    
-    x_shift = shape[0, 0]
-    shape[:, 0] -= x_shift
-    min_angle = 0
-    min_x = np.min(shape[:, 0])
-    for angle in np.linspace(-np.pi / 18, np.pi / 18, 1000):
-        R = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
-        shape_tmp = shape @ R.T
-        if np.min(shape_tmp[:, 0]) < min_x:
-            min_x = np.min(shape_tmp[:, 0])
-            min_angle = angle
-    R = np.array([[np.cos(min_angle), -np.sin(min_angle)], [np.sin(min_angle), np.cos(min_angle)]])
-    shape = shape @ R.T
-    shape[:, 0] = (shape[:, 0] - min_x) / -min_x 
+def position_airfoil(shape_inp, rotate=True, return_LEind=False):
 
-    return shape
+    shape = np.array(shape_inp)
+
+    # position tail at (0, 0)
+    TE = (shape[-1] + shape[0]) / 2
+    shape -= TE
+    
+    # Calculate distance from TE to every other point
+    dist = np.linalg.norm(shape, axis=1)
+    LE = shape[np.argmax(dist)]
+    chord = np.max(dist)
+    # rotate to position LE at y = 0 axis
+    if rotate:
+        cos, sin = tuple(LE / chord)
+        R = np.array([[-cos, -sin], [sin, -cos]])
+        shape = shape @ R.T
+    # else:
+        # t_phys = arc_distance(shape)
+        # s1 = CubicSpline(t_phys, shape[:, 0], bc_type='natural')
+        # t = CubicSpline(shape[:, y], t_phys,  bc_type='natural')
+        # t_0 = t()
+        # TODO:
+
+    # scale to chord = 1
+    shape /= chord 
+    shape[:, 0] += 1
+
+    if return_LEind:
+        return shape, np.argmax(dist)
+    else:
+        return shape
+    
 
 
 def find_selfintersect(shape):
@@ -191,7 +196,8 @@ def calc_area(xy, a=0, b=1):
     (x coordinates are normalized by chord length) from left 
     boundary a to right boundary b using discrete representation 
     of a shape and trapesoidal rule. 
-        E.g. to calculate area inside of an airfoil from 25% chord 
+    
+    E.g. to calculate area inside of an airfoil from 25% chord 
     to 45% chord one can use `calc_area(xy, a=0.25, b=0.45)`
 
     :param xy: (n, 2) array of given shape
