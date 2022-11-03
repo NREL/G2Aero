@@ -18,18 +18,20 @@ Organization
 Documentation is currently organized into three main categories:
 
 * :ref:`How to Guides`: User guides covering basic topics and use cases for the G2Aero software
-* :ref:`Technical Reference`: Programming details on the G2Aero API and functions
 * :ref:`Explanation`: Information and research sources for basic concepts used in G2Aero
+* :ref:`Technical Reference`: Programming details on the G2Aero API and functions
 
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   how_to_guides/index
-   technical_reference/index
-   explanation/index
    usage/installation
+   how_to_guides/index
+   explanation/index
+   technical_reference/index
+   
+   
    community
 
 

@@ -16,8 +16,9 @@ You will also need to install the following packages:
     * PyYAML
 
 Installing via conda-forge
--------------------
-.. code-block::bash
+--------------------------
+
+.. code-block:: bash
     
     conda install -c conda-forge g2aero
 
