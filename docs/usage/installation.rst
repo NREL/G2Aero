@@ -15,6 +15,13 @@ You will also need to install the following packages:
     * scipy
     * PyYAML
 
+Installing via conda-forge
+-------------------
+.. code-block::bash
+    
+    conda install -c conda-forge g2aero
+
+
 Install from source
 -------------------
 

@@ -1,4 +1,4 @@
-Yaml_info module
+yaml_info module
 ----------------------------------------------
 
 .. automodule:: yaml_info
