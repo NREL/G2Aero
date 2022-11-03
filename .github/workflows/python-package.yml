@@ -28,13 +28,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8 pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Python Linter
-        uses: sunnysid3up/python-linter@master
-        with:
-          source: "src"
-          mypy-options: "--ignore-missing-imports --show-error-codes"
-          pylint-options: "--rcfile=setup.cfg"
-          isort-options: "-w 100"
+      #- name: Python Linter
+      #  uses: sunnysid3up/python-linter@master
+      #  with:
+      #    source: "src"
+      #    mypy-options: "--ignore-missing-imports --show-error-codes"
+      #    pylint-options: "--rcfile=setup.cfg"
+      #    isort-options: "-w 100"
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
