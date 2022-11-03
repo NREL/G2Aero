@@ -5,7 +5,7 @@ from scipy.special import comb
 
 from .Grassmann import landmark_affine_transform
 from .SPD import polar_decomposition
-from .utils import add_tailedge_gap, arc_distance
+from .utils import add_tailedge_gap, arc_distance, position_airfoil
 
 
 def get_landmarks(xy, n_landmarks=401, method='planar', add_gap=False, **kwargs):
@@ -27,7 +27,14 @@ def get_landmarks(xy, n_landmarks=401, method='planar', add_gap=False, **kwargs)
     y1_avg = np.average(xy[:le_ind, 1])  # Determine orientation of the airfoil shape
     if y1_avg > 0:
         xy = xy[::-1]  # Flip such that the pressure side is always first
-        
+        le_ind = np.argmin(xy[:, 0])  # Leading edge index
+
+    
+    # check that strictly decreasing x values on the upper surface, and strictly increasing x values on the lower surface
+    ind_up = np.where(np.diff(xy[:le_ind, 0]) >= 0)[0]
+    ind_lo = np.where(np.diff(xy[le_ind:, 0]) <= 0)[0] + le_ind
+    xy = np.delete(xy, np.hstack((ind_up, ind_lo)), axis=0)
+
     if method == 'cst':
         xy_landmarks, _ = cst_reparametrization(xy, n_landmarks, **kwargs)
     elif method == 'polar':
@@ -45,42 +52,71 @@ def get_landmarks(xy, n_landmarks=401, method='planar', add_gap=False, **kwargs)
 def planar_reparametrization(xy, n_landmarks, sampling='uniform', **kwargs):
 
     t_phys = arc_distance(xy)
+
+    if sampling == 'cosine':
+
+        xy, LEind = position_airfoil(xy, return_LEind=True)
+        s1 = CubicSpline(t_phys, xy[:, 0], bc_type='natural')
+        s2 = CubicSpline(t_phys, xy[:, 1], bc_type='natural')
+
+        # sample cosine distributed x coordinates
+        cos_distribution = lambda n: -np.cos(np.linspace(0, np.pi, n)) * 0.5 + 0.5
+        n_half_landmarks = int((n_landmarks+1)/2)
+        x_new_up = cos_distribution(n_half_landmarks)
+        x_new_lo = cos_distribution(n_half_landmarks)[1:]
+        if (n_landmarks % 2 == 0):
+            x_new_lo = cos_distribution(n_half_landmarks + 1)[1:]
+        # make interpolator t(x) 
+        # print(np.flip(xy[:LEind+1, 0]))
+        # print(xy[LEind:, 0])
+        tx_up = PchipInterpolator(np.flip(xy[:LEind+1, 0]), np.flip(t_phys[:LEind+1]))
+        tx_lo = PchipInterpolator(xy[LEind:, 0], t_phys[LEind:])
+        t_new = np.hstack((np.flip(tx_up(x_new_up)), tx_lo(x_new_lo)))
+
+        x_new = np.hstack((np.flip(x_new_up), x_new_lo))
+        landmarks = np.vstack((x_new, s2(t_new))).T
     
-    s1 = CubicSpline(t_phys, xy[:, 0], bc_type='natural')
-    s2 = CubicSpline(t_phys, xy[:, 1], bc_type='natural')
+    else: 
 
-    # # check if the shape is closed (0 tailgap)
-    # # if not closed reduce the number of landmarks by one (so after closing we end up with the same number of landmarks)
-    # closed_flag = True
-    # if np.linalg.norm(xy[0] - xy[-1]) > 10e-7:
-    #     n_landmarks -= 1
-    #     closed_flag = False
+        s1 = CubicSpline(t_phys, xy[:, 0], bc_type='natural')
+        s2 = CubicSpline(t_phys, xy[:, 1], bc_type='natural')
 
-    # if sampling == 'chebyshev_nodes':
-    #     t_new = np.polynomial.chebyshev.Chebyshev.roots()
+        if sampling == 'uniform_gr':
+            # xy_gr, _, _ = landmark_affine_transform(xy)
+            xy_gr, _, _ = polar_decomposition(xy)
+            t_gr = arc_distance(xy_gr)
+            interpolator = PchipInterpolator(t_gr, t_phys)
+            t_new = interpolator(np.linspace(0, 1, n_landmarks))
 
-    if sampling == 'uniform_gr':
-        # xy_gr, _, _ = landmark_affine_transform(xy)
-        xy_gr, _, _ = polar_decomposition(xy)
-        t_gr = arc_distance(xy_gr)
-        interpolator = PchipInterpolator(t_gr, t_phys)
-        t_new = interpolator(np.linspace(0, 1, n_landmarks))
+        elif sampling == 'uniform_phys' or sampling == 'uniform':
+            t_new = np.linspace(0, 1, n_landmarks)
 
-    if sampling == 'uniform_phys' or sampling == 'uniform':
-        t_new = np.linspace(0, 1, n_landmarks)
+        elif sampling == 'curvature':
+            t_tmp = np.linspace(0, 1, 100000)
+            curvature_i = curvature_planar(t_tmp, s1, s2)
+            curvature_cdf_i = np.cumsum(curvature_i) - curvature_i[0]
+            curvature_cdf_i /= curvature_cdf_i[-1]
+            
+            ind = np.where(np.diff(curvature_cdf_i) == 0)[0]
+            curvature_cdf_i = np.delete(curvature_cdf_i, ind)
+            t_tmp = np.delete(t_tmp, ind)
+            t_new = PchipInterpolator(curvature_cdf_i, t_tmp)(np.linspace(0, 1, n_landmarks))
 
-    if sampling == 'curvature':
-        t_tmp = np.linspace(0, 1, 100000)
-        curvature_i = curvature_planar(t_tmp, s1, s2)
-        curvature_cdf_i = np.cumsum(curvature_i) - curvature_i[0]
-        curvature_cdf_i /= curvature_cdf_i[-1]
-        t_new = PchipInterpolator(curvature_cdf_i, t_tmp)(np.linspace(0, 1, n_landmarks))
+        elif sampling == 'chebyshev':
+            cheb = np.zeros((n_landmarks+1, ))
+            cheb[-1] = 1
+            t_new = np.polynomial.chebyshev.chebroots(cheb)
+            t_new = (t_new + 1)/2
 
-    landmarks = np.vstack((s1(t_new), s2(t_new))).T
+        else:
+            print(f"Sampling method '{sampling}' doesn't exist, please provide correct sampling method")
+            exit()
+        
+        landmarks = np.vstack((s1(t_new), s2(t_new))).T
 
-    # # close the shape by adding first landmark to the end
-    # if not closed_flag:
-    #     landmarks = np.vstack((landmarks, landmarks[0]))
+    
+    
+    
 
     return landmarks
 
@@ -124,8 +160,8 @@ def cst_reparametrization(xy, n_landmarks=401, original_landmarks=False, name=''
     else:
         n1, n2 = 0.5, 1.0
 
-    le_ind = np.argmin(xy[:, 0])  # Leading edge index
-    # split int upper and lower parts
+    xy, le_ind = position_airfoil(xy, return_LEind=True)
+    # split into upper and lower parts
     xy_upper, xy_lower = xy[le_ind:], xy[:le_ind]
 
     # tailedge gap
@@ -140,9 +176,17 @@ def cst_reparametrization(xy, n_landmarks=401, original_landmarks=False, name=''
         lower = halfsurface_from_cst_parameters(xy_lower[:, 0], cst_lower, n1, n2, te_lower)
         xy_landmarks = np.vstack((lower, upper))
     else:
-        n_half = int(n_landmarks / 2)
-        x_c = -np.cos(np.linspace(0, np.pi, n_half + 1)) * 0.5 + 0.5
-        xy_landmarks = from_cst_parameters(x_c, cst_lower, cst_upper, n1, n2, te_lower, te_upper)
+        cos_distribution = lambda n: -np.cos(np.linspace(0, np.pi, n)) * 0.5 + 0.5
+        n_half_landmarks = int((n_landmarks+1)/2)
+        x_new_up = cos_distribution(n_half_landmarks)
+        x_new_lo = cos_distribution(n_half_landmarks)[1:]
+        if (n_landmarks % 2 == 0):
+            x_new_lo = cos_distribution(n_half_landmarks + 1)[1:]
+
+        upper = halfsurface_from_cst_parameters(x_new_up, cst_upper, n1, n2, te=te_upper)
+        lower = halfsurface_from_cst_parameters(np.flip(x_new_lo), cst_lower, n1, n2, te=te_lower)
+        
+        xy_landmarks = np.vstack((lower, upper))
 
     cst = np.r_[cst_lower, cst_upper, te_lower, te_upper]
 
