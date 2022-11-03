@@ -10,6 +10,8 @@
  -  Riemannian interpolation connecting a sequence of airfoil cross-sections to build 3D blades from 2D data; 
  -  consistent perturbations over the span of interpolated 3D blades based on dominant modes from the data-driven analysis. 
 
+ More details can be found in the [G2Aero documentation](https://g2aero.readthedocs.io/en/latest/index.html).
+
 ## Installation
 
 Install `G2Aero` from sources with:
