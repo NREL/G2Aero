@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 from g2aero.Grassmann import landmark_affine_transform
-from g2aero.perturbation import PGAspace
+from g2aero.PGA import PGAspace
 from g2aero.utils import remove_tailedge_gap
 from g2aero import yaml_info
 from g2aero.Grassmann_interpolation import GrassmannInterpolator

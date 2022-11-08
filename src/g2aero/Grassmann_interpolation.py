@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.interpolate import PchipInterpolator
-from .Grassmann import exp, log, distance, landmark_affine_transform
+from g2aero.Grassmann import exp, log, distance, landmark_affine_transform
 
 
 class GrassmannInterpolator:

@@ -26,11 +26,9 @@ Documentation is currently organized into three main categories:
    :maxdepth: 2
    :caption: Contents:
 
-   usage/installation
    how_to_guides/index
    explanation/index
    technical_reference/index
-   
    
    community
 

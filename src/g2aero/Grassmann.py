@@ -24,7 +24,7 @@ def landmark_affine_transform(X_phys):
     LA-standardization  normalizes  the  shape  such that  it  has  zero  mean  (translation  invariance)  and
     sample covariance proportional to I2 over the n discrete boundary landmarks defining the shape.
 
-    :param X_phys:(n_shapes, n_landmarks, 2) array of physical coordinates defining shapes
+    :param X_phys: (n_shapes, n_landmarks, 2) array of physical coordinates defining shapes
     :return: X_grassmann, M, b, such that X_phys = X_grassmann @ M + b.
     """
     X_phys = np.asarray(X_phys)

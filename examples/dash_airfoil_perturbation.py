@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
-from g2aero.perturbation import PGAspace
+from g2aero.PGA import PGAspace
 from g2aero.utils import position_airfoil, add_tailedge_gap, check_selfintersect
 
 import dash

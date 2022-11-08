@@ -1,11 +1,8 @@
 Technical Reference
 ===================
 
-g2aero
-===
-
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    Grassmann
    Grassmann_interpolation

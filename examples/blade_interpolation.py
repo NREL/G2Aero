@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from g2aero import yaml_info
+from g2aero.yaml_info import YamlInfo
 from g2aero.Grassmann_interpolation import GrassmannInterpolator
 from g2aero.transform import TransformBlade, global_blade_coordinates
 from g2aero import geometry_gmsh
@@ -21,7 +21,7 @@ def main():
     
     t_start = time()
     
-    Blade = yaml_info.YamlInfo(shapes_path, n_landmarks=n_landmarks)
+    Blade = YamlInfo(shapes_path, n_landmarks=n_landmarks)
     eta_nominal = Blade.eta_nominal
     xy_nominal = Blade.xy_nominal
 

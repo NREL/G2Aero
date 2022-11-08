@@ -2,7 +2,7 @@ import yaml
 import numpy as np
 from scipy.spatial.transform import Rotation, Slerp
 from scipy.interpolate import PchipInterpolator, interp1d
-from .reparametrization import get_landmarks
+from g2aero.reparametrization import get_landmarks
 
 
 class YamlInfo:

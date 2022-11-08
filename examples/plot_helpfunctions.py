@@ -33,7 +33,7 @@ def plot_3d_blade_with_nominal(shapes, shapes_nominal):
     return fig
 
 
-def plot_3d_blade(shapes):
+def plot_3d_blade(shapes, nominal_shapes=False):
     N_eta_skp = 1
     N_arc_skp = 25
     line_b = go.scatter3d.Line(color="#1f77b4", width=1.)
@@ -41,13 +41,20 @@ def plot_3d_blade(shapes):
 
     # Plot Grassmann interpolator cross section refinements
     for i in range(0, int((shapes.shape[0])), N_eta_skp):
-        data.append(go.Scatter3d(x=shapes[i, :, 2], y=shapes[i, :, 0], z=shapes[i, :, 1], mode='lines', line=line_b))
+        data.append(go.Scatter3d(x=shapes[i, :, 2], y=shapes[i, :, 0], z=shapes[i, :, 1], 
+                                 mode='lines', line=line_b, showlegend=False))
 
     # Plot span-wise landmarks
     for j in range(0, int((shapes.shape[1])), N_arc_skp):
         span_line = shapes[:, j]
         data.append(go.Scatter3d(x=span_line[:, 2], y=span_line[:, 0], z=span_line[:, 1],
-                                 mode='lines', line=line_b))
+                                 mode='lines', line=line_b, showlegend=False))
+
+    if not nominal_shapes is None:
+        line_m = go.scatter3d.Line(color="#000000", width=4.)
+        for i in range(0, int((nominal_shapes.shape[0]))):
+            data.append(go.Scatter3d(x=nominal_shapes[i, :, 2], y=nominal_shapes[i, :, 0], z=nominal_shapes[i, :, 1], 
+                                     mode='lines', line=line_m, showlegend=False))
 
     fig = go.Figure(data=data)
     fig.update_layout(scene_aspectmode='data')

@@ -3,7 +3,7 @@ import os
 
 from g2aero.yaml_info import YamlInfo
 from g2aero.Grassmann_interpolation import GrassmannInterpolator
-from g2aero.perturbation import PGAspace
+from g2aero.PGA import PGAspace
 from g2aero.transform import TransformBlade
 from g2aero.Grassmann import landmark_affine_transform
 

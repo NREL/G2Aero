@@ -1,5 +1,5 @@
 from unittest import TestCase
-from g2aero.perturbation import *
+from g2aero.PGA import *
 import os
 import numpy as np
 

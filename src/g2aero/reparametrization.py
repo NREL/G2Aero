@@ -3,9 +3,9 @@ from scipy.interpolate import CubicSpline, PchipInterpolator
 from scipy.optimize import lsq_linear
 from scipy.special import comb
 
-from .Grassmann import landmark_affine_transform
-from .SPD import polar_decomposition
-from .utils import add_tailedge_gap, arc_distance, position_airfoil
+from g2aero.Grassmann import landmark_affine_transform
+from g2aero.SPD import polar_decomposition
+from g2aero.utils import add_tailedge_gap, arc_distance, position_airfoil
 
 
 def get_landmarks(xy, n_landmarks=401, method='planar', add_gap=False, **kwargs):
@@ -50,6 +50,16 @@ def get_landmarks(xy, n_landmarks=401, method='planar', add_gap=False, **kwargs)
 
 
 def planar_reparametrization(xy, n_landmarks, sampling='uniform', **kwargs):
+    """ Builds cubic splines of x(t) and y(t) where t in [0, 1] is coordinate 
+        along the arclength. Resamples landmark 
+
+    :param xy: (n, 2) given coordinated defining the shape
+    :param n_landmarks: scalar number of landmarks in returned shape
+    :param sampling: distribution of landmarks along the arclength 
+                     possible options: 'cosine', 'chebyshev', 'uniform', 'uniform_gr' and 'curvature', 
+                     defaults to 'uniform'
+    :return: (n_landmarks, 2) array of landmarks after reparametrization
+    """
 
     t_phys = arc_distance(xy)
 

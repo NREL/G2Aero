@@ -98,7 +98,7 @@ def transform_blade_for_BEM(eta_span, shapes, twist, scalex, scaley, pitch):
     """
 
     :param eta_span: locations of cross sections on (0, 1)
-    :param shapes: grassamnn shapes
+    :param shapes: grassmann shapes
     :param twist: twist interpolator
     :param scalex: chord interpolator (should be the same as scaley)
     :param scaley: chord interpolator
