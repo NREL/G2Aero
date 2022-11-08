@@ -28,12 +28,35 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8 pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      #- name: Python Linter
+      #  uses: sunnysid3up/python-linter@master
+      #  with:
+      #    source: "src"
+      #    mypy-options: "--ignore-missing-imports --show-error-codes"
+      #    pylint-options: "--rcfile=setup.cfg"
+      #    isort-options: "-w 100"
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      - name: Test with pytest
+      # Install package to be tested
+      - name: Install package to be tested
+        run: pip install -e .
+      # Run unit tests
+      - name: Run main unit tests with coverage report
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          pytest
+          pytest -x --cov=scico --cov-report=xml
+      # Upload coverage to codecov
+      - name: Upload coverage to codecov
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v2
+        with:
+          env_vars: OS,PYTHON
+          fail_ci_if_error: false
+          files: coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          verbose: true
