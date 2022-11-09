@@ -30,8 +30,7 @@ release = 'v0.1.1'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["matplotlib.sphinxext.plot_directive",
-              'nbsphinx_link',
+extensions = ['nbsphinx_link',
               'nbsphinx', 'sphinx.ext.autodoc', 'sphinx.ext.coverage', 'sphinx.ext.napoleon', 'sphinx.ext.autosectionlabel']
 
 # Add any paths that contain templates here, relative to this directory.
