@@ -42,8 +42,12 @@ class PGAspace:
         pga_space.radius = np.max(np.array([r_min, r_max]), axis=0)
         return pga_space, t
 
-    def PGA2gr_shape(self, pga_coord):
-        return perturb_gr_shape(self.Vh, self.karcher_mean, pga_coord)
+    def PGA2gr_shape(self, pga_coord, original_shape_gr=None):
+        gr_shape = perturb_gr_shape(self.Vh, self.karcher_mean, pga_coord)
+        if original_shape_gr is not None:
+            R = procrustes(gr_shape, original_shape_gr)
+            gr_shape = gr_shape @ R
+        return gr_shape
 
     def PGA2shape(self, pga_coord, M=None, b=None, original_shape_gr=None):
         if M is None:
