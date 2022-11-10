@@ -40,6 +40,7 @@ If you use this software in your research or publications, please using the foll
    :caption: Contents:
 
    how_to_guides/index
+   explanation/index
    technical_reference/index
    community
 
