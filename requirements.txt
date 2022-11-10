@@ -2,4 +2,3 @@ PyYAML
 numpy
 scipy
 setuptools
-nbsphinx_link
