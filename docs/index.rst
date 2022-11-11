@@ -27,6 +27,13 @@ Citations
 ---------
 If you use this software in your research or publications, please using the following BibTeX citations::
 
+   @article{grey2022separable,
+      title={Separable Shape Tensors for Aerodynamic Design},
+      author={Grey, Zachary and Doronina, Olga and Glaws, Andrew},
+      journal={arXiv preprint arXiv:2208.04743},
+      year={2022}
+   }
+
    @inproceedings{grassmannian2022,
       title={Grassmannian Shape Representations for Aerodynamic Applications},
       author={Olga Doronina and Zachary Grey and Andrew Glaws},

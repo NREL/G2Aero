@@ -35,12 +35,15 @@ def get_landmarks(xy, n_landmarks=401, method='planar', add_gap=False, **kwargs)
     ind_lo = np.where(np.diff(xy[le_ind:, 0]) <= 0)[0] + le_ind
     xy = np.delete(xy, np.hstack((ind_up, ind_lo)), axis=0)
 
-    if method == 'cst':
+    if method == 'cst' or 'CST':
         xy_landmarks, _ = cst_reparametrization(xy, n_landmarks, **kwargs)
     elif method == 'polar':
         xy_landmarks = polar_reparametrization(xy, n_landmarks, **kwargs)
     elif method == 'planar':
         xy_landmarks = planar_reparametrization(xy, n_landmarks, **kwargs)
+    else: 
+        print('Error: Available reparametrization methods are "cst", "polar" and "planar"')
+        exit()
 
     # make tailedge gap
     if add_gap:

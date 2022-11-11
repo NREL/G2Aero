@@ -1,6 +1,7 @@
 import plotly.graph_objects as go
 import numpy as np
-
+import pandas as pd
+import seaborn as sns
 
 
 def plot_3d_blade_with_nominal(shapes, shapes_nominal):
@@ -60,3 +61,18 @@ def plot_3d_blade(shapes, nominal_shapes=False):
     fig.update_layout(scene_aspectmode='data')
     fig.update_scenes(xaxis_visible=False, yaxis_visible=False, zaxis_visible=False)
     return fig
+
+
+def scatterplot_with_blades(t, blades_t):
+    coord_names = ['$t_1$', '$t_2$', '$t_3$', '$t_4$']
+    df = pd.DataFrame(data=t, columns=coord_names)
+    splot = sns.pairplot(df, x_vars=coord_names, y_vars=coord_names,
+                     diag_kind='kde', corner=True, plot_kws=dict(alpha=.5, s=5))
+    blade_line = ['-', 'dashed']
+    for k, blade in enumerate(blades_t):
+        splot.axes[1,0].plot(blade[:,0], blade[:,1], lw=2, color='k', ls=blade_line[k], marker="+")
+        splot.axes[2,0].plot(blade[:,0], blade[:,2], lw=2, color='k', ls=blade_line[k], marker="+")
+        splot.axes[3,0].plot(blade[:,0], blade[:,3], lw=2, color='k', ls=blade_line[k], marker="+")
+        splot.axes[2,1].plot(blade[:,1], blade[:,2], lw=2, color='k', ls=blade_line[k], marker="+")
+        splot.axes[3,1].plot(blade[:,1], blade[:,3], lw=2, color='k', ls=blade_line[k], marker="+")
+        splot.axes[3,2].plot(blade[:,2], blade[:,3], lw=2, color='k', ls=blade_line[k], marker="+")

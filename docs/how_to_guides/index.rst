@@ -5,5 +5,6 @@ How To Guides
    :caption: Contents:
 
    getting_started
-   files/0_Data-Driven_Domain
-   files/3_How_to_interpolate
+   notebooks/0_Data-Driven_Domain
+   notebooks/3_How_to_interpolate
+   notebooks/4_Blade_perturbation

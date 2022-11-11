@@ -156,12 +156,13 @@ class PGAspace:
         n = len(coef_array)
         blades = np.empty((n, n_shapes, n_landmarks, dim))
         for k, c in enumerate(coef_array):
+            print(f'Perturbing blade {k+1}')
             while True:
                 new_blade = get_new_blade(c)
                 if not intersection_exist_in_blade(new_blade) or coef is not None:
                     break
                 else:
-                    print('generating new coef')
+                    print('Generating new coef')
                     c = self.sample_coef()
                     coef_array[k] = c
             blades[k] = new_blade
