@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('../src/g2aero/'))
 # -- Project information -----------------------------------------------------
 
 project = 'G2Aero'
-copyright = '2021, Olga Doronina, Zach Grey, Andrew Glaws'
+copyright = '2021, Olga Doronina, Andrew Glaws'
 author = 'Olga Doronina, Zach Grey, Andrew Glaws'
 
 # The full version, including alpha/beta/rc tags
