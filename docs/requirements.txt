@@ -1,4 +1,5 @@
 sphinx-rtd-theme
 nbsphinx
 nbsphinx_link
+sphinx-autoapi
 iPython
