@@ -23,10 +23,6 @@ affiliation: 1 # (Multiple affiliations must be quoted)
 
 affiliation: 2
 
-- name: Andrew Glaws
-
-affiliation: 1
-
 affiliations:
 
 - name: National Renewable Energy Laboratory
