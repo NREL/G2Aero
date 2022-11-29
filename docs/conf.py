@@ -33,6 +33,7 @@ release = 'v0.1.1'
 extensions = ['nbsphinx_link', 'nbsphinx', 
               'sphinx.ext.autodoc', 'sphinx.ext.autosummary', 'sphinx.ext.coverage', 'sphinx.ext.napoleon', 'sphinx.ext.autosectionlabel']
 
+autodoc_mock_imports = ['numpy', 'scipy', 'gmsh']
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
