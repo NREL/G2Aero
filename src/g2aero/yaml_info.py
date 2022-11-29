@@ -79,9 +79,9 @@ class YamlInfo:
         # self.pitch_axis_values = np.vstack((self.pitch_axis_values, np.zeros_like(self.pitch_axis_grid))).T
 
         # in yaml file defined in global coordinates
-        # shift of the shape after twist rotation (can happen in x and y direction). Bending blade span
+        # shift of the shape after twist rotation (can happen in x and y direction).
         # z axis is location along the blade span
-        shift_grid, shift_values = cls.make_shift_interpolator(airfoils_dict, hub_d)
+        shift_grid, shift_values = cls.calc_shift(airfoils_dict, hub_d)
 
         yaml_info = cls(eta_nominal, xy_landmarks, 
                         chord_grid, chord_values, 
@@ -122,10 +122,15 @@ class YamlInfo:
         return PchipInterpolator(self.chord_grid, M_yaml)
 
     @staticmethod
-    def make_shift_interpolator(airfoils_dict, hub_d):
-        # in yaml file defined in global coordinates
-        # shift of the shape after twist rotation (can happen in x and y direction). Bending blade span
-        # z axis is location along the blade span
+    def calc_shift(airfoils_dict, hub_d):
+        """Shift of the shape after twist rotation (can happen in x and y direction). 
+        In yaml file defined in global coordinates.
+        z axis is location along the blade span. 
+
+        :param airfoils_dict: dict from yaml file
+        :param hub_d: distance from hub to shift whole blade in z direction
+        :return: coordinates along the blade and shift values
+        """
         ref_axis_values = dict()
         ref_axis_grid = dict()
         ref_axis = dict()
@@ -145,9 +150,12 @@ class YamlInfo:
         
 
     def calc_angle_interpolator(self, shift_grid, shift_values):
-        """ Create Pchip interpolator of angle of out-of-plane (elastic) rotation in yz plane (in local coord),
+        """Create Pchip interpolator of angle of out-of-plane (elastic) rotation in yz plane (in local coord),
         because airfoil shapes have to be rotated out of xy plane to be normal to y component (in local coord)
         of ref axis (elastic axis).
+
+        :param shift_grid: point location along the blade span
+        :param shift_values: shift values at shift_grid points
         :return: angle interpolator
         """
         if np.allclose(shift_values[:, 1], np.zeros_like(shift_values[:, 1])):
@@ -179,8 +187,8 @@ class YamlInfo:
         return xy_transformed
 
     def add_eta_nominal(self, eta):
-        """
-        Adding additional nominal cross section between same shapes
+        """ Adding additional nominal cross section between same shapes
+
         :param eta: list of additional locations
         :return:
         """

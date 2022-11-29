@@ -10,6 +10,7 @@ from g2aero.utils import add_tailedge_gap, arc_distance, position_airfoil
 
 def get_landmarks(xy, n_landmarks=401, method='planar', add_gap=False, **kwargs):
     """Provides landmarks after reparametrization.
+
     :param xy: (n, 2) given coordinated defining the shape
     :param n_landmarks: scalar number of landmarks in returned shape
     :param method: method of reparametrization: 'cst', 'polar' or 'planar'
@@ -54,7 +55,7 @@ def get_landmarks(xy, n_landmarks=401, method='planar', add_gap=False, **kwargs)
 
 def planar_reparametrization(xy, n_landmarks, sampling='uniform', **kwargs):
     """ Builds cubic splines of x(t) and y(t) where t in [0, 1] is coordinate 
-        along the arclength. Resamples landmark 
+    along the arclength. Resamples landmark 
 
     :param xy: (n, 2) given coordinated defining the shape
     :param n_landmarks: scalar number of landmarks in returned shape
@@ -126,10 +127,6 @@ def planar_reparametrization(xy, n_landmarks, sampling='uniform', **kwargs):
             exit()
         
         landmarks = np.vstack((s1(t_new), s2(t_new))).T
-
-    
-    
-    
 
     return landmarks
 
@@ -209,6 +206,7 @@ def cst_reparametrization(xy, n_landmarks=401, original_landmarks=False, name=''
 def calc_cst_param(x, y, n1, n2, y_tailedge=0.0, order=8):
     """
     Solve the least squares problem for a given shape
+
     :param x: (np.ndarray): (x/c) coordinates locations
     :param y: (np.ndarray): (y/c) coordinate locations
     :param n1: normal coord
@@ -236,6 +234,7 @@ def cst_matrix(x, n1, n2, order):
 
 def from_cst_parameters(x, cst_lower, cst_upper, n1=0.5, n2=1.0, te_lower=0, te_upper=0):
     """ Compute landmark coordinates for the airfoil given x-coordinate locations
+
     :param x: (np.ndarray): Non-dimensional x-coordinate locations
     :param cst_lower: (np.ndarray): cst parameters for lower part
     :param cst_upper: (np.ndarray): cst parameters for upper part
@@ -259,6 +258,7 @@ def from_cst_parameters(x, cst_lower, cst_upper, n1=0.5, n2=1.0, te_lower=0, te_
 
 def halfsurface_from_cst_parameters(x, cst, n1=0.5, n2=1.0, te=0):
     """ Compute landmark coordinates for the upper or lower surface of airfoil
+
     :param x: (np.ndarray): Non-dimensional x-coordinate locations
     :param cst: (np.ndarray): cst parameters for upper or lower part
     :param n1: (double): normal coord
