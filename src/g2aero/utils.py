@@ -37,24 +37,35 @@ def remove_tailedge_gap(xy):
     return np.r_[xy_lower, xy_upper]
 
 
-def position_airfoil(shape_inp, rotate=True, return_LEind=False):
+def position_airfoil(shape_inp, rotate=True, LE_cst=False, return_LEind=False):
 
     shape = np.array(shape_inp)
 
     # position tail at (0, 0)
     TE = (shape[-1] + shape[0]) / 2
     shape -= TE
-    
-    # Calculate distance from TE to every other point
-    dist = np.linalg.norm(shape, axis=1)
-    LE = shape[np.argmax(dist)]
-    chord = np.max(dist)
+
     # rotate to position LE at y = 0 axis
-    if rotate:
-        cos, sin = tuple(LE / chord)
-        R = np.array([[-cos, -sin], [sin, -cos]])
-        shape = shape @ R.T
-    # else:
+    if rotate or return_LEind:
+        if LE_cst:
+            LE_ind = int(len(shape)/2)
+            LE = shape[LE_ind]
+            chord = np.linalg.norm(shape[LE_ind])
+        else:  # search for LE
+            # Calculate distance from TE to every other point
+            dist = np.linalg.norm(shape, axis=1)
+            LE_ind = np.argmax(dist)
+            chord = np.max(dist)
+
+        LE = shape[LE_ind]
+        if rotate:
+            cos, sin = tuple(LE / chord)
+            R = np.array([[-cos, -sin], [sin, -cos]])
+            shape = shape @ R.T
+    else:
+        LE_ind = np.argmin(shape[:, 0])
+        LE = shape[LE_ind]
+        chord = np.linalg.norm(shape[LE_ind])
         # t_phys = arc_distance(shape)
         # s1 = CubicSpline(t_phys, shape[:, 0], bc_type='natural')
         # t = CubicSpline(shape[:, y], t_phys,  bc_type='natural')
@@ -66,7 +77,7 @@ def position_airfoil(shape_inp, rotate=True, return_LEind=False):
     shape[:, 0] += 1
 
     if return_LEind:
-        return shape, np.argmax(dist)
+        return shape, LE_ind
     else:
         return shape
     

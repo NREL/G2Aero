@@ -12,10 +12,16 @@ class TransformBlade:
         self.M = M
         self.b = b
         self.b_pitch = b_pitch
-        self.R_out = self.make_R_out_interpolator()
 
-    def make_R_out_interpolator(self):
-        eta = np.linspace(0, 1, 200)
+
+    def make_R_out_interpolator(self, eta):
+        """ Airfoils shapes have to be rotated out of xy plane to be normal 
+        to y component (in local coord) of ref axis (elastic axis).
+
+        :param eta: locations along the blade span (need to define the range)
+        :return: rotation interpolator
+        """
+        eta = np.linspace(eta[0], eta[-1], 200)
         grad = np.gradient(self.b_yaml(eta)[:, 1], self.b_yaml(eta)[:, 2])
         angles = np.arctan(grad)
         rotations = Rotation.from_euler('x', -angles, degrees=False)
@@ -30,6 +36,9 @@ class TransformBlade:
     def grassmann_to_phys(self, xy_gr, eta):
         n_shapes, n_landmarks, _ = xy_gr.shape
         xyz_phys = np.empty((n_shapes, n_landmarks, 3))
+        self.R_out = self.make_R_out_interpolator(eta)
+
+        print(self.R_out(eta).as_matrix)
 
         for i, (eta, xy) in enumerate(zip(eta, xy_gr)):
             M_total, b_total = self.calc_M_b_total(eta)
@@ -46,6 +55,7 @@ class TransformBlade:
         M, b = self.M(eta), self.b(eta)
         b = np.concatenate((b, [0]))
         R_out = self.R_out(eta)
+
         b_total = R_out.as_matrix() @ M_yaml_3d @ b + b_yaml
         M_total = self.M_yaml(eta) @ self.M(eta)
         return M_total, b_total
