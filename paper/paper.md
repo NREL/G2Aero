@@ -4,41 +4,30 @@
 ---
 
 title: 'G2Aero: A Python package for separable shape tensors'
-
 tags:
-
-- Python
-
-  
-
+    - Python
+    - airfoils
+    - manifolds
+    - generative model
+    - shape tensors
+    - Grassmannian
+    - data-driven
 authors:
-
-- name: Olga A. Doronina^[corresponding author]
-
-orcid: 0000-0003-0872-7098
-
-affiliation: 1 # (Multiple affiliations must be quoted)
-
-- name: Zachary Grey
-
-affiliation: 2
-
+    - name: Olga A. Doronina
+      orcid: 0000-0003-0872-7098
+      corresponding: true
+      affiliation: 1 # (Multiple affiliations must be quoted)
+    - name: Zachary J. Grey
+      affiliation: 2
+    - name: Andrew Glaws
+      affiliation: 1
 affiliations:
-
-- name: National Renewable Energy Laboratory
-
-index: 1
-
-- name: National Institute of Standards and Technology
-
-index: 2
-
-  
-
-date: 22 November 2022
-
+    - name: National Renewable Energy Laboratory, USA
+      index: 1
+    - name: National Institute of Standards and Technology, USA
+      index: 2
+date: 29 November 2022
 bibliography: paper.bib
-
 ---
 
 # Summary
