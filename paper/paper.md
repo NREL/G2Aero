@@ -1,8 +1,4 @@
-
-  
-
 ---
-
 title: 'G2Aero: A Python package for separable shape tensors'
 tags:
     - Python
