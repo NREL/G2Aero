@@ -3,3 +3,4 @@ nbsphinx
 nbsphinx_link
 sphinx-autoapi
 iPython
+https://github.com/NREL/G2Aero
