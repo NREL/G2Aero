@@ -47,8 +47,11 @@ def get_landmarks(xy, n_landmarks=401, method='planar', add_gap=False, **kwargs)
         exit()
 
     # make tailedge gap
-    if add_gap:
-        xy_landmarks = add_tailedge_gap(xy_landmarks, 0.002)
+    if np.isscalar(add_gap):
+        xy_landmarks = add_tailedge_gap(xy_landmarks, add_gap)
+    elif add_gap:
+        xy_landmarks = add_tailedge_gap(xy_landmarks, 0.002) 
+        
 
     return xy_landmarks
 

@@ -22,6 +22,13 @@ class PGAspace:
         self.b_mean = b_mean
         self.karcher_mean = karcher_mean
 
+
+    @classmethod
+    def load_from_file(cls, filename):
+        pga_dict = np.load(filename)
+        pga_space = cls(pga_dict['Vh'], pga_dict['M_mean'], pga_dict['b_mean'], pga_dict['karcher_mean'])
+        return pga_space
+
     @classmethod
     def create_from_dataset(cls, phys_shapes, n_modes=None, method='SPD'):
         if method == 'SPD':
@@ -169,6 +176,10 @@ class PGAspace:
         if n == 1:
             return blades.squeeze(axis=0), coef_array
         return blades, coef_array
+
+    def save_to_file(self, filename):
+        np.savez(filename, Vh=self.Vh, karcher_mean=self.karcher_mean, 
+                           M_mean=self.M_mean, b_mean=self.b_mean)
 
 
 class AffineTransformPerturbation:

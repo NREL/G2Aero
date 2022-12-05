@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.interpolate import PchipInterpolator
-from Grassmann import exp, log, distance, landmark_affine_transform
+from g2aero.Grassmann import exp, log, distance, landmark_affine_transform
 
 
 class GrassmannInterpolator:
@@ -123,7 +123,7 @@ class GrassmannInterpolator:
         :param n_samples: number of samples uniformly distributed over Grassmannian
         :param n_hub: number of samples uniform over eta between duplicated shapes on the left
         :param n_tip: number of samples uniform over eta between duplicated shapes on the right, not including tip end
-        :param n_end: number of samples uniform over eta for the tip end
+        :param n_end: number of samples uniform over eta for the tip end (2% of the blade length)
         :return: array of eta samples
         """
         # make inverse interpolator
@@ -131,9 +131,8 @@ class GrassmannInterpolator:
         t_tmp = self.interpolator_cdf(eta_scaled_01_tmp)
         interpolator_inv_01 = PchipInterpolator(t_tmp, eta_scaled_01_tmp)
 
-        if n_end == 0:
-            tip_end = 0.0
-        else:
+        tip_end = 0.0
+        if n_end != 0:
             tip_end = self.eta_nominal_scaled[-1] * 0.02
         if not n_tip:
             n_tip = 0.2*n_samples
