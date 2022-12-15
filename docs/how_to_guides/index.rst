@@ -6,5 +6,6 @@ How To Guides
 
    getting_started
    notebooks/0_Data-Driven_Domain
-   notebooks/3_How_to_interpolate
-   notebooks/4_Blade_perturbation
+   notebooks/1_Generating_Airfoils
+   notebooks/2_How_to_interpolate
+   notebooks/3_Blade_perturbation
