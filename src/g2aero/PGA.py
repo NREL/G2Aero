@@ -14,19 +14,27 @@ class Dataset:
 
 
 class PGAspace:
-    def __init__(self, Vh, M_mean, b_mean, karcher_mean):
+    def __init__(self, Vh, M_mean, b_mean, karcher_mean, t):
         self.n_modes = Vh.shape[0]
         self.n_landmarks, self.ndim = karcher_mean.shape
         self.Vh = Vh
         self.M_mean = M_mean
         self.b_mean = b_mean
         self.karcher_mean = karcher_mean
+        self.t = t
 
 
     @classmethod
     def load_from_file(cls, filename):
         pga_dict = np.load(filename)
-        pga_space = cls(pga_dict['Vh'], pga_dict['M_mean'], pga_dict['b_mean'], pga_dict['karcher_mean'])
+        pga_space = cls(pga_dict['Vh'], pga_dict['M_mean'], pga_dict['b_mean'], pga_dict['karcher_mean'], pga_dict['t'])
+        
+        # for coefficients sampling.
+        pga_space.axis_min = np.min(pga_dict['t'], axis=0)
+        pga_space.axis_max = np.max(pga_dict['t'], axis=0)
+        r_min = np.abs(np.quantile(pga_dict['t'], 0.0, axis=0))
+        r_max = np.abs(np.quantile(pga_dict['t'], 1.0, axis=0))
+        pga_space.radius = np.max(np.array([r_min, r_max]), axis=0)
         return pga_space
 
     @classmethod
@@ -38,7 +46,7 @@ class PGAspace:
         karcher_mean = Karcher(shapes_gr)
 
         Vh, S, t = PGA(karcher_mean, shapes_gr, n_coord=n_modes)
-        pga_space = cls(Vh, np.mean(M, axis=0), np.mean(b, axis=0), karcher_mean)
+        pga_space = cls(Vh, np.mean(M, axis=0), np.mean(b, axis=0), karcher_mean, t)
         pga_space.S = S
 
         # for coefficients sampling.
@@ -84,10 +92,10 @@ class PGAspace:
         coef = np.empty((n_samples, self.n_modes))
         while k < n_samples:
             c = np.random.uniform(self.axis_min, self.axis_max)
-            # Check that c is inside of ellipse
-            if np.sum(c ** 2 / self.radius ** 2) <= 1:
-                coef[k] = c
-                k += 1
+            # Check that c is inside of ellipse (this criteria doesn't work when eigenspaces collapse)
+            # if np.sum(c ** 2 / self.radius ** 2) <= 1:
+            coef[k] = c
+            k += 1
         return coef
 
     def generate_perturbed_shapes(self, coef=None, n=1):
@@ -179,7 +187,7 @@ class PGAspace:
 
     def save_to_file(self, filename):
         np.savez(filename, Vh=self.Vh, karcher_mean=self.karcher_mean, 
-                           M_mean=self.M_mean, b_mean=self.b_mean)
+                           M_mean=self.M_mean, b_mean=self.b_mean, t=self.t)
 
 
 class AffineTransformPerturbation:

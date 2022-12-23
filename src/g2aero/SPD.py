@@ -2,6 +2,45 @@
 
 import numpy as np
 
+def vec(P):
+    """
+
+    :param P:(n, n) symmetric matrix
+    :return: (n*(n+1)/2,1) vectorization of unique entries
+    """
+    n = P.shape[1]
+    vec = np.zeros((int(n*(n+1)/2),1))
+    k = 0
+    for i in range(1,n+1):
+        vec[int(k):int(i+k)] = P[0:int(i),int(i-1)].reshape((i,1))
+        k += i
+    return vec
+
+def vecinv(p):
+    """
+
+    :param p:(n*(n+1)/2,1) vector of symmetric matrix entries returned by consistent vectorization
+    :return: (n,n) corresponding symmetric matrix
+    """
+    # compute matrix dimension
+    roots = [(-0.5 + np.sqrt(0.25 + 2*len(p))), \
+             (-0.5 - np.sqrt(0.25 + 2*len(p)))]
+    n = int(np.max(roots))
+    # assign diagonal entries
+    i_d = np.array(SPD.vec(np.eye(4)),dtype=bool)
+    D = np.diag(p[i_d])
+    # collect the remaining off-diagonal entries
+    OD = p[~i_d]
+    
+    # assign off-diagonal entries
+    P = np.zeros((n,n))
+    k = 0
+    for i in range(1,n):
+        for j in range(0,i):
+                P[j,i] = OD[k]
+                k+=1
+    return P + P.T + D
+
 def polar_decomposition(X_phys):
     """
 
@@ -107,18 +146,18 @@ def PGA(mu, data, n_coord=None):
              S is corresponding singular values,
     """
     data, mu = np.asarray(data), np.asarray(mu)
-    n_points, dim, _ = data.shape
-    # get tangent directions from mu to each point (each direction is set of (2, 2)-dimensional vectors)
-    # flatten each (2, 2) vector into (n_landmark*dim) vector for later svd decomposition
-    H = np.zeros((n_points, dim * dim))
+    n_points, n, _ = data.shape
+    # get tangent directions from mu to each point
+    # flatten each into (n_landmark*dim) vector for later svd decomposition
+    H = np.zeros((n_points, int(n*(n+1)/2)))
     for i, point in enumerate(data):
-        H[i] = log(mu, point).flatten()
+        H[i] = vec(log(mu, point)).flatten()
     # Principal Geodesic Analysis (PGA)
     # # columns of V are principal directions/axis
     U, S, Vh = np.linalg.svd(H, full_matrices=False)
     # projection of the data on principal axis (H@V = U@S@Vh@V = U@S))
-    t = U*S  # shape(n_shapes, 2*2)
-    if n_coord is None or n_coord > 2*2:
+    t = U*S
+    if n_coord is None or n_coord > int(n*(n+1)/2):
         n_coord = 4
     return Vh[:n_coord, :], S[:n_coord], t[:, :n_coord]
 
