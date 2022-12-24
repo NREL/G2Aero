@@ -27,7 +27,7 @@ def vecinv(p):
              (-0.5 - np.sqrt(0.25 + 2*len(p)))]
     n = int(np.max(roots))
     # assign diagonal entries
-    i_d = np.array(SPD.vec(np.eye(4)),dtype=bool)
+    i_d = np.array(vec(np.eye(4)),dtype=bool)
     D = np.diag(p[i_d])
     # collect the remaining off-diagonal entries
     OD = p[~i_d]
