@@ -25,15 +25,17 @@ class PGAspace:
 
 
     @classmethod
-    def load_from_file(cls, filename):
+    def load_from_file(cls, filename, n_modes=None):
         pga_dict = np.load(filename)
-        pga_space = cls(pga_dict['Vh'], pga_dict['M_mean'], pga_dict['b_mean'], pga_dict['karcher_mean'], pga_dict['t'])
+        Vh = pga_dict['Vh'][:n_modes, :]
+        t = pga_dict['t'][:, :n_modes]
+        pga_space = cls(Vh, pga_dict['M_mean'], pga_dict['b_mean'], pga_dict['karcher_mean'], t)
         
         # for coefficients sampling.
-        pga_space.axis_min = np.min(pga_dict['t'], axis=0)
-        pga_space.axis_max = np.max(pga_dict['t'], axis=0)
-        r_min = np.abs(np.quantile(pga_dict['t'], 0.0, axis=0))
-        r_max = np.abs(np.quantile(pga_dict['t'], 1.0, axis=0))
+        pga_space.axis_min = np.min(t, axis=0)
+        pga_space.axis_max = np.max(t, axis=0)
+        r_min = np.abs(np.quantile(t, 0.0, axis=0))
+        r_max = np.abs(np.quantile(t, 1.0, axis=0))
         pga_space.radius = np.max(np.array([r_min, r_max]), axis=0)
         return pga_space
 
