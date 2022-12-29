@@ -15,7 +15,7 @@ class Dataset:
 
 class PGAspace:
     def __init__(self, Vh, M_mean, b_mean, karcher_mean, t):
-        self.n_modes = Vh.shape[0]
+        # self.n_modes = Vh.shape[0]
         self.n_landmarks, self.ndim = karcher_mean.shape
         self.Vh = Vh
         self.M_mean = M_mean
@@ -23,24 +23,41 @@ class PGAspace:
         self.karcher_mean = karcher_mean
         self.t = t
 
+        # for coefficients sampling.
+        self.axis_min = np.min(t, axis=0)
+        self.axis_max = np.max(t, axis=0)
+        r_min = np.abs(np.quantile(t, 0.0, axis=0))
+        r_max = np.abs(np.quantile(t, 1.0, axis=0))
+        self.radius = np.max(np.array([r_min, r_max]), axis=0)
 
     @classmethod
     def load_from_file(cls, filename, n_modes=None):
+        """Loading PGA space from the .npz file. Can load trancated space 
+        (n dimensions defined by `n_modes`)
+
+        :param filename: path to the file
+        :param n_modes: dimensions of trancated PGA space, defaults to None (using full dimension)
+        :return: PGA_space class instance
+        """
         pga_dict = np.load(filename)
         Vh = pga_dict['Vh'][:n_modes, :]
         t = pga_dict['t'][:, :n_modes]
         pga_space = cls(Vh, pga_dict['M_mean'], pga_dict['b_mean'], pga_dict['karcher_mean'], t)
-        
-        # for coefficients sampling.
-        pga_space.axis_min = np.min(t, axis=0)
-        pga_space.axis_max = np.max(t, axis=0)
-        r_min = np.abs(np.quantile(t, 0.0, axis=0))
-        r_max = np.abs(np.quantile(t, 1.0, axis=0))
-        pga_space.radius = np.max(np.array([r_min, r_max]), axis=0)
         return pga_space
+
+    def save_to_file(self, filename):
+        np.savez(filename, Vh=self.Vh, karcher_mean=self.karcher_mean, 
+                 M_mean=self.M_mean, b_mean=self.b_mean, t=self.t)
 
     @classmethod
     def create_from_dataset(cls, phys_shapes, n_modes=None, method='SPD'):
+        """Create PGA space by using the dataset of shapes and performing PGA.
+
+        :param phys_shapes: (n_shapes, n_landmarks, ndim) array of dataset of shapes
+        :param n_modes: dimensions of trancated PGA space, defaults to None (using full dimension)
+        :param method: _description_, defaults to 'SPD'
+        :return: _description_
+        """
         if method == 'SPD':
             shapes_gr, M, b = spd.polar_decomposition(phys_shapes)
         elif method == 'LA-transform':
@@ -50,13 +67,6 @@ class PGAspace:
         Vh, S, t = PGA(karcher_mean, shapes_gr, n_coord=n_modes)
         pga_space = cls(Vh, np.mean(M, axis=0), np.mean(b, axis=0), karcher_mean, t)
         pga_space.S = S
-
-        # for coefficients sampling.
-        pga_space.axis_min = np.min(t, axis=0)
-        pga_space.axis_max = np.max(t, axis=0)
-        r_min = np.abs(np.quantile(t, 0.0, axis=0))
-        r_max = np.abs(np.quantile(t, 1.0, axis=0))
-        pga_space.radius = np.max(np.array([r_min, r_max]), axis=0)
         return pga_space, t
 
     def PGA2gr_shape(self, pga_coord, original_shape_gr=None):
@@ -89,23 +99,24 @@ class PGAspace:
         t = get_PGA_coordinates(shapes_gr, self.karcher_mean, self.Vh.T)
         return t, M, b
 
-    def sample_coef(self, n_samples=1):
+    def sample_coef(self, n_modes, n_samples=1):
         k = 0
-        coef = np.empty((n_samples, self.n_modes))
+        coef = np.empty((n_samples, n_modes))
         while k < n_samples:
-            c = np.random.uniform(self.axis_min, self.axis_max)
+            c = np.random.uniform(self.axis_min[:n_modes], self.axis_max[:n_modes])
             # Check that c is inside of ellipse (this criteria doesn't work when eigenspaces collapse)
             # if np.sum(c ** 2 / self.radius ** 2) <= 1:
             coef[k] = c
             k += 1
         return coef
 
-    def generate_perturbed_shapes(self, coef=None, n=1):
+    def generate_perturbed_shapes(self, n_modes=None, coef=None, n=1):
         """ Generates perturbed shapes.
 
         If coef are sampled (not given) checks for intersection
         in generated shape and resample if needed.
 
+        :param n_modes: dimensions of trancated PGA space, defaults to None (using full dimension)
         :param coef: array of deterministic perturbations (n, n_modes)
         :param n: number of perturbed shapes, if not given calculated from coef.shape[0]
         :return: array of generated perturbed shapes (n, n_landmarks, 2) in physical and 
@@ -113,7 +124,9 @@ class PGAspace:
                  array of PGA coordinates corresponding to perturbations (n, n_modes)
         """
         if coef is None:
-            coef_array = self.sample_coef(n)
+            if n_modes is None:
+                n_modes = self.Vh.shape[0]
+            coef_array = self.sample_coef(n_samples=n, n_modes=n_modes)
         else:
             coef_array = coef
         n = len(coef_array)
@@ -125,7 +138,7 @@ class PGAspace:
                 if coef is not None or not check_selfintersect(gr_samples[i])       :
                     break
                 else:
-                    c = self.sample_coef()
+                    c = self.sample_coef(n_modes=n_modes)
                     print(f"WARNING: New shape {i} has intersection! Generating new coef")
                     coef_array[i] = c
             phys_samples[i] = gr_samples[i] @ self.M_mean.T + self.b_mean
@@ -133,22 +146,27 @@ class PGAspace:
             return phys_samples.squeeze(axis=0), gr_samples.squeeze(axis=0),  coef_array
         return phys_samples, gr_samples, coef_array
 
-    def generate_perturbed_blade(self, blade, coef=None, n=1):
+    def generate_perturbed_blade(self, blade, n_modes, coef=None, n=1):
         """ Generates perturbed blades.
 
         If coef are sampled (not given) checks for intersection
         in generated shape and resample if needed.
 
         :param blade: array of grassmann shapes for baseline blade
+        :param n_modes: dimensions of trancated PGA space, defaults to None (using full dimension)
         :param coef: perturbation coefficients (sampled if not given)
         :param n: number of perturbations (if need to sample)
         :return: array of perturbed blades (in grassmann coordinates) (shape=(n, n_shapes, n_landmarks, 2)) and 
                  array of PGA corresponding to perturbations (n, n_modes)
         """
-        n_shapes, n_landmarks, dim = blade.shape
+        n_shapes, n_landmarks, ndim = blade.shape
+        if n_landmarks!=self.n_landmarks or ndim!=self.ndim:
+            raise ValueError("n_landmark or dimension of the blade shapes don't match PGA space dimensions")
+        if n_modes is None:
+                n_modes = self.Vh.shape[0]
 
         def get_new_blade(c):
-            new_blade = np.empty((n_shapes, n_landmarks, dim))
+            new_blade = np.empty((n_shapes, n_landmarks, ndim))
             vector = (c @ self.Vh).reshape(-1, 2)
             for i, shape in enumerate(blade):
                 direction = log(self.karcher_mean, shape)
@@ -164,14 +182,14 @@ class PGAspace:
             return False
 
         if coef is None:
-            coef_array = self.sample_coef(n)
+            coef_array = self.sample_coef(n_samples=n, n_modes=n_modes)
         else:
-            coef_array = np.asarray(coef)
+            coef_array = np.asarray(coef, n_modes)
             if len(coef_array.shape) == 1:
                 coef_array = np.expand_dims(coef_array, axis=0)
 
         n = len(coef_array)
-        blades = np.empty((n, n_shapes, n_landmarks, dim))
+        blades = np.empty((n, n_shapes, n_landmarks, ndim))
         for k, c in enumerate(coef_array):
             print(f'Perturbing blade {k+1}')
             while True:
@@ -180,16 +198,12 @@ class PGAspace:
                     break
                 else:
                     print('Generating new coef')
-                    c = self.sample_coef()
+                    c = self.sample_coef(n_modes=n_modes)
                     coef_array[k] = c
             blades[k] = new_blade
         if n == 1:
             return blades.squeeze(axis=0), coef_array
         return blades, coef_array
-
-    def save_to_file(self, filename):
-        np.savez(filename, Vh=self.Vh, karcher_mean=self.karcher_mean, 
-                           M_mean=self.M_mean, b_mean=self.b_mean, t=self.t)
 
 
 class AffineTransformPerturbation:

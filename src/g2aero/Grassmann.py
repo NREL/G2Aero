@@ -180,7 +180,7 @@ def PGA(mu, shapes_gr, n_coord=None):
     # projection of the data on principal axis (H@V = U@S@Vh@V = U@S))
     t = U*S  # shape(n_shapes, n_landmark*dim)
     if n_coord is None or n_coord > 2*n_landmarks:
-        n_coord = 2*n_landmarks
+        n_coord = 2*n_landmarks - 4 
     return Vh[:n_coord, :], S[:n_coord], t[:, :n_coord]
 
 
