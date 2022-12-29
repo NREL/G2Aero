@@ -168,10 +168,10 @@ def PGA(mu, shapes_gr, n_coord=None):
     """
     shapes_gr, mu = np.asarray(shapes_gr), np.asarray(mu)
     check_orthogonality(shapes_gr[0])
-    n_shapes, n_landmarks, dim = shapes_gr.shape
+    n_shapes, n_landmarks, ndim = shapes_gr.shape
     # get tangent directions from mu to each point (each direction is set of (n_landmark, dim)-dimensional vectors)
     # flatten each (n_landmark, dim) vector into (n_landmark*dim) vector for later svd decomposition
-    H = np.zeros((n_shapes, n_landmarks * dim))
+    H = np.zeros((n_shapes, n_landmarks * ndim))
     for i, shape in enumerate(shapes_gr):
         H[i] = log(mu, shape).flatten()
     # Principal Geodesic Analysis (PGA)
@@ -179,8 +179,8 @@ def PGA(mu, shapes_gr, n_coord=None):
     U, S, Vh = np.linalg.svd(H, full_matrices=False)
     # projection of the data on principal axis (H@V = U@S@Vh@V = U@S))
     t = U*S  # shape(n_shapes, n_landmark*dim)
-    if n_coord is None or n_coord > 2*n_landmarks:
-        n_coord = 2*n_landmarks - 4 
+    if n_coord is None or n_coord > ndim*(n_landmarks - ndim):
+        n_coord = ndim*(n_landmarks - ndim) 
     return Vh[:n_coord, :], S[:n_coord], t[:, :n_coord]
 
 
