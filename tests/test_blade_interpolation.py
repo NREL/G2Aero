@@ -10,7 +10,7 @@ class Test(TestCase):
     def test_NREL_5MW(self):
         shapes_filename = os.path.join(os.getcwd(), "data", 'blades_yamls', "nrel5mw_ofpolars.yaml")
 
-        Blade = YamlInfo(shapes_filename, n_landmarks=321)
+        Blade = YamlInfo.init_from_yaml(shapes_filename, n_landmarks=321)
         eta_nominal = Blade.eta_nominal
         xy_nominal = Blade.xy_landmarks
 
@@ -36,7 +36,7 @@ class Test(TestCase):
     def test_IEA_15(self):
         shapes_filename = os.path.join(os.getcwd(), "data", 'blades_yamls', "IEA-15-240-RWT.yaml")
 
-        Blade = YamlInfo(shapes_filename, n_landmarks=401)
+        Blade = YamlInfo.init_from_yaml(shapes_filename, n_landmarks=401)
         eta_nominal = Blade.eta_nominal
         xy_nominal = Blade.xy_landmarks
 
@@ -60,7 +60,7 @@ class Test(TestCase):
     def test_IEA_10(self):
         shapes_filename = os.path.join(os.getcwd(), "data", 'blades_yamls', "IEA-10-198-RWT.yaml")
 
-        Blade = YamlInfo(shapes_filename, n_landmarks=200)
+        Blade = YamlInfo.init_from_yaml(shapes_filename, n_landmarks=200)
         eta_nominal = Blade.eta_nominal
         xy_nominal = Blade.xy_landmarks
 
@@ -84,7 +84,7 @@ class Test(TestCase):
     def test_IEA_3_4(self):
         shapes_filename = os.path.join(os.getcwd(), "data", 'blades_yamls', "IEA-3.4-130-RWT.yaml")
 
-        Blade = YamlInfo(shapes_filename, n_landmarks=500)
+        Blade = YamlInfo.init_from_yaml(shapes_filename, n_landmarks=500)
         eta_nominal = Blade.eta_nominal
         xy_nominal = Blade.xy_landmarks
 
@@ -107,7 +107,7 @@ class Test(TestCase):
 
     def test_number_crosssections(self):
         shapes_filename = os.path.join(os.getcwd(), "data", 'blades_yamls', "nrel5mw_ofpolars.yaml")
-        Blade = YamlInfo(shapes_filename, n_landmarks=401)
+        Blade = YamlInfo.init_from_yaml(shapes_filename, n_landmarks=401)
         M_yaml = Blade.M_yaml_interpolator
         b_yaml = Blade.b_yaml_interpolator
         b_pitch = Blade.pitch_axis
@@ -125,7 +125,7 @@ class Test(TestCase):
 
         for n in [100, 501, 10000]:
             for method in ['cst', 'planar', 'polar']:
-                Blade = YamlInfo(shapes_filename, n_landmarks=n, landmark_method=method)
+                Blade = YamlInfo.init_from_yaml(shapes_filename, n_landmarks=n, landmark_method=method)
                 M_yaml = Blade.M_yaml_interpolator
                 b_yaml = Blade.b_yaml_interpolator
                 b_pitch = Blade.pitch_axis

@@ -1005,14 +1005,14 @@ X = [[ 7.68737274e-02, -2.06633743e-02],
        [ 7.63063102e-02, -1.65547060e-02],
        [ 7.69006036e-02, -1.73544087e-02]]
 
-TESTDATA_FILENAME = os.path.join(os.getcwd(), "data", 'pga_space', 'full_space', 'PGA_space.npz')
+TESTDATA_FILENAME = os.path.join(os.getcwd(), "data", 'pga_space', 'CST_Gr_PGA.npz')
 
 class Test(TestCase):
 
     def setUp(self):
 
         pga_dict = np.load(TESTDATA_FILENAME)
-        self.pga = PGAspace(pga_dict['Vh'], pga_dict['M_mean'], pga_dict['b_mean'], pga_dict['karcher_mean'])
+        self.pga = PGAspace(pga_dict['Vh'], pga_dict['M_mean'], pga_dict['b_mean'], pga_dict['karcher_mean'], pga_dict['t'])
 
 
     def test_PGA_Grassmann_shape(self):

@@ -2,6 +2,8 @@ from re import I
 import numpy as np
 from scipy.interpolate import CubicSpline, PchipInterpolator
 
+def tailedge_gap(xy):
+    return xy[-1, 1] - xy[0, 1]
 
 def add_tailedge_gap(xy, gap):
     # need to position airfoil first
@@ -34,6 +36,8 @@ def remove_tailedge_gap(xy):
     te_lower, te_upper = xy[0, 1], xy[-1, 1]
     xy_upper[:, 1] -=  xy_upper[:, 0] * te_upper
     xy_lower[:, 1] -=  xy_lower[:, 0] * te_lower
+    xy_upper[-1] = [1, 0]
+    xy_lower[0] = [1, 0]
     return np.r_[xy_lower, xy_upper]
 
 
