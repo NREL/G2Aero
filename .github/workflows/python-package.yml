@@ -49,14 +49,14 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           pytest -x --cov=scico --cov-report=xml
-#       # Upload coverage to codecov
-#       - name: Upload coverage to Codecov
-#         uses: codecov/codecov-action@v3
-#         with:
-#           directory: ./coverage/reports/
-#           env_vars: OS,PYTHON
-#           fail_ci_if_error: true
-#           files: coverage.xml
-#           flags: unittests
-#           name: codecov-umbrella
-#           verbose: true
+      # Upload coverage to codecov
+      - name: Upload coverage to codecov
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v2
+        with:
+          env_vars: OS,PYTHON
+          fail_ci_if_error: false
+          files: coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          verbose: true
