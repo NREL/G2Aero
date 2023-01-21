@@ -31,7 +31,10 @@ release = 'v0.1.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['nbsphinx_link', 'nbsphinx', 
-              'sphinx.ext.autodoc', 'sphinx.ext.autosummary', 'sphinx.ext.coverage', 'sphinx.ext.napoleon', 'sphinx.ext.autosectionlabel']
+              'sphinx.ext.autodoc', 'sphinx.ext.autosummary', 'sphinx.ext.coverage', 'sphinx.ext.napoleon', 'sphinx.ext.autosectionlabel',
+              'sphinxcontrib.bibtex']
+
+bibtex_bibfiles = ['refs.bib']
 
 autodoc_mock_imports = ['numpy', 'scipy', 'gmsh', 'g2aero']
 # Add any paths that contain templates here, relative to this directory.
