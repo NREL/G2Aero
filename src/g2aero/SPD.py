@@ -112,6 +112,7 @@ def Karcher(data, eps=1e-8, max_steps=20):
     (Fletcher, Lu, and Joshi 2003)
 
     :param data: (n_elements, 2, 2) array of given data
+    :param eps: float number: convergence criterion 
     :param max_steps: maximum number of iterations to converge
     :return: (2, 2) array defining Karcher mean
     """

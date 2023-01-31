@@ -18,16 +18,16 @@ class PGAspace:
         # self.n_modes = Vh.shape[0]
         self.n_landmarks, self.ndim = karcher_mean.shape
         self.Vh = Vh
-        self.M_mean = M_mean
-        self.b_mean = b_mean
         self.karcher_mean = karcher_mean
         self.t = t
+        self.M_mean = M_mean
+        self.b_mean = b_mean
 
         # for coefficients sampling.
         self.axis_min = np.min(t, axis=0)
         self.axis_max = np.max(t, axis=0)
-        r_min = np.abs(np.quantile(t, 0.0, axis=0))
-        r_max = np.abs(np.quantile(t, 1.0, axis=0))
+        r_min = np.abs(np.quantile(t, 0.1, axis=0))
+        r_max = np.abs(np.quantile(t, 0.9, axis=0))
         self.radius = np.max(np.array([r_min, r_max]), axis=0)
 
     @classmethod
@@ -65,7 +65,8 @@ class PGAspace:
         karcher_mean = Karcher(shapes_gr)
 
         Vh, S, t = PGA(karcher_mean, shapes_gr, n_coord=n_modes)
-        pga_space = cls(Vh, np.mean(M, axis=0), np.mean(b, axis=0), karcher_mean, t)
+        M_karcher = spd.Karcher(M)  #M_mean is default to M_karcher
+        pga_space = cls(Vh, M_karcher, np.mean(b, axis=0), karcher_mean, t)
         pga_space.S = S
         return pga_space, t
 
@@ -97,7 +98,7 @@ class PGAspace:
         elif method == 'LA-transform':
             shapes_gr, M, b = landmark_affine_transform(shapes)
         t = get_PGA_coordinates(shapes_gr, self.karcher_mean, self.Vh.T)
-        return t, M, b
+        return t[:, :n_modes], M, b
 
     def sample_coef(self, n_modes, n_samples=1):
         k = 0
@@ -110,38 +111,33 @@ class PGAspace:
             k += 1
         return coef
 
-    def generate_perturbed_shapes(self, n_modes=None, coef=None, n=1):
-        """ Generates perturbed shapes.
+    def generate_perturbed_shapes(self, n_modes=None, n=1):
+        """Samples PGA coefficients and corresponding shapes.
 
-        If coef are sampled (not given) checks for intersection
-        in generated shape and resample if needed.
+        Coef are randomly sampled and shapes are checked for self-intersection
+        and resample if needed.
 
         :param n_modes: dimensions of trancated PGA space, defaults to None (using full dimension)
-        :param coef: array of deterministic perturbations (n, n_modes)
-        :param n: number of perturbed shapes, if not given calculated from coef.shape[0]
-        :return: array of generated perturbed shapes (n, n_landmarks, 2) in physical and 
-                 array of grassmann coordinates and 
+        :param n: number of perturbed shapes, (defualt n=1)
+        :return: array of generated perturbed shapes (n, n_landmarks, 2) in physical space
+                 array of grassmann shapes (n, n_landmarks, 2) 
                  array of PGA coordinates corresponding to perturbations (n, n_modes)
         """
-        if coef is None:
-            if n_modes is None:
-                n_modes = self.Vh.shape[0]
-            coef_array = self.sample_coef(n_samples=n, n_modes=n_modes)
-        else:
-            coef_array = coef
-        n = len(coef_array)
+        if n_modes is None:
+            n_modes = self.Vh.shape[0]
+        coef_array = self.sample_coef(n_samples=n, n_modes=n_modes)
         gr_samples = np.empty((n, self.n_landmarks, self.ndim))
         phys_samples = np.empty_like(gr_samples)
         for i, c in enumerate(coef_array):
             while True:
                 gr_samples[i] = perturb_gr_shape(self.Vh, self.karcher_mean, c)
-                if coef is not None or not check_selfintersect(gr_samples[i])       :
+                if not check_selfintersect(gr_samples[i]):
                     break
                 else:
                     c = self.sample_coef(n_modes=n_modes)
                     print(f"WARNING: New shape {i} has intersection! Generating new coef")
                     coef_array[i] = c
-            phys_samples[i] = gr_samples[i] @ self.M_mean.T + self.b_mean
+            phys_samples[i] = gr_samples[i] @ self.M_mean + self.b_mean
         if n == 1:
             return phys_samples.squeeze(axis=0), gr_samples.squeeze(axis=0),  coef_array
         return phys_samples, gr_samples, coef_array

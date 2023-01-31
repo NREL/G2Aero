@@ -162,7 +162,7 @@ def PGA(mu, shapes_gr, n_coord=None):
     :param mu: (n_landmarks, 2) array defining Karcher mean (element on Grassmann)
     :param shapes_gr: (n_shapes, n_landmarks, 2) given shapes (elements on Grassmann)
     :param n_coord: dimension of resulting PGA space (if None n_coord=n_landmarks)
-    :return: Vh is principal basis transposed ((n_coord*2)x(n_coord*2)),
+    :return: Vh is principal basis transposed ((n_coord*2 - 4)x(n_coord*2 - 4)),
              t are given elements in principal coordinates,
              S is corresponding singular values,
     """
@@ -228,7 +228,7 @@ def get_PGA_coordinates(shapes_gr, mu, V, n_modes=None):
 def perturb_gr_shape(Vh, mu, perturbation):
     """Given element Karcher mean, perturbs it in given direction by a given amount.
 
-    :param Vh: (n_landmarks*2, n_landmarks*2) array of PGA basis vectors transposed
+    :param Vh: (n_landmarks*2 - 4 , n_landmarks*2 - 4) array of PGA basis vectors transposed
     :param mu: (n_landmarks, 2) array of Karcher mean (elenemt on Grassmann)
     :param perturbation: (n_modes,) array of amount of perturbations in pga coordinates
     :return: (n_landmarks, 2) array of perturbed element on Grassmann
