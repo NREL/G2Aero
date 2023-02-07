@@ -4,42 +4,71 @@ import numpy as np
 
 def vec(P):
     """
-
+    Return vector of the upper-triangle elements
     :param P:(n, n) symmetric matrix
     :return: (n*(n+1)/2,1) vectorization of unique entries
     """
-    n = P.shape[1]
-    vec = np.zeros((int(n*(n+1)/2),1))
-    k = 0
-    for i in range(1,n+1):
-        vec[int(k):int(i+k)] = P[0:int(i),int(i-1)].reshape((i,1))
-        k += i
-    return vec
+    return P[np.triu_indices_from(P)]
 
 def vecinv(p):
     """
-
+    Return symmetric matrix from vectorized form
     :param p:(n*(n+1)/2,1) vector of symmetric matrix entries returned by consistent vectorization
     :return: (n,n) corresponding symmetric matrix
     """
-    # compute matrix dimension
-    roots = [(-0.5 + np.sqrt(0.25 + 2*len(p))), \
-             (-0.5 - np.sqrt(0.25 + 2*len(p)))]
-    n = int(np.max(roots))
-    # assign diagonal entries
-    i_d = np.array(vec(np.eye(4)),dtype=bool)
-    D = np.diag(p[i_d])
-    # collect the remaining off-diagonal entries
-    OD = p[~i_d]
+    # compute matrix dimension (solve quadratic equation n**2+n-2*len(p)=0) 
+    discrimenant = 1+4*2*len(p)
+    root = (-1 + np.sqrt(discrimenant))/2
+    n = int(root)
+    assert(root%n == 0), "Vector with such length can't be converted to symmetric square matrix"
+
+    P = np.empty((n, n))
+    inds = np.triu_indices(n)
+    P[inds] = p
+    P_upper = np.triu(P, 1)
+    P = P + P_upper.T
+    return P
+
+
+# def vec(P):
+#     """
+#     :param P:(n, n) symmetric matrix
+#     :return: (n*(n+1)/2,1) vectorization of unique entries
+#     """
+#     n = P.shape[1]
+#     vec = np.zeros((int(n*(n+1)/2),1))
+#     k = 0
+#     for i in range(1,n+1):
+#         vec[int(k):int(i+k)] = P[0:int(i),int(i-1)].reshape((i,1))
+#         k += i
+#     return vec
+
+
+# def vecinv(p):
+#     """
+
+#     :param p:(n*(n+1)/2,1) vector of symmetric matrix entries returned by consistent vectorization
+#     :return: (n,n) corresponding symmetric matrix
+#     """
+#     # compute matrix dimension
+#     roots = [(-0.5 + np.sqrt(0.25 + 2*len(p))), \
+#              (-0.5 - np.sqrt(0.25 + 2*len(p)))]
+#     n = int(np.max(roots))
+#     # assign diagonal entries
+#     i_d = np.array(vec(np.eye(4)),dtype=bool)
+#     D = np.diag(p[i_d])
+#     # collect the remaining off-diagonal entries
+#     OD = p[~i_d]
     
-    # assign off-diagonal entries
-    P = np.zeros((n,n))
-    k = 0
-    for i in range(1,n):
-        for j in range(0,i):
-                P[j,i] = OD[k]
-                k+=1
-    return P + P.T + D
+#     # assign off-diagonal entries
+#     P = np.zeros((n,n))
+#     k = 0
+#     for i in range(1,n):
+#         for j in range(0,i):
+#                 P[j,i] = OD[k]
+#                 k+=1
+#     return P + P.T + D
+
 
 def polar_decomposition(X_phys):
     """
