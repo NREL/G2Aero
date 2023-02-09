@@ -138,6 +138,7 @@ def Karcher(shapes, eps=1e-8, max_steps=20):
     check_orthogonality(shapes[0])
     log_directions = np.zeros_like(shapes)
     mu_karcher = shapes[0]
+    print('Grassmann manifold')
     print('Karcher mean convergence:')
     for j in range(max_steps):
         for i, shape in enumerate(shapes):

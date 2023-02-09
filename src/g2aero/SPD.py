@@ -17,17 +17,18 @@ def vecinv(p):
     :return: (n,n) corresponding symmetric matrix
     """
     # compute matrix dimension (solve quadratic equation n**2+n-2*len(p)=0) 
+    p = p.flatten()
     discrimenant = 1+4*2*len(p)
     root = (-1 + np.sqrt(discrimenant))/2
     n = int(root)
     assert(root%n == 0), "Vector with such length can't be converted to symmetric square matrix"
 
-    P = np.empty((n, n))
+    P = np.zeros((n, n))
     inds = np.triu_indices(n)
     P[inds] = p
     P_upper = np.triu(P, 1)
-    P = P + P_upper.T
-    return P
+    out = P + P_upper.T
+    return out
 
 
 # def vec(P):
@@ -148,6 +149,7 @@ def Karcher(data, eps=1e-8, max_steps=20):
     data = np.asarray(data)
     log_directions = np.zeros_like(data)
     mu_karcher = data[0]
+    print('SPD manifold')
     print('Karcher mean convergence:')
     for j in range(max_steps):
         for i, point in enumerate(data):
@@ -160,6 +162,18 @@ def Karcher(data, eps=1e-8, max_steps=20):
             return mu_karcher
     print('WARNING: Maximum count reached...')
     return mu_karcher
+
+
+def tangent_space(mu, data):
+    data, mu = np.asarray(data), np.asarray(mu)
+    n_points, n, _ = data.shape
+    # get tangent directions from mu to each point
+    # vectorize matrices for later svd decomposition
+    H = np.zeros((n_points, int(n*(n+1)/2)))
+    for i, element in enumerate(data):
+        H[i] = vec(log(mu, element)).flatten()
+    return H
+
 
 def PGA(mu, data, n_coord=None):
     """Principal Geodesic Analysis (PGA).
@@ -176,32 +190,27 @@ def PGA(mu, data, n_coord=None):
              S is corresponding singular values,
     """
     data, mu = np.asarray(data), np.asarray(mu)
-    n_points, n, _ = data.shape
-    # get tangent directions from mu to each point
-    # flatten each into (n_landmark*dim) vector for later svd decomposition
-    H = np.zeros((n_points, int(n*(n+1)/2)))
-    for i, point in enumerate(data):
-        H[i] = vec(log(mu, point)).flatten()
+    # get tangent vectors from mu to each point
+    H = tangent_space(mu, data)
     # Principal Geodesic Analysis (PGA)
     # # columns of V are principal directions/axis
     U, S, Vh = np.linalg.svd(H, full_matrices=False)
     # projection of the data on principal axis (H@V = U@S@Vh@V = U@S))
     t = U*S
-    if n_coord is None or n_coord > int(n*(n+1)/2):
-        n_coord = 4
+    if n_coord is None or n_coord > H.shape[1]:
+        n_coord = H.shape[1]
     return Vh[:n_coord, :], S[:n_coord], t[:, :n_coord]
 
-# def PGA(muX, XD):
-#     m = XD.shape[0]
-#     n = XD.shape[1]
-#     N = XD.shape[2]
-#     H = np.zeros((m*n, N))
-#     for i in range(N):
-#         Hi = Log(muX, XD[:, :, i])
-#         H[:, i] = Hi.reshape((m*n,))
-    
-#     # Principal Geodesic Analysis (PGA)
-#     U, S, V = np.linalg.svd(1/np.sqrt(N) * H, full_matrices=False)
-#     # compute normal coordiantes
-#     t = H.T @ U
-#     return U, t, S
+
+def perturb_mu(Vh, mu, perturbation):
+    """Given element Karcher mean, perturbs it in given direction by a given amount.
+
+    :param Vh: (n_landmarks*2 - 4 , n_landmarks*2 - 4) array of PGA basis vectors transposed
+    :param mu: (n_landmarks, 2) array of Karcher mean (elenemt on Grassmann)
+    :param perturbation: (n_modes,) array of amount of perturbations in pga coordinates
+    :return: (n_landmarks, 2) array of perturbed element on Grassmann
+    """
+    perturbation = np.asarray(perturbation).reshape(1, -1)
+    direction = vecinv(perturbation@Vh)
+    spd_matrix = exp(1, mu, direction)
+    return spd_matrix 

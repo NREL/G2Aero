@@ -1,19 +1,11 @@
 import numpy as np
 from scipy.interpolate import PchipInterpolator
-from g2aero.Grassmann import *
+import g2aero.Grassmann as gr
 from g2aero.utils import check_selfintersect
 import g2aero.SPD as spd
 
-class Dataset:
-    def __init__(self, phys_shapes, method='SPD'):
-        self.n_shapes = len(phys_shapes)
-        if method == 'SPD':
-            self.shapes_gr, self.M, self.b = spd.polar_decomposition(phys_shapes)
-        elif method == 'LA-transform':
-            self.shapes_gr, self.M, self.b = landmark_affine_transform(phys_shapes)
 
-
-class PGAspace:
+class Grassmann_PGAspace:
     def __init__(self, Vh, M_mean, b_mean, karcher_mean, t):
         # self.n_modes = Vh.shape[0]
         self.n_landmarks, self.ndim = karcher_mean.shape
@@ -41,13 +33,13 @@ class PGAspace:
         """
         pga_dict = np.load(filename)
         Vh = pga_dict['Vh'][:n_modes, :]
-        t = pga_dict['t'][:, :n_modes]
+        t = pga_dict['coords'][:, :n_modes]
         pga_space = cls(Vh, pga_dict['M_mean'], pga_dict['b_mean'], pga_dict['karcher_mean'], t)
         return pga_space
 
     def save_to_file(self, filename):
         np.savez(filename, Vh=self.Vh, karcher_mean=self.karcher_mean, 
-                 M_mean=self.M_mean, b_mean=self.b_mean, t=self.t)
+                 M_mean=self.M_mean, b_mean=self.b_mean, coords=self.t)
 
     @classmethod
     def create_from_dataset(cls, phys_shapes, n_modes=None, method='SPD'):
@@ -60,20 +52,21 @@ class PGAspace:
         """
         if method == 'SPD':
             shapes_gr, M, b = spd.polar_decomposition(phys_shapes)
+            M_mean = spd.Karcher(M)  #M_mean is default to M_karcher
         elif method == 'LA-transform':
-            shapes_gr, M, b = landmark_affine_transform(phys_shapes)
-        karcher_mean = Karcher(shapes_gr)
-
-        Vh, S, t = PGA(karcher_mean, shapes_gr, n_coord=n_modes)
-        M_karcher = spd.Karcher(M)  #M_mean is default to M_karcher
-        pga_space = cls(Vh, M_karcher, np.mean(b, axis=0), karcher_mean, t)
+            shapes_gr, M, b = gr.landmark_affine_transform(phys_shapes)
+            M_mean == np.mean(M, axis=0)
+        
+        karcher_mean = gr.Karcher(shapes_gr)
+        Vh, S, t = gr.PGA(karcher_mean, shapes_gr, n_coord=n_modes)
+        pga_space = cls(Vh, M_mean, np.mean(b, axis=0), karcher_mean, t)
         pga_space.S = S
         return pga_space, t
 
     def PGA2gr_shape(self, pga_coord, original_shape_gr=None):
-        gr_shape = perturb_gr_shape(self.Vh, self.karcher_mean, pga_coord)
+        gr_shape = gr.perturb_gr_shape(self.Vh, self.karcher_mean, pga_coord)
         if original_shape_gr is not None:
-            R = procrustes(gr_shape, original_shape_gr)
+            R = gr.procrustes(gr_shape, original_shape_gr)
             gr_shape = gr_shape @ R
         return gr_shape
 
@@ -82,22 +75,22 @@ class PGAspace:
             M = self.M_mean
         if b is None:
             b = self.b_mean
-        gr_shape = perturb_gr_shape(self.Vh, self.karcher_mean, pga_coord)
+        gr_shape = gr.perturb_gr_shape(self.Vh, self.karcher_mean, pga_coord)
         # rotate to match with original shape (e.g. for reconstruction error calculation)
         if original_shape_gr is not None:
-            R = procrustes(gr_shape, original_shape_gr)
+            R = gr.procrustes(gr_shape, original_shape_gr)
             gr_shape= gr_shape @ R
         return gr_shape @ M + b
 
     def gr_shapes2PGA(self, shapes_gr):
-        return get_PGA_coordinates(shapes_gr, self.karcher_mean, self.Vh.T)
+        return gr.get_PGA_coordinates(shapes_gr, self.karcher_mean, self.Vh.T)
     
     def shapes2PGA(self, shapes, method='SPD', n_modes=None):
         if method == 'SPD':
             shapes_gr, M, b = spd.polar_decomposition(shapes)
         elif method == 'LA-transform':
-            shapes_gr, M, b = landmark_affine_transform(shapes)
-        t = get_PGA_coordinates(shapes_gr, self.karcher_mean, self.Vh.T)
+            shapes_gr, M, b = gr.landmark_affine_transform(shapes)
+        t = gr.get_PGA_coordinates(shapes_gr, self.karcher_mean, self.Vh.T)
         return t[:, :n_modes], M, b
 
     def sample_coef(self, n_modes, n_samples=1):
@@ -130,7 +123,7 @@ class PGAspace:
         phys_samples = np.empty_like(gr_samples)
         for i, c in enumerate(coef_array):
             while True:
-                gr_samples[i] = perturb_gr_shape(self.Vh, self.karcher_mean, c)
+                gr_samples[i] = gr.perturb_gr_shape(self.Vh, self.karcher_mean, c)
                 if not check_selfintersect(gr_samples[i]):
                     break
                 else:
@@ -165,9 +158,9 @@ class PGAspace:
             new_blade = np.empty((n_shapes, n_landmarks, ndim))
             vector = (c @ self.Vh).reshape(-1, 2)
             for i, shape in enumerate(blade):
-                direction = log(self.karcher_mean, shape)
-                new_vector = parallel_translate(self.karcher_mean, direction, vector)
-                new_blade[i] = exp(1, shape, new_vector)
+                direction = gr.log(self.karcher_mean, shape)
+                new_vector = gr.parallel_translate(self.karcher_mean, direction, vector)
+                new_blade[i] = gr.exp(1, shape, new_vector)
             return new_blade
 
         def intersection_exist_in_blade(blade):
@@ -200,6 +193,133 @@ class PGAspace:
         if n == 1:
             return blades.squeeze(axis=0), coef_array
         return blades, coef_array
+
+
+##########################################################################################################################
+#
+#
+#
+##########################################################################################################################
+class SPD_PGAspace:
+
+    def __init__(self, Vh, shape_mean, b_mean, karcher_mean, t):
+        self.n_landmarks, self.ndim = karcher_mean.shape
+        self.Vh = Vh
+        self.karcher_mean = karcher_mean
+        self.t = t
+        self.shape_mean = shape_mean
+        self.b_mean = b_mean
+
+    @classmethod
+    def load_from_file(cls, filename, n_modes=None):
+        """Loading PGA space from the .npz file. Can load trancated space 
+        (n dimensions defined by `n_modes`)
+
+        :param filename: path to the file
+        :param n_modes: dimensions of trancated PGA space, defaults to None (using full dimension)
+        :return: PGA_space class instance
+        """
+        
+        pga_dict = np.load(filename)
+        Vh = pga_dict['Vh'][:n_modes, :]
+        t = pga_dict['coords'][:, :n_modes]
+        pga_space = cls(Vh, pga_dict['shape_mean'], pga_dict['b_mean'], pga_dict['karcher_mean'], t)
+        return pga_space
+
+    def save_to_file(self, filename):
+        np.savez(filename, Vh=self.Vh, karcher_mean=self.karcher_mean, 
+                 shape_mean=self.shape_mean, b_mean=self.b_mean, coords=self.t)
+
+    @classmethod
+    def create_from_dataset(cls, phys_shapes):
+        """Create PGA space by using the dataset of shapes and performing PGA.
+
+        :param phys_shapes: (n_shapes, n_landmarks, ndim) array of dataset of shapes
+        :param n_modes: dimensions of trancated PGA space, defaults to None (using full dimension)
+        :param method: _description_, defaults to 'SPD'
+        :return: _description_
+        """
+        shapes_gr, P, b = spd.polar_decomposition(phys_shapes)
+        karcher_mean = spd.Karcher(P)
+
+        Vh, S, t_spd = spd.PGA(karcher_mean, P)
+        shape_karcher = gr.Karcher(shapes_gr)
+        spd_pga_space = cls(Vh, shape_karcher, np.mean(b, axis=0), karcher_mean, t_spd)
+        spd_pga_space.S = S
+        return spd_pga_space, t_spd
+    
+    def recreate_data(self):
+        spd_elements = np.empty((len(self.t), 2, 2))
+        for i, ti in enumerate(self.t):
+            spd_elements[i] = self.PGA2spd(ti)
+        return spd_elements
+
+    def PGA2spd(self, pga_coord):
+        return spd.perturb_mu(self.Vh, self.karcher_mean, pga_coord)
+
+
+##########################################################################################################################
+#
+#
+#
+##########################################################################################################################
+class SPD_TangentSpace:
+    def __init__(self, karcher_mean, t, shape_mean, b_mean, ):
+        
+        self.n_landmarks, self.ndim = karcher_mean.shape
+        self.karcher_mean = karcher_mean
+        self.t = t
+        self.shape_mean = shape_mean
+        self.b_mean = b_mean
+
+    @classmethod
+    def load_from_file(cls, filename):
+        """Loading SPD tangent space from the .npz file. 
+
+        :param filename: path to the file
+        :return: SPD_TangentSpace class instance
+        """
+        
+        pga_dict = np.load(filename)
+        pga_space = cls(pga_dict['karcher_mean'], pga_dict['coords'], pga_dict['shape_mean'], pga_dict['b_mean'], )
+        return pga_space
+
+    def save_to_file(self, filename):
+        np.savez(filename, karcher_mean=self.karcher_mean, 
+                 shape_mean=self.shape_mean, b_mean=self.b_mean, coords=self.t)
+
+    @classmethod
+    def create_from_dataset(cls, phys_shapes):
+        """Create PGA space by using the dataset of shapes and performing PGA.
+
+        :param phys_shapes: (n_shapes, n_landmarks, ndim) array of dataset of shapes
+        :param n_modes: dimensions of trancated PGA space, defaults to None (using full dimension)
+        :param method: _description_, defaults to 'SPD'
+        :return: _description_
+        """
+        shapes_gr, P, b = spd.polar_decomposition(phys_shapes)
+        karcher_mean = spd.Karcher(P)
+        t_spd = spd.tangent_space(karcher_mean, P)
+        shape_karcher = gr.Karcher(shapes_gr)
+        spd_tan_space = cls(karcher_mean, t_spd, shape_karcher, np.mean(b, axis=0))
+        return spd_tan_space, t_spd
+    
+    def recreate_data(self):
+        spd_elements = np.empty((len(self.t), 2, 2))
+        for i, ti in enumerate(self.t):
+            spd_elements[i] = self.tan2spd(ti)
+        return spd_elements
+
+    def tan2spd(self, pga_coord):
+        direction = spd.vecinv(pga_coord)
+        spd_element = spd.exp(1, self.karcher_mean, direction)
+        return spd_element
+
+
+
+
+
+
 
 
 class AffineTransformPerturbation:
