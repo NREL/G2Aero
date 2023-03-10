@@ -25,13 +25,19 @@ New users may find it helpful to review the :ref:`Getting Started` materials fir
 
 Citations
 ---------
-If you use this software in your research or publications, please using the following BibTeX citations::
+If you use this software in your research or publications, please use the following BibTeX citations::
 
-   @article{grey2022separable,
-      title={Separable Shape Tensors for Aerodynamic Design},
-      author={Grey, Zachary and Doronina, Olga and Glaws, Andrew},
-      journal={arXiv preprint arXiv:2208.04743},
-      year={2022}
+   @article{GreyJCDE2023,
+      author = {Grey, Zachary J and Doronina, Olga A and Glaws, Andrew},
+      title = "{Separable shape tensors for aerodynamic design}",
+      journal = {Journal of Computational Design and Engineering},
+      volume = {10},
+      number = {1},
+      pages = {468-487},
+      year = {2023},
+      month = {01},
+      doi = {10.1093/jcde/qwac140},
+      url = {https://doi.org/10.1093/jcde/qwac140},
    }
 
    @inproceedings{grassmannian2022,
