@@ -54,7 +54,7 @@ def landmark_affine_transform(X_phys):
 
 def exp(t, X, direction):
     """Exponential mapping (Grassmannian geodesic).
-    
+
     :param t: scalar > 0, how far in given direction to move (if t=0, exp(X, log_map) = X)
     :param X: (n_landmarks, 2) array defining starting point of geodesic on Grassmann
     :param direction: (n_landmarks, 2) array defining direction in tangent space (tangent vector \Delta)
@@ -67,8 +67,8 @@ def exp(t, X, direction):
 
 
 def log(X, Y):
-    """Logarithmic mapping (inverse mapping of exponential map).
-    Algorithm 11 (Zimmermann, 2019)
+    """Logarithmic mapping (inverse mapping of exponential map). Algorithm 11 (Zimmermann, 2019)
+    
     Calculate logarithmic map log_X(Y) (inverse mapping of exponential map).
     Calculates direction(tangent vector \Delta) from X to Y in tangent subspace.
 

@@ -135,7 +135,7 @@ class Grassmann_PGAspace:
             return phys_samples.squeeze(axis=0), gr_samples.squeeze(axis=0),  coef_array
         return phys_samples, gr_samples, coef_array
 
-    def generate_perturbed_blade(self, blade, n_modes, coef=None, n=1):
+    def generate_perturbed_blade(self, blade, n_modes=None, coef=None, n=1):
         """ Generates perturbed blades.
 
         If coef are sampled (not given) checks for intersection

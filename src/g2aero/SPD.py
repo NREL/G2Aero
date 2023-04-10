@@ -17,7 +17,7 @@ def vecinv(p):
     :return: (n,n) corresponding symmetric matrix
     """
     # compute matrix dimension (solve quadratic equation n**2+n-2*len(p)=0) 
-    p = p.flatten()
+    p = np.array(p).flatten()
     discrimenant = 1+4*2*len(p)
     root = (-1 + np.sqrt(discrimenant))/2
     n = int(root)
@@ -101,7 +101,7 @@ def polar_decomposition(X_phys):
 
 def exp(t, P, S):
     """SPD Exponential. (Fletcher, P. T., & Joshi, S. 2004)
-    
+
     :param t: scalar > 0, how far in given direction to move (if t=0, exp(P, log_map) = P)
     :param P: (2, 2) array = starting point \in S_++^2
     :param S: (2, 2) array = direction in tangent space \in T_P S_++^2
@@ -116,8 +116,7 @@ def exp(t, P, S):
     return (gv * np.exp(t*Sigma)) @ gv.T
 
 def log(P, D):
-    """SPD Logarithmic mapping (inverse mapping of exponential map).
-    (Fletcher, P. T., & Joshi, S. 2004)
+    """SPD Logarithmic mapping (inverse mapping of exponential map). (Fletcher, P. T., & Joshi, S. 2004)
 
     Calculates direction S (tangent vector \Delta) from P to D in tangent subspace.
 
@@ -135,11 +134,10 @@ def log(P, D):
 
 
 def Karcher(data, eps=1e-8, max_steps=20):
-    """Karcher mean for given shapes.
+    """Karcher mean for given shapes. (Fletcher, Lu, and Joshi 2003)
 
     Calculated Karcher mean for given data by minimizing the sum 
-    of squared (Riemannian) distances to all points in the data 
-    (Fletcher, Lu, and Joshi 2003)
+    of squared (Riemannian) distances to all points in the data  
 
     :param data: (n_elements, 2, 2) array of given data
     :param eps: float number: convergence criterion 

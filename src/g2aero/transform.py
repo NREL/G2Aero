@@ -38,8 +38,6 @@ class TransformBlade:
         xyz_phys = np.empty((n_shapes, n_landmarks, 3))
         self.R_out = self.make_R_out_interpolator(eta)
 
-        print(self.R_out(eta).as_matrix)
-
         for i, (eta, xy) in enumerate(zip(eta, xy_gr)):
             M_total, b_total = self.calc_M_b_total(eta)
             M_total_xy = xy @ M_total.T
