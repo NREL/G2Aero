@@ -14,14 +14,14 @@ def main():
     # blade_filename = 'nrel5mw_ofpolars.yaml'
 
     shapes_path = os.path.join(os.getcwd(), "../data", 'blades_yamls', blade_filename)
-    n_landmarks = 401
-    n_cross_sections = 100
+    n_landmarks = 1001
+    n_cross_sections = 200
     print(f'Number of landmarks: {n_landmarks}')
     print(f'Number of interpolated cross sections: {n_cross_sections}')
     
     t_start = time()
     
-    Blade = YamlInfo(shapes_path, n_landmarks=n_landmarks)
+    Blade = YamlInfo.init_from_yaml(shapes_path, n_landmarks=n_landmarks, add_gap=0.002)
     eta_nominal = Blade.eta_nominal
     xy_nominal = Blade.xy_nominal
 
@@ -50,11 +50,11 @@ def main():
     t3 = time()
     
     # print("creating CAD model")
-    # TODO: check gmsh functionality
+    # TODO: check gmsh functionality (need to have at least a minimum gap to work)
     # # to create stp file and unstructured grid
-    # geometry_gmsh.blade_CAD_geometry(xyz_global, blade_filename[:-5], msh=True)
-    # # to create structured grid
-    # geometry_gmsh.write_geofile(xyz_global, blade_filename[:-5], n_spanwise=300, n_te=3, n_cross_half=100)
+    geometry_gmsh.blade_CAD_geometry(xyz_global, blade_filename[:-5], msh=True)
+    # to create structured grid
+    geometry_gmsh.write_geofile(xyz_global, blade_filename[:-5], n_spanwise=300, n_te=3, n_cross_half=100)
     
     t4 = time()
 

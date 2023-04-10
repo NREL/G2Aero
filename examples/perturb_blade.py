@@ -4,7 +4,7 @@ from g2aero.SPD import polar_decomposition
 
 from g2aero.yaml_info import YamlInfo
 from g2aero.Grassmann_interpolation import GrassmannInterpolator
-from g2aero.PGA import PGAspace
+from g2aero.PGA import Grassmann_PGAspace
 from g2aero.transform import TransformBlade, global_blade_coordinates
 from g2aero.SPD import polar_decomposition
 
@@ -21,12 +21,12 @@ shapes = np.load(shapes_file)['shapes']
 n_landmarks = shapes.shape[1]
 
 #make PGA space
-pga, _ = PGAspace.create_from_dataset(shapes, n_modes=4)
+pga, _ = Grassmann_PGAspace.create_from_dataset(shapes, n_modes=4)
 pga.radius /= 2
 
 # load baseline airfoils for a blade from .yaml file
 shapes_filename = os.path.join(os.getcwd(), '../', 'data', 'blades_yamls', 'IEA-15-240-RWT.yaml')
-Blade = YamlInfo(shapes_filename, n_landmarks=n_landmarks)
+Blade =  YamlInfo.init_from_yaml(shapes_filename, n_landmarks=n_landmarks)
 eta_nominal = Blade.eta_nominal
 M_yaml = Blade.M_yaml_interpolator
 b_yaml = Blade.b_yaml_interpolator
