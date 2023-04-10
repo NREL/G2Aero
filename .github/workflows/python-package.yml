@@ -34,8 +34,8 @@ jobs:
           # default set of ruff rules with GitHub Annotations
           ruff --format=github --target-version=py37 .
         continue-on-error: true
-#       - name: Install package to be tested
-#         run: pip install -e .
+      - name: Install package to be tested
+        run: pip install -e .
       - name: Test with pytest
         run: |
           pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
