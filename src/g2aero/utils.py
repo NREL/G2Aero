@@ -80,6 +80,9 @@ def position_airfoil(shape_inp, rotate=True, LE_cst=False, return_LEind=False):
     shape /= chord 
     shape[:, 0] += 1
 
+    # to avoid numerical difficulties seting LE to (0, 0)
+    shape -= shape[LE_ind]
+
     if return_LEind:
         return shape, LE_ind
     else:

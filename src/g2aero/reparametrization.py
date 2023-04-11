@@ -36,7 +36,7 @@ def get_landmarks(xy, n_landmarks=401, method='planar', add_gap=False, **kwargs)
     ind_lo = np.where(np.diff(xy[le_ind:, 0]) <= 0)[0] + le_ind
     xy = np.delete(xy, np.hstack((ind_up, ind_lo)), axis=0)
 
-    if method == 'cst' or 'CST':
+    if method == 'cst' or method == 'CST':
         xy_landmarks, _ = cst_reparametrization(xy, n_landmarks, **kwargs)
     elif method == 'polar':
         xy_landmarks = polar_reparametrization(xy, n_landmarks, **kwargs)
@@ -218,6 +218,7 @@ def calc_cst_param(x, y, n1, n2, y_tailedge=0.0, order=8):
     :return: CST parameters
     """
     amat = cst_matrix(x, n1, n2, order)
+    print(np.linalg.cond(amat))
     bvec = y - x * y_tailedge
     out = lsq_linear(amat, bvec)
     return out.x
@@ -230,6 +231,7 @@ def cst_matrix(x, n1, n2, order):
     K = comb(order, range(order + 1))
     shape_function = np.empty((order + 1, x.shape[0]))
     for i in range(order + 1):
+        print((1.0 - x))
         shape_function[i, :] = K[i] * np.power(x, i) * np.power((1.0 - x), (order - i))
 
     return (class_function * shape_function).T
