@@ -25,8 +25,13 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff pytest pytest-cov
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install ruff pytest pytest-cov 
+          # install the package with requirements
+          pip install -e .
+          # install extra packages used in examples
+          pip install pandas plotly seaborn dash dash_bootstrap_components
+          # install extra packages to test notebooks
+          pip install nbmake pytest-xdist
       - name: Lint with ruff
         run: |
           # stop the build if there are Python syntax errors or undefined names
@@ -34,8 +39,7 @@ jobs:
           # default set of ruff rules with GitHub Annotations
           ruff --format=github --target-version=py37 .
         continue-on-error: true
-      - name: Install package to be tested
-        run: pip install -e .
       - name: Test with pytest
         run: |
-          pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+          # pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html --nbmake  -n=auto "./examples/notebooks/"
+          pytest --doctest-modules --nbmake  -n=auto "./examples/notebooks/"

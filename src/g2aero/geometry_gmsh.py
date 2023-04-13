@@ -1,9 +1,13 @@
-import gmsh
 import os
 import numpy as np
 
-
 def blade_CAD_geometry(shapes, outfilename, msh=False):
+
+    try:
+        import gmsh                    
+    except ImportError:
+        print("Skipping 'blade_CAD_geometry' function: gmsh is not installed")
+        return 
 
     gmsh.initialize()
     gmsh.model.add("blade")
@@ -45,6 +49,12 @@ def blade_CAD_geometry(shapes, outfilename, msh=False):
 
 
 def write_geofile(shapes, outfilename, n_spanwise=300, n_te=3, n_cross_half=100):
+    try:
+        import gmsh                    
+    except ImportError:
+        print("Skipping 'blade_CAD_geometry' function: gmsh is not installed")
+        return 
+        
     n_shapes, n_landmarks, _ = shapes.shape
     n_half = int(n_landmarks / 2)
 

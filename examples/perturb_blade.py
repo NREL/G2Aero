@@ -8,14 +8,18 @@ from g2aero.PGA import Grassmann_PGAspace
 from g2aero.transform import TransformBlade, global_blade_coordinates
 from g2aero.SPD import polar_decomposition
 
-output_folder = os.path.join(os.getcwd(), 'Perturbations_blade', )
+examples_path = os.path.dirname(__file__)
+root_path = os.path.abspath(os.path.join(examples_path, os.pardir))
+
+
+output_folder = os.path.join(examples_path, 'Perturbations_blade', )
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 
 N = 10 # Number of perturbation to generate
 
 # load shapes from the database
-shapes_file = os.path.join(os.getcwd(), '../', 'data', 'airfoils', 'CST_shapes_TE_gap.npz')
+shapes_file = os.path.join(root_path, 'data', 'airfoils', 'CST_shapes_TE_gap.npz')
 shapes = np.load(shapes_file)['shapes']
 # define n_landmarks based on dataset data
 n_landmarks = shapes.shape[1]
@@ -25,7 +29,7 @@ pga, _ = Grassmann_PGAspace.create_from_dataset(shapes, n_modes=4)
 pga.radius /= 2
 
 # load baseline airfoils for a blade from .yaml file
-shapes_filename = os.path.join(os.getcwd(), '../', 'data', 'blades_yamls', 'IEA-15-240-RWT.yaml')
+shapes_filename = os.path.join(root_path, 'data', 'blades_yamls', 'IEA-15-240-RWT.yaml')
 Blade =  YamlInfo.init_from_yaml(shapes_filename, n_landmarks=n_landmarks)
 eta_nominal = Blade.eta_nominal
 M_yaml = Blade.M_yaml_interpolator
