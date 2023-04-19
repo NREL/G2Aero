@@ -120,18 +120,18 @@ class Test(TestCase):
             Transform = TransformBlade(M_yaml, b_yaml, b_pitch, M, b)
             xyz_local = Transform.grassmann_to_phys(gr_crosssections, eta_span)
 
-    def test_number_landmarks(self):
-        shapes_filename = os.path.join(os.getcwd(), "data", 'blades_yamls', "nrel5mw_ofpolars.yaml")
-
-        for n in [100, 501, 10000]:
-            for method in ['cst', 'planar', 'polar']:
-                Blade = YamlInfo.init_from_yaml(shapes_filename, n_landmarks=n, landmark_method=method)
-                M_yaml = Blade.M_yaml_interpolator
-                b_yaml = Blade.b_yaml_interpolator
-                b_pitch = Blade.pitch_axis
-                Grassmann = GrassmannInterpolator(Blade.eta_nominal, Blade.xy_landmarks)
-                M = Grassmann.interpolator_M
-                b = Grassmann.interpolator_b
-                _, gr_crosssections = Grassmann(np.linspace(0, 1, 100), grassmann=True)
-                Transform = TransformBlade(M_yaml, b_yaml, b_pitch, M, b)
-                xyz_local = Transform.grassmann_to_phys(gr_crosssections, np.linspace(0, 1, 100))
+    def test_different_reparametrizations(self):
+        for blade in ["nrel5mw_ofpolars.yaml", "IEA-15-240-RWT.yaml", "IEA-10-198-RWT.yaml", "IEA-3.4-130-RWT.yaml"]:
+            shapes_filename = os.path.join(os.getcwd(), "data", 'blades_yamls', blade)
+            for n in [100, 501, 10000]:
+                for method in ['cst', 'planar', 'polar']:
+                    Blade = YamlInfo.init_from_yaml(shapes_filename, n_landmarks=n, landmark_method=method)
+                    M_yaml = Blade.M_yaml_interpolator
+                    b_yaml = Blade.b_yaml_interpolator
+                    b_pitch = Blade.pitch_axis
+                    Grassmann = GrassmannInterpolator(Blade.eta_nominal, Blade.xy_landmarks)
+                    M = Grassmann.interpolator_M
+                    b = Grassmann.interpolator_b
+                    _, gr_crosssections = Grassmann(np.linspace(0, 1, 100), grassmann=True)
+                    Transform = TransformBlade(M_yaml, b_yaml, b_pitch, M, b)
+                    xyz_local = Transform.grassmann_to_phys(gr_crosssections, np.linspace(0, 1, 100))

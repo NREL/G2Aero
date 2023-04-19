@@ -218,7 +218,6 @@ def calc_cst_param(x, y, n1, n2, y_tailedge=0.0, order=8):
     :return: CST parameters
     """
     amat = cst_matrix(x, n1, n2, order)
-    print(np.linalg.cond(amat))
     bvec = y - x * y_tailedge
     out = lsq_linear(amat, bvec)
     return out.x
@@ -231,7 +230,6 @@ def cst_matrix(x, n1, n2, order):
     K = comb(order, range(order + 1))
     shape_function = np.empty((order + 1, x.shape[0]))
     for i in range(order + 1):
-        print((1.0 - x))
         shape_function[i, :] = K[i] * np.power(x, i) * np.power((1.0 - x), (order - i))
 
     return (class_function * shape_function).T

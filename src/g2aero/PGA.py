@@ -22,6 +22,15 @@ class Grassmann_PGAspace:
         r_max = np.abs(np.quantile(t, 0.9, axis=0))
         self.radius = np.max(np.array([r_min, r_max]), axis=0)
 
+        # q = 0.95
+        # q_min, q_max = 0.5-q/2, 0.5+q/2
+        # centers = (np.quantile(self.t, q_max, axis=0) + np.quantile(self.t, q_min, axis=0))/2
+        # q = 0.99
+        # q_min, q_max = 0.5-q/2, 0.5+q/2
+        # self.radius = (np.quantile(self.t, q_max, axis=0) - np.quantile(self.t, q_min, axis=0))/2
+        # tmin = centers-self.radius
+        # tmax = centers+self.radius
+
     @classmethod
     def load_from_file(cls, filename, n_modes=None):
         """Loading PGA space from the .npz file. Can load trancated space 
@@ -152,11 +161,11 @@ class Grassmann_PGAspace:
         if n_landmarks!=self.n_landmarks or ndim!=self.ndim:
             raise ValueError("n_landmark or dimension of the blade shapes don't match PGA space dimensions")
         if n_modes is None:
-                n_modes = self.Vh.shape[0]
+            n_modes = self.Vh.shape[0]
 
         def get_new_blade(c):
             new_blade = np.empty((n_shapes, n_landmarks, ndim))
-            vector = (c @ self.Vh).reshape(-1, 2)
+            vector = (c @ self.Vh[:len(c)]).reshape(-1, 2)
             for i, shape in enumerate(blade):
                 direction = gr.log(self.karcher_mean, shape)
                 new_vector = gr.parallel_translate(self.karcher_mean, direction, vector)
@@ -170,15 +179,18 @@ class Grassmann_PGAspace:
                     return True
             return False
 
+
         if coef is None:
             coef_array = self.sample_coef(n_samples=n, n_modes=n_modes)
         else:
-            coef_array = np.asarray(coef, n_modes)
+            coef_array = np.asarray(coef)
             if len(coef_array.shape) == 1:
                 coef_array = np.expand_dims(coef_array, axis=0)
+            n_modes = coef_array.shape[1]
 
         n = len(coef_array)
         blades = np.empty((n, n_shapes, n_landmarks, ndim))
+
         for k, c in enumerate(coef_array):
             print(f'Perturbing blade {k+1}')
             while True:
@@ -187,14 +199,12 @@ class Grassmann_PGAspace:
                     break
                 else:
                     print('Generating new coef')
-                    c = self.sample_coef(n_modes=n_modes)
+                    c = self.sample_coef(n_modes=n_modes).squeeze(axis=0)
                     coef_array[k] = c
             blades[k] = new_blade
         if n == 1:
             return blades.squeeze(axis=0), coef_array
         return blades, coef_array
-
-
 ##########################################################################################################################
 #
 #

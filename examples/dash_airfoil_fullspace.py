@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
-from g2aero.PGA import PGAspace
+from g2aero.PGA import Grassmann_PGAspace
 from g2aero.utils import position_airfoil, add_tailedge_gap, check_selfintersect
 
 import dash
@@ -10,11 +10,15 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output
 
-space_folder = os.path.join(os.getcwd(), '../data', 'pga_space', 'full_space')
-shapes_folder = os.path.join(os.getcwd(), '../data', 'airfoils')
+examples_path = os.path.dirname(__file__)
+root_path = os.path.abspath(os.path.join(examples_path, os.pardir))
+
+space_folder = os.path.join(root_path, 'data', 'pga_space', 'full_space')
+# shapes_folder = os.path.join(root_path, 'data', 'airfoils')
 
 pga_dict = np.load(os.path.join(space_folder, 'PGA_space.npz'))
-pga = PGAspace(pga_dict['Vh'], pga_dict['M_mean'], pga_dict['b_mean'], pga_dict['karcher_mean'])
+t = np.load(os.path.join(space_folder, 't.npz'))['t']
+pga = Grassmann_PGAspace(pga_dict['Vh'], pga_dict['M_mean'], pga_dict['b_mean'], pga_dict['karcher_mean'], t)
 M = np.load(os.path.join(space_folder, 'M_b.npz'))['M']
 Mmin = np.min(M, axis=0).reshape(4,)
 Mmax = np.max(M, axis=0).reshape(4,)
@@ -23,14 +27,12 @@ t = np.load(os.path.join(space_folder, 't.npz'))['t']
 labels = np.load(os.path.join(space_folder, 't.npz'))['labels']
 print(labels.shape)
 
-r_min = np.abs(np.quantile(t, 0.0, axis=0))
-r_max = np.abs(np.quantile(t, 1.0, axis=0))
-pga.radius = np.max(np.array([r_min, r_max]), axis=0).tolist()
-# t = np.hstack((t, s2))
-# pga.radius.append((np.max(s2[:-1001]) - np.min(s2[:-1001]))/2)
-# centers = [0, 0, 0, 0, (np.max(s2[:-1001]) + np.min(s2[:-1001]))/2]
-# centers = np.array(centers)
-pga.radius = np.array(pga.radius)
+q = 0.95
+q_min, q_max = 0.5-q/2, 0.5+q/2
+centers = (np.quantile(t, q_max, axis=0) + np.quantile(t, q_min, axis=0))/2
+q = 0.99
+q_min, q_max = 0.5-q/2, 0.5+q/2
+pga.radius = (np.quantile(t, q_max, axis=0) - np.quantile(t, q_min, axis=0))/2
 
 df = pd.DataFrame(data=t[:, :4], columns=['t1', 't2', 't3', 't4'])
 df['label'] = labels
@@ -38,12 +40,9 @@ karcher_mean = pga.PGA2shape([0, 0, 0, 0])
 
 # karcher_mean = position_airfoil(karcher_mean)
 # karcher_mean = add_tailedge_gap(karcher_mean, 0.01)
-tmin = -pga.radius
-# # tmin[-1] = np.min(s2)
-tmax = pga.radius
-# tmax[-1] = np.max(s2)
+tmin = centers-pga.radius
+tmax = centers+pga.radius
 
-# radius = np.max(np.array([r_min, r_max]), axis=0).tolist()
 
 
 app = dash.Dash(__name__, 

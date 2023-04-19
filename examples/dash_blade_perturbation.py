@@ -2,11 +2,13 @@ import os
 import numpy as np
 import pandas as pd
 from g2aero.Grassmann import landmark_affine_transform
-from g2aero.PGA import PGAspace
+from g2aero.PGA import Grassmann_PGAspace, SPD_TangentSpace
 from g2aero.utils import remove_tailedge_gap
-from g2aero import yaml_info
+from g2aero.yaml_info import YamlInfo
 from g2aero.Grassmann_interpolation import GrassmannInterpolator
 from g2aero.transform import TransformBlade
+from g2aero.utils import position_airfoil, add_tailedge_gap, check_selfintersect
+from g2aero.SPD import polar_decomposition
 
 from plot_helpfunctions import plot_3d_blade_with_nominal
 
@@ -17,61 +19,58 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output
 
-
-############################################
-# Load PGA_space
-############################################
-pga_dict = np.load(os.path.join(os.getcwd(), '../data', 'PGA_space', 'PGA_space.npz'))
-pga = PGAspace(pga_dict['Vh'], pga_dict['M_mean'], pga_dict['b_mean'], pga_dict['karcher_mean'])
-pga.M_mean = pga.M_mean.T
-t = np.load(os.path.join(os.getcwd(), '../data', 'PGA_space', 't.npz'))['t']
-
-
-r_min = np.abs(np.quantile(t, 0.0, axis=0))
-r_max = np.abs(np.quantile(t, 0.0, axis=0))
-pga.radius = np.max(np.array([r_min, r_max]), axis=0)
-centers = np.array([0, 0, 0, 0])
-
-airfoils = ['NACA64_A17', 'DU21_A17', 'DU25_A17', 'DU30_A17', 'DU35_A17', 'DU40_A17', 'DU00-W2-350', 'DU08-W-210',
-            'FFA-W3-211',  'FFA-W3-241', 'FFA-W3-270blend', 'FFA-W3-301', 'FFA-W3-330blend', 'FFA-W3-360', 'SNL-FFA-W3-500']
-
-n_airfoils = len(airfoils)
-label_dict = dict(zip(airfoils, np.arange(len(airfoils))))
-
+examples_path = os.path.dirname(__file__)
+root_path = os.path.abspath(os.path.join(examples_path, os.pardir))
+# Load airfoils classes
+shapes_folder = os.path.join(root_path, 'data', 'airfoils')
+airfoils = np.load(os.path.join(shapes_folder, 'CST_shapes_TE_gap.npz'))['classes']
 colors_pallete = ['#FF00FF', '#00429d', '#2571b0', '#4a9fc3', '#6fced6', '#96ffea', '#008000', '#58ffd8',
-                  '#ff9e7c', '#fa7779', '#e9546f', '#d13660', '#b51c4d', '#940638', '#720022']
-dict_color = {airfoils[i]: colors_pallete[i] for i in range(len(airfoils))}
+                  '#ff9e7c', '#fa7779', '#e9546f', '#d13660', '#b51c4d']#, '#940638', '#720022']
+dict_color = {airfoils[::1000][i]: colors_pallete[i] for i in range(len(airfoils[::1000]))}
+############################################
+# Load PGA_space (dataset with TE gap)
+############################################
+space_folder = os.path.join(root_path, 'data', 'pga_space')
+pga = Grassmann_PGAspace.load_from_file(os.path.join(space_folder, 'CST_Gr_PGA.npz'))
+# spd_tan = SPD_TangentSpace.load_from_file(os.path.join(space_folder, 'CST_SPD_tangent.npz'))
 
-df = pd.DataFrame(data=t, columns=['t1', 't2', 't3', 't4'])
-df['label'] = [airfoil for airfoil in airfoils for i in range(1001)]
-df['colors'] = [dict_color[airfoil] for airfoil in airfoils for i in range(1001)]
+# make dataframe
+df = pd.DataFrame(data=pga.t[:, :4], columns=['t1', 't2', 't3', 't4'])
+df['label'] = airfoils
+df['colors'] = [dict_color[airfoil] for airfoil in airfoils]
 
-tmin = -pga.radius
-tmax = pga.radius
+# make Karcher mean airfoil
+karcher_mean = pga.PGA2shape([0, 0, 0, 0])
+karcher_mean = position_airfoil(karcher_mean)
+
+# define center and radius to define ranges of parameters on a slidebar
+q = 0.95
+q_min, q_max = 0.5-q/2, 0.5+q/2
+centers = (np.quantile(pga.t, q_max, axis=0) + np.quantile(pga.t, q_min, axis=0))/2
+q = 0.99
+q_min, q_max = 0.5-q/2, 0.5+q/2
+pga.radius = (np.quantile(pga.t, q_max, axis=0) - np.quantile(pga.t, q_min, axis=0))/2
+tmin = centers-pga.radius
+tmax = centers+pga.radius
+
 ############################################
 # Load blade
 ############################################
 blade_filename = 'IEA-15-240-RWT.yaml'
 # blade_filename = 'nrel5mw_ofpolars.yaml'
+blade_path = os.path.join(root_path, "data", 'blades_yamls', blade_filename)
+Blade = YamlInfo.init_from_yaml(blade_path, n_landmarks=401, landmark_method='cst')
 
-shapes_path = os.path.join(os.getcwd(), "../data", 'blades_yamls', blade_filename)
+shapes_bs = Blade.xy_landmarks[2:] # given (baseline) blade airfoils
+shapes_gr_bs, M_bs, b_bs = polar_decomposition(shapes_bs)
+t_blade = pga.gr_shapes2PGA(shapes_gr_bs)
+
+# Interpolate baseline blade
 n_cross_sections = 100
-
-Blade = yaml_info.YamlInfo(shapes_path, n_landmarks=401)
-
-nogap_shapes = np.empty_like(Blade.xy_landmarks)
-for i, xy in enumerate(Blade.xy_landmarks):
-    nogap_shapes[i] = remove_tailedge_gap(xy)
-Blade.xy_nominal = Blade.shift_to_pitch_axis(Blade.eta_nominal)
-
 Grassmann = GrassmannInterpolator(Blade.eta_nominal, Blade.xy_nominal)
-
-eta_span = Grassmann.sample_eta(100, n_hub=10, n_tip=10, n_end=25)
+eta_span = Grassmann.sample_eta(n_cross_sections, n_hub=10, n_tip=10, n_end=25)
 Transform = TransformBlade(Blade.M_yaml_interpolator, Blade.b_yaml_interpolator, 
                            Blade.pitch_axis, Grassmann.interpolator_M, Grassmann.interpolator_b)
-
-curve_gr_shapes, _, _ = landmark_affine_transform(nogap_shapes[2:-1])
-t_blade = pga.gr_shapes2PGA(curve_gr_shapes)
 #################################
 # App
 #################################
@@ -171,24 +170,22 @@ def update_scatterplot(t1, t2, t3, t4):
                                         marker=dict(color="#000000", size=10), name='Perturbation'))
 
     # Add baseline blade
-
     fig_scatterplot.add_trace(go.Splom(dimensions=[dict(label=r'$t_1$', values=t_blade[:, 0]), dict(label='t2', values=t_blade[:, 1]),
                                                     dict(label='t3', values=t_blade[:, 2]), dict(label='t4', values=t_blade[:, 3])],
                                         showupperhalf=False, diagonal_visible=False,  # remove plots on diagonal
-                                         marker=dict(color="#000000", size=8), name='Baseline blade'))
+                                         marker=dict(color="#FF0000", size=8), name='Baseline blade'))
 
     # fig_scatterplot.add_trace(go.Splom(dimensions=[dict(label=r'$t_1$', values=IEA15_airfoils[:, 0]), dict(label='t2', values=t_blade[:, 1]),
     #                                                 dict(label='t3', values=IEA15_airfoils[:, 2]), dict(label='t4', values=IEA15_airfoils[:, 3])],
     #                                     showupperhalf=False, diagonal_visible=False,  # remove plots on diagonal
     #                                     marker=dict(color="#FF0000", size=8), name='Perturbation'))
 
-
-    perturbation, coef = pga.generate_perturbed_blade(curve_gr_shapes, coef=[t1, t2, t3, t4])
+    perturbation, _ = pga.generate_perturbed_blade(shapes_gr_bs, coef=[t1, t2, t3, t4])
     t_perturbation = pga.gr_shapes2PGA(perturbation)
     fig_scatterplot.add_trace(go.Splom(dimensions=[dict(label=r'$t_1$', values=t_perturbation[:, 0]), dict(label='t2', values=t_perturbation[:, 1]),
                                                     dict(label='t3', values=t_perturbation[:, 2]), dict(label='t4', values=t_perturbation[:, 3])],
                                         showupperhalf=False, diagonal_visible=False,  # remove plots on diagonal
-                                        marker=dict(color="#FF0000", size=8), name='Perturbed blade'))
+                                        marker=dict(color="#000000", size=8), name='Perturbed blade'))
     return fig_scatterplot
 
 
@@ -199,16 +196,23 @@ def update_scatterplot(t1, t2, t3, t4):
             Input('t4-slider', 'value')])
 def update_3d_blade(t1, t2, t3, t4):
 
-    perturbation, _ = pga.generate_perturbed_blade(curve_gr_shapes, coef=[t1, t2, t3, t4])
-    print(perturbation.shape)
-    perturbation = np.vstack((perturbation, perturbation[-1:]))
-    print(perturbation.shape)
+    perturbation, _ = pga.generate_perturbed_blade(shapes_gr_bs, coef=[t1, t2, t3, t4])
 
-    Grassmann.shapes_perturbation(perturbation, np.arange(2, len(perturbation)+2))
-    _, new_blade = Grassmann(eta_span, grassmann=True)
-    xyz_local = Transform.grassmann_to_phys(new_blade, eta_span)
-    xyz_nominal = Transform.grassmann_to_phys(Grassmann.xy_grassmann, Grassmann.eta_nominal)
+    # Inverse affine transform
+    new_blade_phys = np.empty_like(perturbation)
+    for i, sh in enumerate(perturbation):
+        new_blade_phys[i] = sh @ M_bs[i] + b_bs[i]
 
+    # Add circles
+    new_blade_full = np.vstack((Blade.xy_landmarks[:2], new_blade_phys))
+
+    GrInterp = GrassmannInterpolator(Blade.eta_nominal, new_blade_full)
+    eta_span = GrInterp.sample_eta(100, n_hub=10, n_tip=10, n_end=25)
+    _, blade_gr = GrInterp(eta_span, grassmann=True)
+    Transform = TransformBlade(Blade.M_yaml_interpolator, Blade.b_yaml_interpolator,
+                            Blade.pitch_axis, GrInterp.interpolator_M, GrInterp.interpolator_b)
+    xyz_local = Transform.grassmann_to_phys(blade_gr, eta_span)
+    xyz_nominal = Transform.grassmann_to_phys(GrInterp.xy_grassmann, GrInterp.eta_nominal)
     fig_3d_blade = plot_3d_blade_with_nominal(xyz_local, xyz_nominal)
     return fig_3d_blade
 

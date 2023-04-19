@@ -7,13 +7,15 @@ from g2aero import geometry_gmsh
 from time import time
 import datetime
 
+examples_path = os.path.dirname(__file__)
+root_path = os.path.abspath(os.path.join(examples_path, os.pardir))
 
 def main():
 
     blade_filename = 'IEA-15-240-RWT.yaml'
     # blade_filename = 'nrel5mw_ofpolars.yaml'
 
-    shapes_path = os.path.join(os.getcwd(), "../data", 'blades_yamls', blade_filename)
+    shapes_path = os.path.join(root_path, "data", 'blades_yamls', blade_filename)
     n_landmarks = 1001
     n_cross_sections = 200
     print(f'Number of landmarks: {n_landmarks}')
