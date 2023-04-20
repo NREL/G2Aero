@@ -74,7 +74,7 @@ def vecinv(p):
 def polar_decomposition(X_phys):
     """
 
-    :param X_phys:(n_shapes, n_landmarks, 2) array of physical coordinates defining shapes
+    :param X_phys: (n_shapes, n_landmarks, 2) array of physical coordinates defining shapes
     :return: X_grassmann, P, b, such that X_phys = X_grassmann @ P + b.
     """
     X_phys = np.asarray(X_phys)

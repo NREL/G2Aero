@@ -29,7 +29,7 @@ angle-of-attack, thickness, and chordal scaling.
 Computations based on this formalism are predicated on a Landmark-Affine (LA) standardization which maps physical airfoil shapes :math:`\mathbf{X}` 
 to (Stiefel representative) elements of the Grassmannian :math:`\mathbf{\tilde{X}}`. In particular, LA standardization normalizes the shape with 
 zero mean and identity covariance. This standardization of the shape acts as a kind of scale normalization and is achieved by the singular 
-value decomposition with computational complexity :math:`O(n)` or the related polar decomposition (Grey 2022). 
+value decomposition with computational complexity :math:`O(n)` or the related polar decomposition (:footcite:t:`Grey:2022`). 
 
 To define airfoil perturbations, we use Principal Geodesic Analysis (PGA), a generalization of Principal Component Analysis over smooth 
 manifolds (:footcite:t:`Fletcher:2003`). PGA is a data-driven approach which approximates a notion of the most amount of variability in a data 
