@@ -3,9 +3,21 @@ import numpy as np
 from scipy.interpolate import CubicSpline, PchipInterpolator
 
 def tailedge_gap(xy):
+    """Calculate tail edge gap size
+
+    :param xy (n, 2) shape coordinates
+    :return: TE gap size
+    """
     return xy[-1, 1] - xy[0, 1]
 
 def add_tailedge_gap(xy, gap):
+    """Adding tail edge gap. 
+    Before using need to position airfoil first (chord on x-axis from 0 to 1)
+
+    :param xy: (n, 2) shape coordinate
+    :param gap: gap size to be added
+    :return: array of shape coordinates with added gap
+    """
     # need to position airfoil first
     # split into upper and lower parts
     le_ind = np.argmin(xy[:, 0])  # Leading edge index
@@ -18,7 +30,7 @@ def add_minimum_gap(xy):
     """Adding minimum TE gap of 2mm.
     Before using need to position airfoil first (chord on x-axis from 0 to 1)
 
-    :param xy (n, 2): shape coordinates
+    :param xy: (n, 2)shape coordinates
     :return: array of shape coordinates with added gap
     """
     # split into upper and lower parts
@@ -30,6 +42,11 @@ def add_minimum_gap(xy):
 
 
 def remove_tailedge_gap(xy):
+    """Remove tailedge gap.
+
+    :param xy: (n, 2) shape coordinates
+    :return: array of shape coordinates without gap
+    """
     le_ind = np.argmin(xy[:, 0])  # Leading edge index
     # split int upper and lower parts
     xy_upper, xy_lower = xy[le_ind:], xy[:le_ind]
@@ -42,6 +59,15 @@ def remove_tailedge_gap(xy):
 
 
 def position_airfoil(shape_inp, rotate=True, LE_cst=False, return_LEind=False):
+    """Normalize, rotates and translates given airfoil coordinates 
+    so that the leading edge is at (0, 0) and tail edge is at (1, 0).
+
+    :param shape_inp: (n, 2) shape coordinates
+    :param rotate: (bool) rotate airfoil to set LE at (0,0), defaults to True
+    :param LE_cst: (bool) set true if shape_inp is from CST parametrization to use x=0 point as LE, defaults to False
+    :param return_LEind: (bool) return index of leading edge coordinate, defaults to False
+    :return: array of shape coordinates 
+    """
 
     shape = np.array(shape_inp)
 
@@ -144,6 +170,12 @@ def check_selfintersect(shape):
 
 
 def arc_distance(xy):
+    """Calculate distance along the arc of points defining airfoil shape. 
+    t in [0, 1]
+
+    :param xy: (n_landmarks, 2) discrete planar curve with n landmarks representing a shape
+    :return: (n_landmarks, ) distance along the arc of points defining airfoil shape
+    """
     dist = np.linalg.norm(np.diff(xy, axis=0), axis=1)
     t = np.cumsum(dist) / np.sum(dist)
     return np.hstack(([0.0], t))
@@ -152,6 +184,11 @@ def arc_distance(xy):
 # Functions to calculate some characteristics of a shape
 ########################################################################################
 def calc_curvature(xy):
+    """Calculate curvature based on planar respresentation.
+
+    :param xy: (n_landmarks, 2) discrete planar curve with n landmarks representing a shape
+    :return: curvature values
+    """
     t_phys = arc_distance(xy)
     
     s1 = CubicSpline(t_phys, xy[:, 0])

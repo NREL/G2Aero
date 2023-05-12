@@ -2,6 +2,13 @@ import os
 import numpy as np
 
 def blade_CAD_geometry(shapes, outfilename, msh=False):
+    """Write blade into CAD file .stp using gmsh, 
+    if msh=True create unstructured surface mesh 
+
+    :param shapes: coordinates of airfoil shapes defining blade
+    :param outfilename: name of output file
+    :param msh: (bool) create unstrunctured surface mesh  and save .msh file as well, defaults to False
+    """
 
     try:
         import gmsh                    
@@ -49,6 +56,14 @@ def blade_CAD_geometry(shapes, outfilename, msh=False):
 
 
 def write_geofile(shapes, outfilename, n_spanwise=300, n_te=3, n_cross_half=100):
+    """Create structured surface mesh using GMSH and .geo file
+
+    :param shapes: coordinates of airfoil shapes defining blade
+    :param outfilename: name of output file
+    :param n_spanwise: number of cells in spanwise direction, defaults to 300
+    :param n_te: number of cross points in trail edge, defaults to 3
+    :param n_cross_half: number of upper and lower cross section points, defaults to 100
+    """
     try:
         import gmsh                    
     except ImportError:

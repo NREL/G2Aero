@@ -258,5 +258,10 @@ def parallel_translate(start, end_direction, vector):
     return exp_map @ vector
 
 def check_orthogonality(X):
+    """Checks orthogonality of a matrix.
+
+    :param X: np.array of matrix
+    :raises ValueError: raises error is given matrix is not orthogonal
+    """
     if not np.allclose(X.T @ X, np.eye(X.shape[1])):
         raise ValueError(f'Input does not constitute an element of the Grassmannian: X.T @ X = {X.T @ X}')

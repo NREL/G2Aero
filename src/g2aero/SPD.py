@@ -3,16 +3,16 @@
 import numpy as np
 
 def vec(P):
-    """
-    Return vector of the upper-triangle elements
+    """Return vector of the upper-triangle elements
+
     :param P:(n, n) symmetric matrix
     :return: (n*(n+1)/2,1) vectorization of unique entries
     """
     return P[np.triu_indices_from(P)]
 
 def vecinv(p):
-    """
-    Return symmetric matrix from vectorized form
+    """Return symmetric matrix from vectorized form
+    
     :param p:(n*(n+1)/2,1) vector of symmetric matrix entries returned by consistent vectorization
     :return: (n,n) corresponding symmetric matrix
     """
@@ -163,6 +163,15 @@ def Karcher(data, eps=1e-8, max_steps=20):
 
 
 def tangent_space(mu, data):
+    """Get tangent directions (SPD Logarithmic mapping) from given 
+    point `mu` to each point of the data and vectorize resulting 
+    tangent vectors of shape (n, 2) into shape (2*n) for later 
+    SVD decomposition in PGA analysis.
+
+    :param mu: starting point for tangent vectors
+    :param data: nparray of data points (elements of Grassamnnian)
+    :return: nparray of vectorized tangent vectors
+    """
     data, mu = np.asarray(data), np.asarray(mu)
     n_points, n, _ = data.shape
     # get tangent directions from mu to each point
