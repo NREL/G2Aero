@@ -3,7 +3,7 @@
 [![Documentation Status](https://readthedocs.org/projects/g2aero/badge/?version=latest)](https://g2aero.readthedocs.io/en/latest/?badge=latest)
 
 # G2Aero: Separable shape tensors for aerodynamic design
- `G2Aero` is  a flexible and practical tool for design and deformation of 2D airfoils and 3D blades using data-driven approaches. `G2Aero` utilizes the geometry of matrix manifolds&mdash;specifically the Grassmannian&mdash;to build a novel framework for representing physics-based separable deformations of shapes. `G2Aero` offers the flexibility to generate perturbations in a customizable way over any portion of the blade. The `G2Aero` framework utilizes data-driven methods based on a curated database of physically relevant airfoils. Specific tools include: 
+ `G2Aero` is a flexible and practical tool for design and deformation of 2D airfoils and 3D blades using data-driven approaches. `G2Aero` utilizes the geometry of matrix manifolds&mdash;specifically the Grassmannian&mdash;to build a novel framework for representing physics-based separable deformations of shapes. `G2Aero` offers the flexibility to generate perturbations in a customizable way over any portion of the blade. The `G2Aero` framework utilizes data-driven methods based on a curated database of physically relevant airfoils. Specific tools include: 
  
  -  principal geodesic analysis over normal coordinate neighborhoods of matrix manifolds; 
  -  a variety of data-regularized deformations to nominal 2D airfoil shapes; 
@@ -14,7 +14,7 @@
 
 ## Installation
 
-Install `G2Aero` from sources with:
+Install `G2Aero` from sources with Python3.x:
 
 ```bash
 git clone https://github.com/NREL/G2Aero.git
@@ -26,6 +26,12 @@ Installing via `conda-forge`
 ```bash
 conda install -c conda-forge g2aero
 ```
+## Testing
+You can run the tests from the root `g2aero` folder (once you installed pytest):
+```bash
+pip install pytest
+pytest
+```
 
 ## Usage
 
@@ -36,13 +42,6 @@ conda install -c conda-forge g2aero
 Grassmannian interpolation combined with parametrized affine deformations:
 <img src="https://github.com/NREL/G2Aero/blob/main/data/animations/animation.gif" alt="blade gif" title="gif" width="500"/>
 
-
-## Testing
-You can run the tests from the root `g2aero` folder (once you installed pytest):
-```bash
-pip install pytest
-pytest
-```
 ## Contributing
 
 Contributions are always welcome! See `contributing.md` for ways to get started.
