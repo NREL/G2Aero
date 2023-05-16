@@ -22,7 +22,7 @@ copyright = '2021, Olga Doronina, Andrew Glaws'
 author = 'Olga Doronina, Zach Grey, Andrew Glaws'
 
 # The full version, including alpha/beta/rc tags
-release = 'v0.1.1'
+release = 'v0.1.2'
 
 
 # -- General configuration ---------------------------------------------------
