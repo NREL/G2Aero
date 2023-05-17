@@ -11,6 +11,9 @@ class Dataset:
             self.shapes_gr, self.M, self.b = spd.polar_decomposition(phys_shapes)
         elif method == 'LA-transform':
             self.shapes_gr, self.M, self.b = gr.landmark_affine_transform(phys_shapes)
+        else:
+            print('Error: Available methods are "SPD" and "LA-transform"')
+            exit()
 
 
 class ProductManifold():

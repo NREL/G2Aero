@@ -5,15 +5,15 @@ import numpy as np
 def vec(P):
     """Return vector of the upper-triangle elements
 
-    :param P:(n, n) symmetric matrix
+    :param P: (n, n) symmetric matrix
     :return: (n*(n+1)/2,1) vectorization of unique entries
     """
     return P[np.triu_indices_from(P)]
 
 def vecinv(p):
     """Return symmetric matrix from vectorized form
-    
-    :param p:(n*(n+1)/2,1) vector of symmetric matrix entries returned by consistent vectorization
+
+    :param p: (n*(n+1)/2,1) vector of symmetric matrix entries returned by consistent vectorization
     :return: (n,n) corresponding symmetric matrix
     """
     # compute matrix dimension (solve quadratic equation n**2+n-2*len(p)=0) 
