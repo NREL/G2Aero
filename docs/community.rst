@@ -1,4 +1,2 @@
-Feedback, Support, and Contributions
-====================================
-
-.. mdinclude:: ../../CONTRIBUTING.md
+.. include:: ../CONTRIBUTING.md
+    :parser: myst_parser.sphinx_

@@ -69,13 +69,13 @@ To submit your code when fixing bugs, documentation, or implementing new feature
 
 1. Fork the `G2Aero` repository on GitHub.
 2. Clone your fork locally:
-```bash
-git clone https://github.com/NREL/G2Aero.git
-```
+    ```bash
+    git clone https://github.com/NREL/G2Aero.git
+    ```
 3. Create a branch for local development:
-```bash
-git checkout -b name-of-your-bugfix-or-feature
-```
+    ```bash
+    git checkout -b name-of-your-bugfix-or-feature
+    ```
 4. Make your desired changes on your local branch.
 5. Commit your changes and push your branch to GitHub:
 ``` bush
