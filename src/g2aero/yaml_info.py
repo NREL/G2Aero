@@ -101,7 +101,9 @@ class YamlInfo:
         xy_nominal = []
         names_dict = {}
         for name in airfoils_list:
-            names_dict[name['name']] = np.vstack((name['coordinates']['x'], name['coordinates']['y'])).T
+            x = [float(i) for i in name['coordinates']['x']]
+            y = [float(i) for i in name['coordinates']['y']]
+            names_dict[name['name']] = np.vstack((x, y)).T
         for i, label in enumerate(nominal_labels):
             xy_nominal.append(names_dict[label])
         return xy_nominal
