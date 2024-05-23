@@ -23,11 +23,25 @@ Documentation is currently organized into three main categories:
 
 New users may find it helpful to review the :ref:`Getting Started` materials first.
 
-Citations
+Citations     
 ---------
 If you use this software in your research or publications, please use the following BibTeX citations::
 
-   @article{GreyJCDE2023,
+   
+    @article{Doronina_JOSS_2023, 
+      author = {Olga A. Doronina and Zachary J. Grey and Andrew Glaws}, 
+      title = {G2Aero: A Python package for separable shape tensors}, 
+      journal = {Journal of Open Source Software}, 
+      publisher = {The Open Journal}, 
+      year = {2023}, 
+      volume = {8}, 
+      number = {89}, 
+      pages = {5408},
+      doi = {10.21105/joss.05408}, 
+      url = {https://doi.org/10.21105/joss.05408}, 
+    }
+
+    @article{GreyJCDE2023,
       author = {Grey, Zachary J and Doronina, Olga A and Glaws, Andrew},
       title = "{Separable shape tensors for aerodynamic design}",
       journal = {Journal of Computational Design and Engineering},
