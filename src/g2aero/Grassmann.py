@@ -185,19 +185,23 @@ def PGA(mu, shapes_gr, n_coord=None):
     return Vh[:n_coord, :], S[:n_coord], t[:, :n_coord]
 
 
-def PGA_modes(PGA_directions, mu, scale=1, sub=10):
+def PGA_modes(PGA_directions, mu, scale=0.1, sub=10):
     """
     Moves given element on Grassmann in each of given directions.
 
     :param PGA_directions: directions to perturb element mu
-    :param mu: element on grassmann
+    :param scale: how much we perturb element mu
+    :param mu: element on grassmann according which we perturb
     :param sub: subset of directions (first sub directions)
     :return: elements on Grassmann (perturbed from mu in PGA_directions)
     """
     PGA_directions = PGA_directions.reshape(len(PGA_directions), -1, 2)
-    PGA_fwd = np.zeros_like(PGA_directions)
-    for i in range(min(sub, len(PGA_directions))):
-        PGA_fwd[i] = exp(scale, mu, PGA_directions[i])
+    n_modes = min(sub, len(PGA_directions))
+    if np.isscalar(scale):
+        scale = np.array([scale]*n_modes)
+    PGA_fwd = np.zeros_like(PGA_directions)[:n_modes]
+    for i in range(n_modes):
+        PGA_fwd[i] = exp(scale[i], mu, PGA_directions[i])
     return PGA_fwd
 
 

@@ -64,7 +64,10 @@ class Grassmann_PGAspace:
             M_mean = spd.Karcher(M)  #M_mean is default to M_karcher
         elif method == 'LA-transform':
             shapes_gr, M, b = gr.landmark_affine_transform(phys_shapes)
-            M_mean == np.mean(M, axis=0)
+            M_mean = np.mean(M, axis=0)
+        else:
+            print('Error: Available methods are "SPD" and "LA-transform"')
+            exit()
         
         karcher_mean = gr.Karcher(shapes_gr)
         Vh, S, t = gr.PGA(karcher_mean, shapes_gr, n_coord=n_modes)

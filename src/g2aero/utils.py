@@ -33,12 +33,7 @@ def add_minimum_gap(xy):
     :param xy: (n, 2)shape coordinates
     :return: array of shape coordinates with added gap
     """
-    # split into upper and lower parts
-    le_ind = np.argmin(xy[:, 0])  # Leading edge index
-    xy_upper, xy_lower = xy[le_ind:], xy[:le_ind]
-    xy_upper[:, 1] += xy_upper[:, 0] * 0.001
-    xy_lower[:, 1] -= xy_lower[:, 0] * 0.001
-    return np.r_[xy_lower, xy_upper]
+    return add_tailedge_gap(xy, 0.001)
 
 
 def remove_tailedge_gap(xy):
@@ -183,6 +178,23 @@ def arc_distance(xy):
 ########################################################################################
 # Functions to calculate some characteristics of a shape
 ########################################################################################
+def calc_unit_normal(shape):
+    t_phys = arc_distance(shape)
+    # tangent vector
+    dx = CubicSpline(t_phys, shape[:, 0], bc_type='natural').derivative(nu=1)(t_phys)
+    dy = CubicSpline(t_phys, shape[:, 1], bc_type='natural').derivative(nu=1)(t_phys)
+    # Rotate this vector 90 degrees
+    dx_n = -dy
+    dy_n = dx 
+    # Scale it to magnitude equal 1
+    scale = np.sqrt(dx_n**2 + dy_n**2)
+    dx_n /= scale
+    dy_n /= scale
+    unit_normal = np.array([dx_n, dy_n]).T
+    return unit_normal
+
+
+
 def calc_curvature(xy):
     """Calculate curvature based on planar respresentation.
 
