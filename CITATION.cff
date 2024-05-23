@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+title: 'G2Aero: A Python package for separable shape tensors'
+message: If you use this software, please cite it as below.
+type: software
+authors:
+  - given-names: Olga
+    family-names: Doronina
+  - given-names: Andrew
+    family-names: Glaws
+  - given-names: Ryan
+    family-names: King
+  - given-names: Ganesh
+    family-names: Vijayakumar
+  - given-names: Zachary
+    family-names: Grey
+identifiers:
+  - type: doi
+    value: 10.11578/dc.20220422.1
+repository-code: 'https://github.com/NREL/G2Aero'
+url: 'https://g2aero.readthedocs.io/en/latest/index.html'
+license: BSD-3-Clause
+version: v1.0.0
+date-released: 2023-08-07
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Olga A."
+    given-names: "Doronina"
+  - family-names: "Zachary J."
+    given-names: "Grey"
+  - family-names: "Andrew"
+    given-names: "Glaws"
+  doi: "10.21105/joss.05408"
+  journal: "Journal of Open Source Software"
+  start: 5408 # First page number
+  title: "G2Aero: A Python package for separable shape tensors"
+  issue: 89
+  volume: 8
+  year: 2023

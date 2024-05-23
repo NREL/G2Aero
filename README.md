@@ -50,6 +50,18 @@ Please adhere to this project's `code of conduct`.
 ## Citations
 If you use this software in your research or publications, please cite the following paper:
 
+    @article{Doronina_JOSS_2023, 
+      author = {Olga A. Doronina and Zachary J. Grey and Andrew Glaws}, 
+      title = {G2Aero: A Python package for separable shape tensors}, 
+      journal = {Journal of Open Source Software}, 
+      year = {2023}, publisher = {The Open Journal}, 
+      volume = {8}, 
+      number = {89}, 
+      pages = {5408},
+      doi = {10.21105/joss.05408}, 
+      url = {https://doi.org/10.21105/joss.05408}, 
+    }
+
     @article{GreyJCDE2023,
       author = {Grey, Zachary J and Doronina, Olga A and Glaws, Andrew},
       title = "{Separable shape tensors for aerodynamic design}",
