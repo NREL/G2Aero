@@ -34,7 +34,7 @@ bibliography: paper.bib
 We focus on airfoil and blade design applications to emphasize the utility of the methods in an environment where the separation of affine and undulation-type deformations is critical. Notable functionalities of the framework for blade design include:  
 
 1) generating novel 2D (airfoil) shapes informed by a database of physically relevant airfoils,
-2) building 3D blades by interpolating sequences of 2D airfoil cross-sections,
+2) building 3D blades by interpolating sequences of 2D airfoil cross-sections, and
 3) generating blades with consistent perturbations along the blade span.
 
 We discuss the framework and provide examples in the context of wind energy applications, specifically wind turbine blade design. \autoref{fig:wire_frame} shows the wire frame obtained by interpolating airfoils defining the IEA 15-MW wind turbine blade [@IEA15MW] and applying affine transformations corresponding to twist, chordal scaling, and bending. This, and all other figures in the paper, can be reproduced following examples and referencing supporting documentation provided in the `G2Aero` package.
