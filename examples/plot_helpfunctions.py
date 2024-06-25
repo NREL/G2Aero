@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from IPython.display import HTML
 from matplotlib.lines import Line2D
 import matplotlib.animation as animation
 import matplotlib as mpl
