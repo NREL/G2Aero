@@ -16,8 +16,9 @@ def main():
     # blade_filename = 'nrel5mw_ofpolars.yaml'
 
     shapes_path = os.path.join(root_path, "data", 'blades_yamls', blade_filename)
-    n_landmarks = 1001
-    n_cross_sections = 200
+    n_landmarks = 501
+    n_cross_sections = 100
+    make_geo_file = False # flag to make structured grid and write into gmsh specific format .geo file
     print(f'Number of landmarks: {n_landmarks}')
     print(f'Number of interpolated cross sections: {n_cross_sections}')
     
@@ -51,12 +52,13 @@ def main():
     
     t3 = time()
     
-    # print("creating CAD model")
+    print("creating CAD model")
     # TODO: check gmsh functionality (need to have at least a minimum gap to work)
     # # to create stp file and unstructured grid
     geometry_gmsh.blade_CAD_geometry(xyz_global, blade_filename[:-5], msh=True)
-    # to create structured grid
-    geometry_gmsh.write_geofile(xyz_global, blade_filename[:-5], n_spanwise=300, n_te=3, n_cross_half=100)
+    if make_geo_file:
+        # to create structured grid and .geo file
+        geometry_gmsh.write_geofile(xyz_global, blade_filename[:-5], n_spanwise=300, n_te=3, n_cross_half=100)
     
     t4 = time()
 
