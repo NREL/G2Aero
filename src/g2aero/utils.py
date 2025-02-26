@@ -209,7 +209,26 @@ def calc_curvature(xy):
     
     ds1, ds2 = s1(t_tmp, 1), s2(t_tmp, 1)
     dds1, dds2 = s1(t_tmp, 2), s2(t_tmp, 2)
+
     return ds1 * dds2 - ds2 * dds1 / (ds1 ** 2 + ds2 ** 2) ** 1.5
+
+def calc_curvature_at_x(xy):
+    """Calculate curvature based on planar respresentation.
+
+    :param xy: (n_landmarks, 2) discrete planar curve with n landmarks representing a shape
+    :return: curvature values
+    """
+    t_phys = arc_distance(xy)
+    
+    s1 = CubicSpline(t_phys, xy[:, 0])
+    s2 = CubicSpline(t_phys, xy[:, 1])
+    t_tmp = np.linspace(0, 1, 100000)
+    
+    ds1, ds2 = s1(t_tmp, 1), s2(t_tmp, 1)
+    dds1, dds2 = s1(t_tmp, 2), s2(t_tmp, 2)
+    curvature = CubicSpline(t_tmp, ds1 * dds2 - ds2 * dds1 / (ds1 ** 2 + ds2 ** 2) ** 1.5)
+
+    return curvature(t_phys)
 
 
 # def calc_camber(xy):
