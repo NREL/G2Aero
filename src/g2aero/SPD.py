@@ -103,8 +103,8 @@ def exp(t, P, S):
     """SPD Exponential. (Fletcher, P. T., & Joshi, S. 2004)
 
     :param t: scalar > 0, how far in given direction to move (if t=0, exp(P, log_map) = P)
-    :param P: (2, 2) array = starting point \in S_++^2
-    :param S: (2, 2) array = direction in tangent space \in T_P S_++^2
+    :param P: (2, 2) array = starting point \\in S_++^2
+    :param S: (2, 2) array = direction in tangent space \\in T_P S_++^2
     :return: (2, 2) array  = end point 
     """
     Lambda, u = np.linalg.eig(P)
@@ -118,11 +118,11 @@ def exp(t, P, S):
 def log(P, D):
     """SPD Logarithmic mapping (inverse mapping of exponential map). (Fletcher, P. T., & Joshi, S. 2004)
 
-    Calculates direction S (tangent vector \Delta) from P to D in tangent subspace.
+    Calculates direction S (tangent vector \\Delta) from P to D in tangent subspace.
 
-    :param P: (2, 2) array = start point  \in S_++^2
-    :param D: (2, 2) array = end point \in S_++^2
-    :return: (2, 2) array = direction in tangent space (tangent vector \Delta) \in T_P S_++^2
+    :param P: (2, 2) array = start point  \\in S_++^2
+    :param D: (2, 2) array = end point \\in S_++^2
+    :return: (2, 2) array = direction in tangent space (tangent vector \\Delta) \\in T_P S_++^2
     """
     Lambda, u = np.linalg.eig(P)
     g = u * np.sqrt(Lambda)  # g = u @ np.diag(np.sqrt(Lambda))

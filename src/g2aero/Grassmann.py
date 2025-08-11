@@ -57,7 +57,7 @@ def exp(t, X, direction):
 
     :param t: scalar > 0, how far in given direction to move (if t=0, exp(X, log_map) = X)
     :param X: (n_landmarks, 2) array defining starting point of geodesic on Grassmann
-    :param direction: (n_landmarks, 2) array defining direction in tangent space (tangent vector \Delta)
+    :param direction: (n_landmarks, 2) array defining direction in tangent space (tangent vector \\Delta)
     :return: (n_landmarks, 2) array defining end point on Grassmann
     """
     U, S, Vh = np.linalg.svd(direction, full_matrices=False)
@@ -70,11 +70,11 @@ def log(X, Y):
     """Logarithmic mapping (inverse mapping of exponential map). Algorithm 11 (Zimmermann, 2019)
     
     Calculate logarithmic map log_X(Y) (inverse mapping of exponential map).
-    Calculates direction(tangent vector \Delta) from X to Y in tangent subspace.
+    Calculates direction(tangent vector \\Delta) from X to Y in tangent subspace.
 
     :param X: (n_landmarks, 2) array defining start point of geodesic on Grassmann
     :param Y: (n_landmarks, 2) array defining end point of geodesic on Grassmann
-    :return: (n_landmarks, 2) array defining direction in tangent space (tangent vector \Delta)
+    :return: (n_landmarks, 2) array defining direction in tangent space (tangent vector \\Delta)
     """
     X, Y = np.asarray(X), np.asarray(Y)
     # Procrutes match
