@@ -45,7 +45,7 @@ If you are reporting a bug, please include the following information:
 
 - A quick summary and/or background.
 - Your operating system name and version.
-- Details about your local setup that might be helpful in troubleshooting e.g. python version, library versions
+- Details about your local setup that might be helpful in troubleshooting, e.g., Python version, library versions
 - Detailed steps to reproduce the bug.
 - What you expected to happen.
 - What actually happens.
@@ -53,7 +53,7 @@ If you are reporting a bug, please include the following information:
 ### Proposing a new feature
 The best way to propose a new feature is by submitting an issue.
 
-To propose a feature please include:
+To propose a feature, please include:
 
 - Describe in detail how the new feature would work.
 - Explain the use case of the new feature.
@@ -65,7 +65,7 @@ The latest documentation for the `G2Aero` library is available at https://g2aero
 If any documentation is unclear or requires correction, please submit an issue.
 
 ## Submitting changes
-To submit your code when fixing bugs, documentation, or implementing new features, please follow the steps below.
+To submit your code when fixing bugs, documenting, or implementing new features, please follow the steps below.
 
 1. Fork the `G2Aero` repository on GitHub.
 2. Clone your fork locally:
@@ -78,7 +78,7 @@ To submit your code when fixing bugs, documentation, or implementing new feature
     ```
 4. Make your desired changes on your local branch.
 5. Commit your changes and push your branch to GitHub:
-``` bush
+```bash
 git add .
 git commit -m "Your detailed description of your changes."
 git push origin name-of-your-bugfix-or-feature
