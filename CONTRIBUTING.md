@@ -78,7 +78,7 @@ To submit your code when fixing bugs, documenting, or implementing new features,
     ```
 4. Make your desired changes on your local branch.
 5. Commit your changes and push your branch to GitHub:
-``` bash
+```bash
 git add .
 git commit -m "Your detailed description of your changes."
 git push origin name-of-your-bugfix-or-feature
