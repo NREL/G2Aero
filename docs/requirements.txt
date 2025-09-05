@@ -5,4 +5,3 @@ nbsphinx_link
 sphinx-autoapi
 sphinxcontrib-bibtex
 iPython
-pandoc
