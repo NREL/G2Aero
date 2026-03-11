@@ -16,16 +16,13 @@ git clone https://github.com/NREL/G2Aero.git
 Once you have the source, you can build G2Aero in development mode by executing
 
 ```bash
-python setup.py develop
-```
-or
-
-```bash
 pip install -e .
 ```
 
 in the top-level directory. The required Python packages will automatically be
 installed as well.
+
+> **Legacy install (Python 3.6–3.8):** The `setup.py` file was removed in favor of `pyproject.toml`. For older Python versions, check out tag `v1.0.0` or earlier (`git checkout v1.0.0`) and use `python setup.py develop`.
 
 ### Testing
 To test that the package is working correctly, run

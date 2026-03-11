@@ -24,7 +24,7 @@ class TransformBlade:
         eta = np.linspace(eta[0], eta[-1], 200)
         grad = np.gradient(self.b_yaml(eta)[:, 1], self.b_yaml(eta)[:, 2])
         angles = np.arctan(grad)
-        rotations = Rotation.from_euler('x', -angles, degrees=False)
+        rotations = Rotation.from_euler('x', -angles.reshape(-1, 1), degrees=False)
         return Slerp(eta, rotations)
 
     def grassmann_to_nominal(self, xy_gr, eta):

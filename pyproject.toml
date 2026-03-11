@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "g2aero"
+version = "0.1.1"
+description = "Separable shape tensors for aerodynamic applications"
+readme = "README.md"
+license = "BSD-3-Clause"
+requires-python = ">=3.9"
+authors = [
+    { name = "Olga Doronina", email = "olga.doronina@nrel.gov" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "PyYAML",
+    "numpy",
+    "scipy",
+]
+
+[project.urls]
+"Bug Tracker" = "https://github.com/NREL/G2Aero"
+
+[tool.setuptools.packages.find]
+where = ["src"]

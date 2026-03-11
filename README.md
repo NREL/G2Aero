@@ -14,13 +14,15 @@
 
 ## Installation
 
-Install `G2Aero` from sources with Python3.x:
+Install `G2Aero` from sources with Python 3.9+:
 
 ```bash
 git clone https://github.com/NREL/G2Aero.git
 cd G2Aero
-python setup.py install
+pip install .
 ```
+
+> **Legacy install (Python 3.6–3.8):** The `setup.py` file was removed in favor of `pyproject.toml`. For older Python versions, check out tag `v1.0.0` or earlier (`git checkout v1.0.0`) and use `python setup.py install`.
 
 Installing via `conda-forge`
 ```bash
