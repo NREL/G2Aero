@@ -7,7 +7,7 @@ name = "g2aero"
 version = "0.1.1"
 description = "Separable shape tensors for aerodynamic applications"
 readme = "README.md"
-license = "BSD-3-Clause"
+license = {text = "BSD-3-Clause"}
 requires-python = ">=3.9"
 authors = [
     { name = "Olga Doronina", email = "olga.doronina@nrel.gov" },
