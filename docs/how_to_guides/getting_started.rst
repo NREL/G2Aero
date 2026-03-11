@@ -8,7 +8,7 @@ The below will help you quickly install G2Aero.
 Requirements
 ------------
 
-You will need a working Python 3.x installation;
+You will need a working Python 3.9+ installation;
 You will also need to install the following packages:
 
     * numpy
@@ -39,16 +39,17 @@ by executing
 
 .. code-block:: bash
 
-    python setup.py install
-
-or
-
-.. code-block:: bash
-
-    pip install -e .
+    pip install .
 
 in the top-level directory. The required Python packages will automatically be
 installed as well.
+
+.. note::
+
+    **Legacy install (Python 3.6–3.8):** The ``setup.py`` file was removed in
+    favor of ``pyproject.toml``. For older Python versions, check out tag
+    ``v1.0.0`` or earlier (``git checkout v1.0.0``) and build with
+    ``python setup.py install``.
 
 You can test your installation by looking for the g2aero
 executable built by the installation
