@@ -3,6 +3,7 @@ from scipy.interpolate import PchipInterpolator
 import g2aero.Grassmann as gr
 from g2aero.utils import check_selfintersect
 import g2aero.SPD as spd
+import torch
 
 
 class Grassmann_PGAspace:
@@ -92,6 +93,9 @@ class Grassmann_PGAspace:
         if original_shape_gr is not None:
             R = gr.procrustes(gr_shape, original_shape_gr)
             gr_shape= gr_shape @ R
+        if torch.is_tensor(gr_shape):
+            M = torch.as_tensor(M, dtype=gr_shape.dtype, device=gr_shape.device)
+            b = torch.as_tensor(b, dtype=gr_shape.dtype, device=gr_shape.device)
         return gr_shape @ M + b
 
     def gr_shapes2PGA(self, shapes_gr):

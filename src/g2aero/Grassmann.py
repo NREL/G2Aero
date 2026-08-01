@@ -1,5 +1,6 @@
 # Intrinsic maps and routines for the Grassmannian
 import numpy as np
+import torch
 
 
 def procrustes(X, Y):
@@ -60,9 +61,19 @@ def exp(t, X, direction):
     :param direction: (n_landmarks, 2) array defining direction in tangent space (tangent vector \Delta)
     :return: (n_landmarks, 2) array defining end point on Grassmann
     """
-    U, S, Vh = np.linalg.svd(direction, full_matrices=False)
-    exp_map = np.hstack((X @ Vh.T, U)) @ np.vstack((np.diag(np.cos(t *
-                                                                   S)), np.diag(np.sin(t * S)))) @ Vh
+    if torch.is_tensor(direction) or torch.is_tensor(X):
+        reference = direction if torch.is_tensor(direction) else X
+        direction = torch.as_tensor(direction, dtype=reference.dtype, device=reference.device)
+        X = torch.as_tensor(X, dtype=reference.dtype, device=reference.device)
+        U, S, Vh = torch.linalg.svd(direction, full_matrices=False)
+        exp_map = torch.hstack((X @ Vh.T, U)) @ torch.vstack(
+            (torch.diag(torch.cos(t * S)), torch.diag(torch.sin(t * S)))
+        ) @ Vh
+    else:
+        U, S, Vh = np.linalg.svd(direction, full_matrices=False)
+        exp_map = np.hstack((X @ Vh.T, U)) @ np.vstack(
+            (np.diag(np.cos(t * S)), np.diag(np.sin(t * S)))
+        ) @ Vh
     return exp_map
 
 
@@ -238,7 +249,12 @@ def perturb_gr_shape(Vh, mu, perturbation):
     :param perturbation: (n_modes,) array of amount of perturbations in pga coordinates
     :return: (n_landmarks, 2) array of perturbed element on Grassmann
     """
-    perturbation = np.asarray(perturbation).reshape(1, -1)
+    if torch.is_tensor(perturbation):
+        perturbation = perturbation.reshape(1, -1)
+        Vh = torch.as_tensor(Vh, dtype=perturbation.dtype, device=perturbation.device)
+        mu = torch.as_tensor(mu, dtype=perturbation.dtype, device=perturbation.device)
+    else:
+        perturbation = np.asarray(perturbation).reshape(1, -1)
     n_modes = perturbation.shape[1]
     direction = perturbation@Vh[:n_modes]
     direction = direction.reshape(-1, 2)

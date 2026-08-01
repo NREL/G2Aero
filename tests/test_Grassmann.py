@@ -1,6 +1,7 @@
 import os
 from unittest import TestCase
 from g2aero.Grassmann import *
+import torch
 
 
 class Test(TestCase):
@@ -28,6 +29,14 @@ class Test(TestCase):
         Y1 = exp(1, self.X, self.vector)
         new_vector = log(self.X, Y1)
         np.testing.assert_almost_equal(self.vector, new_vector, decimal=10, err_msg='', verbose=True)
+
+    def test_exp_torch_gradient(self):
+        direction = torch.tensor(self.vector, dtype=torch.float64, requires_grad=True)
+        result = exp(1, self.X, direction)
+        assert torch.is_tensor(result)
+        result.square().sum().backward()
+        assert direction.grad is not None
+        assert torch.all(torch.isfinite(direction.grad))
 
     def test_parallel_translate(self):
         direction = log(self.X, self.Y)
@@ -62,5 +71,4 @@ class Test(TestCase):
         R1 = np.array([[np.cos(np.pi/2), np.sin(np.pi/2)], [- np.sin(np.pi/2), np.cos(np.pi/2)]])
         new_R1 = procrustes(self.Y, self.Y @ R1)
         np.testing.assert_almost_equal(R1, new_R1, decimal=10, err_msg='', verbose=True)
-
 
